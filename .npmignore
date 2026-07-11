@@ -1,0 +1,14 @@
+# Files excluded from npm package (but tracked in git)
+# Source files - users don't need these, only the compiled output
+
+# Internal source skills (compiled to generated/)
+# NOTE: .agents/generated/ IS included in the npm package (pre-compiled for users)
+
+# Development & repo files
+Frame\ 2.png
+tests/
+docs/
+*.log
+.DS_Store
+.env
+.env.*

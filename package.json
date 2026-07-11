@@ -1,22 +1,49 @@
 {
   "name": "koko-contextos-agents",
   "version": "1.0.0",
-  "description": "CLI для установки настроек .agents для ИИ-ассистентов",
+  "description": "Install a .agents folder into your project to teach AI assistants best practices: UI/UX, architecture, security, and engineering workflow skills.",
   "bin": {
     "koko-contextos-agents": "./bin/index.js"
   },
   "files": [
     "bin",
-    ".agents"
+    ".agents/AGENTS.md",
+    ".agents/skills.json",
+    ".agents/ctx.js",
+    ".agents/adapters",
+    ".agents/core",
+    ".agents/generated"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node .agents/ctx.js export all",
+    "export": "node .agents/ctx.js export gemini",
+    "test": "node --test tests/install.test.js tests/export.test.js tests/skills.test.js",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "ai",
     "agents",
-    "contextos"
+    "contextos",
+    "ai-agents",
+    "claude",
+    "gemini",
+    "cursor",
+    "llm",
+    "prompt-engineering",
+    "skills",
+    "coding-assistant"
   ],
-  "author": "",
-  "license": "ISC"
+  "author": "koko-o",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kok-o/koko-contextos-agents.git"
+  },
+  "homepage": "https://github.com/kok-o/koko-contextos-agents#readme",
+  "bugs": {
+    "url": "https://github.com/kok-o/koko-contextos-agents/issues"
+  },
+  "engines": {
+    "node": ">=16.7.0"
+  }
 }

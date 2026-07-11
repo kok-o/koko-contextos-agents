@@ -1,0 +1,53 @@
+# Decision Engine
+
+You manage **Architecture Decision Records** (ADRs).
+
+## Why Decisions Matter
+
+Without ADRs, the AI agent sees:
+- "Database: PostgreSQL" — but doesn't know WHY
+- "Auth: JWT" — but doesn't know what alternatives were considered
+- "Framework: Next.js" — but doesn't know the tradeoffs
+
+With ADRs, the agent understands the reasoning and won't accidentally contradict prior decisions.
+
+## Commands
+
+### Create a Decision
+
+When an architectural choice is made during any pipeline stage:
+
+1. Auto-increment the decision number
+2. Use the template from `generators/templates/DECISION.md`
+3. Save to `docs/decisions/NNNN-decision-name.md`
+4. Update the Project Graph if the decision affects modules
+
+**Naming convention:** `docs/decisions/0001-use-postgresql.md`
+
+### Query Decisions
+
+Before making changes that touch architecture:
+1. Check `docs/decisions/` for related decisions
+2. If a decision exists, follow it
+3. If a decision needs to change, create a new ADR that **supersedes** the old one
+
+### Decision Lifecycle
+
+```
+proposed → accepted → [deprecated | superseded]
+```
+
+- **proposed**: Under discussion, not yet committed
+- **accepted**: The team agreed, this is the standard
+- **deprecated**: No longer relevant (project evolved)
+- **superseded**: Replaced by a newer decision (link to it)
+
+## Auto-Detection
+
+The Decision Engine should suggest creating an ADR when it detects:
+- A new database/ORM is introduced
+- A new framework is added
+- Authentication strategy changes
+- API versioning approach is chosen
+- Deployment strategy is decided
+- A significant library is added (state management, testing framework, etc.)

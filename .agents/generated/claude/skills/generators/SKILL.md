@@ -1,0 +1,75 @@
+# Document Generator
+
+You generate project documentation from a user's idea. Use the templates in `templates/` as the structure for each document.
+
+## Commands
+
+### `ctx init`
+
+Full project initialization. From one user prompt, generate ALL documents:
+
+1. Ask clarifying questions (see Context OS SKILL.md)
+2. Select profile and skill pack
+3. Generate documents in this order:
+   - `docs/PRD.md` — Product Requirements (from template)
+   - `docs/ARCHITECTURE.md` — System Architecture
+   - `docs/DATABASE.md` — Database Schema
+   - `docs/API.md` — API Specification
+   - `docs/UI.md` — UI/UX Specification
+   - `docs/ROADMAP.md` — Development Roadmap
+   - `docs/TASKS.md` — Task Breakdown
+   - `docs/PROJECT_GRAPH.md` — Project Graph
+4. Create `docs/decisions/` directory for future ADRs
+5. Generate agent config via Adapters skill
+
+### `ctx update`
+
+Incremental update. When requirements change:
+
+1. Identify which documents are affected
+2. Update only affected documents
+3. Show diff of changes
+4. Ask user to confirm
+5. Update Project Graph if structure changed
+
+### `ctx plan`
+
+Generate development plan from existing PRD:
+
+1. Read `docs/PRD.md`
+2. Break into modules (Project Graph)
+3. Break modules into features
+4. Break features into tasks
+5. Estimate complexity (S/M/L/XL)
+6. Output to `docs/TASKS.md`
+
+## Template Usage
+
+Each template contains:
+- **Section headers** — required sections for the document
+- **Placeholder prompts** — `{{description}}` markers that guide content generation
+- **Examples** — sample content to illustrate the expected format
+- **Validation rules** — what must be present for the document to be valid
+
+When generating a document:
+1. Read the template
+2. Fill in each section based on the user's idea and clarifying answers
+3. Replace all `{{placeholders}}` with real content
+4. Remove the template comments (lines starting with `<!-- -->`)
+5. Validate: ensure all required sections are present
+
+## Document Dependencies
+
+```
+PRD.md
+  ├── ARCHITECTURE.md
+  │     ├── DATABASE.md
+  │     ├── API.md
+  │     └── DEPLOYMENT.md
+  ├── UI.md
+  ├── ROADMAP.md
+  │     └── TASKS.md
+  └── PROJECT_GRAPH.md
+```
+
+When updating a parent document, check if child documents need updates too.
