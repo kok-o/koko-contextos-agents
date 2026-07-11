@@ -22,6 +22,67 @@ The script will automatically create the `.agents` folder and copy all necessary
 - **Skills:** Ready-to-use prompts and guidelines for specific technologies (React, Next.js, FastAPI, Node.js).
 - **Design Patterns:** Architectural rules, DDD, microservices.
 
+## CLI — Context Compiler (`ctx.js`)
+
+The `.agents/ctx.js` file is the **Context Compiler** — a local CLI tool that reads skills from `core/skills/` and generates agent-ready `SKILL.md` files for specific AI platforms.
+
+### How it works
+
+```
+.agents/core/skills/<skill>/      ← source (skill.yaml + SKILL.md)
+           ↓
+  node .agents/ctx.js export gemini
+           ↓
+.agents/generated/gemini/skills/<skill>/SKILL.md  ← compiled output
+```
+
+The compiler merges `skill.yaml` metadata with the `SKILL.md` content and outputs a file in the format each AI agent expects.
+
+### Available Commands
+
+#### `export` — Compile skills for an AI agent
+
+```bash
+node .agents/ctx.js export gemini
+```
+
+Reads all skills from `.agents/core/skills/`, compiles them, and writes the output to `.agents/generated/gemini/skills/`.
+
+**Run this command whenever you:**
+- Add a new skill to `core/skills/`
+- Edit an existing skill
+- Want to refresh the generated output
+
+**Supported agents:**
+
+| Agent | Command | Output directory |
+|-------|---------|-----------------|
+| Gemini / Antigravity | `node .agents/ctx.js export gemini` | `.agents/generated/gemini/skills/` |
+| *(more coming)* | — | — |
+
+### When to Run
+
+| Situation | Command |
+|-----------|---------|
+| After adding a new skill | `node .agents/ctx.js export gemini` |
+| After editing an existing skill | `node .agents/ctx.js export gemini` |
+| After cloning the repo | `node .agents/ctx.js export gemini` |
+| First-time setup | `node .agents/ctx.js export gemini` |
+
+### Expected Output
+
+```
+Starting Gemini adapter export...
+Generated SKILL.md for gstack-roles
+Generated SKILL.md for ui-ux-pro
+Generated SKILL.md for system-design
+Generated SKILL.md for engineering-workflow
+Generated SKILL.md for impeccable-design
+Generated SKILL.md for ponytail-mindset
+... (25 skills total)
+Export complete. Skills are in generated/gemini/skills
+```
+
 ## Testing
 
 *(Tests will be added here soon)*
