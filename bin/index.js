@@ -111,7 +111,7 @@ try {
     console.log('Tip: Run `node .agents/ctx.js export gemini` to compile skills.');
   }
 
-  console.log('\n📚 Next steps:');
+  console.log('\n Next steps:');
   console.log('  1. Open your project in your AI assistant');
   console.log('  2. The assistant will automatically load .agents/AGENTS.md');
   console.log('  3. Skills are pre-compiled in .agents/generated/gemini/skills/');
