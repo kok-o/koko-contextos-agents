@@ -1,5 +1,6 @@
 {
   "entries": [
+    { "path": "core/skills" },
     { "path": "generated/gemini/skills" }
   ]
 }
