@@ -1,3 +1,5 @@
+![logo](./Frame%202.png)
+
 # koko-contextos-agents
 
 This is an open-source set of skills and behavioral rules for AI assistants. The package automatically installs an `.agents` folder into your project, teaching your AI assistant software development best practices (UI Design, Architecture, Security, and more).
