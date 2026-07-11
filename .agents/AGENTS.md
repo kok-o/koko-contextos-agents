@@ -1,63 +1,325 @@
 # ContextOS — AI Project Operating System
 
-You are working inside a project managed by **ContextOS**, a context compiler for AI-driven development.
+You are working inside a project managed by **ContextOS**. This file is the **single source of truth** for how you must behave, think, and which skills to activate for every task.
 
-## Core Principle
+> **Core law: Do not read everything. Read only what the current task requires.**
 
-> **Do not read everything. Read only what the current task requires.**
+---
 
-ContextOS organizes knowledge into a dependency graph. Before starting any task:
+## 🧠 Step 0 — Identify Before Acting
 
-1. **Read the Project Graph** (`docs/PROJECT_GRAPH.md`) to understand the project structure
-2. **Identify the current task's scope** — which module, feature, and layer it affects
-3. **Load only the relevant skills** — the Context Manager will tell you which ones
-4. **Check Decision Records** (`docs/decisions/`) for prior architectural choices
-5. **Follow the pipeline**: Idea → Requirements → Architecture → Planning → Development → Review → Release
-
-## Pipeline
-
-Every change follows this lifecycle:
+Before writing a single line of code or plan, stop and answer three questions:
 
 ```
-DEFINE → PLAN → BUILD → VERIFY → REVIEW → SHIP
+1. WHAT DOMAIN?   → Frontend / Backend / Architecture / Full-Stack / DevOps
+2. WHAT PHASE?    → Define / Plan / Build / Verify / Review / Ship
+3. WHAT ROLE?     → Declare your gstack role for this phase
 ```
 
-- **DEFINE**: Read PRD, understand requirements
-- **PLAN**: Check Architecture, plan minimal changes
-- **BUILD**: Write code, follow loaded skills
-- **VERIFY**: Test, check edge cases
-- **REVIEW**: Self-review against quality gates
-- **SHIP**: Commit, document decisions
+State your answers explicitly:
+```
+[DOMAIN: Frontend] [PHASE: Build] [ROLE: Senior Developer]
+Skills loaded: react, typescript, ui-ux-pro, ponytail-mindset
+```
 
-## Context Loading Rules
+---
 
-### For Frontend tasks
-Load: `UI.md`, `ARCHITECTURE.md`, `API.md` + frontend skills (react, typescript, etc.)
-Skip: `DATABASE.md`, `DEPLOYMENT.md`
+## 🗺 Skill Registry
 
-### For Backend tasks
-Load: `ARCHITECTURE.md`, `DATABASE.md`, `API.md` + backend skills
-Skip: `UI.md`, frontend skills
+All skills live in `.agents/core/skills/`. Here is what each does and when to use it:
 
-### For Architecture tasks
-Load: `ARCHITECTURE.md`, `DATABASE.md`, `API.md`, `PRD.md` + architecture skills
-Skip: `UI.md`, frontend/backend implementation skills
+### 🔑 Core Skills (Always Considered)
 
-### For Full-Stack tasks
-Load: `ARCHITECTURE.md`, `API.md` + check Project Graph for affected modules
+| Skill | File | Activate When |
+|-------|------|--------------|
+| **engineering-workflow** | `engineering-workflow/SKILL.md` | **Every task** — defines the DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP pipeline |
+| **gstack-roles** | `gstack-roles/SKILL.md` | **Every task** — declare your specialist role before each phase |
+| **ponytail-mindset** | `ponytail-mindset/SKILL.md` | **Every BUILD phase** — run the 7-rung ladder before writing any code |
 
-## Decision Records
+### 🎨 Frontend Skills
 
-When making architectural decisions (choosing a database, framework, library, pattern):
-1. Document it in `docs/decisions/NNNN-decision-name.md`
-2. Include: Decision, Why, Alternatives, Tradeoffs, Impact
-3. Future tasks must respect existing decisions
+| Skill | File | Activate When |
+|-------|------|--------------|
+| **ui-ux-pro** | `ui-ux-pro/SKILL.md` | Any UI task — planning guide, design decisions, color systems |
+| **impeccable-design** | `impeccable-design/SKILL.md` | REVIEW phase for UI — run as hard QA checklist before shipping |
+| **react** | `react/SKILL.md` | React component work |
+| **nextjs** | `nextjs/SKILL.md` | Next.js App Router, Server Actions, routing |
+| **typescript** | `typescript/SKILL.md` | Type-safe code, generics, config |
+| **ui-design** | `ui-design/SKILL.md` | Component library design, tokens |
+| **ux-design** | `ux-design/SKILL.md` | User flow design, interaction patterns |
+| **web-accessibility** | `web-accessibility/SKILL.md` | ARIA, WCAG compliance |
 
-## Skills
+### 🏗 Backend Skills
 
-Skills are located in `.agents/skills/`. Each skill is a directory with:
-- `skill.yaml` — machine-readable manifest (dependencies, tags, conflicts)
-- `*.md` — human-readable knowledge and instructions
+| Skill | File | Activate When |
+|-------|------|--------------|
+| **system-design** | `system-design/SKILL.md` | Any backend architecture — mandatory pre-design checklist |
+| **node** | `node/SKILL.md` | Node.js server code |
+| **fastapi** | `fastapi/SKILL.md` | FastAPI / Python backend |
+| **nestjs** | `nestjs/SKILL.md` | NestJS framework |
+| **microservices** | `microservices/SKILL.md` | Service decomposition |
+| **ddd** | `ddd/SKILL.md` | Domain modeling, bounded contexts |
 
-The Context Compiler reads `skill.yaml` to resolve dependencies automatically.
-**Never load all skills at once. Load only what the task requires.**
+### ⚙️ Cross-Cutting Skills
+
+| Skill | File | Activate When |
+|-------|------|--------------|
+| **security** | `security/SKILL.md` | Any feature with auth, data access, user input |
+| **performance** | `performance/SKILL.md` | Optimization tasks, Core Web Vitals |
+| **decisions** | `decisions/SKILL.md` | Making architectural choices |
+| **adapters** | `adapters/SKILL.md` | Building system integrations |
+| **generators** | `generators/SKILL.md` | Code generation patterns |
+
+---
+
+## 🤖 Automatic Skill Activation Rules
+
+The following rules are **deterministic** — no judgment needed. If the condition is true, the skill is loaded.
+
+### By Task Type
+
+```yaml
+trigger: "create component" OR "build UI" OR "design page"
+load: [ui-ux-pro, react, typescript, ponytail-mindset]
+role: Senior Developer → Senior Designer (review phase)
+
+trigger: "design system" OR "color palette" OR "typography"
+load: [ui-ux-pro, impeccable-design, ui-design]
+role: Senior Designer
+
+trigger: "API" OR "endpoint" OR "route" OR "database" OR "backend"
+load: [system-design, security, ponytail-mindset]
+role: Architect (plan) → Senior Developer (build)
+
+trigger: "architecture" OR "design the system" OR "how should we structure"
+load: [system-design, ddd, microservices, decisions]
+role: Architect
+
+trigger: "auth" OR "login" OR "permissions" OR "JWT" OR "session"
+load: [security, system-design]
+role: Chief Security Officer (audit) → Senior Developer (build)
+
+trigger: "performance" OR "slow" OR "optimize" OR "Core Web Vitals" OR "lighthouse"
+load: [performance, system-design]
+role: Performance Engineer
+
+trigger: "review" OR "PR" OR "before merge" OR "check the code"
+load: [engineering-workflow (review phase), impeccable-design (if UI)]
+role: Staff Engineer + Senior Designer (if UI)
+
+trigger: "ship" OR "deploy" OR "release" OR "production"
+load: [engineering-workflow (ship phase)]
+role: Release Engineer
+```
+
+### By Technology Detected in Codebase
+
+```yaml
+files: "*.tsx" OR "*.jsx" present → load react, typescript
+files: "next.config.*" present → load nextjs (supersedes node)
+files: "*.py" OR "requirements.txt" present → load fastapi
+files: "nest-cli.json" present → load nestjs
+files: "tailwind.config.*" present → apply Tailwind rules from ui-ux-pro
+files: "components/ui/*" present → shadcn detected, apply K9-K11 rules from impeccable-design
+```
+
+---
+
+## 📋 Pipeline — Phase-by-Phase Rules
+
+Every task MUST follow these phases in order. No skipping.
+
+### Phase 1: DEFINE `/spec`
+**Role**: `[ROLE: Product Manager]`  
+**Load**: `engineering-workflow` (spec template)
+
+Required output before proceeding:
+- Problem statement
+- Explicit in-scope / out-of-scope
+- List of files that will change
+- Acceptance criteria as testable statements
+- **STOP — do not write code until spec is reviewed**
+
+---
+
+### Phase 2: PLAN `/plan`
+**Role**: `[ROLE: Architect]`  
+**Load**: `engineering-workflow` (plan template) + domain-specific skill (system-design OR ui-ux-pro)
+
+Required output before proceeding:
+- Atomic task breakdown (each < 2 hours)
+- File list per task
+- Test requirement per task
+- Risk assessment
+- **STOP — do not write code until plan is approved**
+
+---
+
+### Phase 3: BUILD `/build`
+**Role**: `[ROLE: Senior Developer]`  
+**Load**: domain skills + `ponytail-mindset` (7-rung ladder)
+
+Rules:
+- Run ponytail ladder before writing each new piece of code
+- Commit after each atomic task
+- Limit blast radius: only touch files in the current task's plan
+- Write tests first (TDD for logic, BDD for UI)
+
+---
+
+### Phase 4: VERIFY `/test`
+**Role**: `[ROLE: QA Lead]`  
+**Load**: `engineering-workflow` (test quality gates)
+
+- Logic/services → TDD (unit + integration)
+- UI/components → BDD with React Testing Library + Playwright
+- All edge cases covered (null, empty, unauthorized, overflow)
+
+---
+
+### Phase 5: REVIEW `/review`
+**Role**: `[ROLE: Staff Engineer]` + `[ROLE: Senior Designer]` if UI  
+**Load**: `engineering-workflow` (code review checklist) + `impeccable-design` (if UI)
+
+For UI tasks — run the full impeccable-design audit:
+- Typography rules T1–T10
+- Color rules C1–C12
+- Layout rules L1–L11 (including z-index check)
+- Component rules K1–K11 (shadcn-first)
+- Animation rules A1–A8 (Framer Motion exception noted)
+
+---
+
+### Phase 6: SHIP `/ship`
+**Role**: `[ROLE: Release Engineer]`  
+**Load**: `engineering-workflow` (pre-ship checklist)
+
+- All tests pass in CI
+- Vercel Preview verified + Core Web Vitals pass
+- Docs updated
+- Breaking changes documented
+
+---
+
+## 🚦 Decision Routing Table
+
+Use this table to instantly determine which skills to load:
+
+| I am working on... | Load these skills | Declare this role |
+|--------------------|-------------------|-------------------|
+| New React component | `react` + `typescript` + `ui-ux-pro` + `ponytail-mindset` | Senior Developer |
+| Landing page / marketing | `ui-ux-pro` + `impeccable-design` + `web-accessibility` | Senior Designer |
+| API endpoint (Node/Next) | `system-design` + `security` + `node`/`nextjs` + `ponytail-mindset` | Architect → Senior Dev |
+| Database schema | `system-design` + `ddd` + `decisions` | Architect |
+| Auth system | `security` + `system-design` | Chief Security Officer |
+| Performance issue | `performance` + `system-design` | Performance Engineer |
+| Bug fix | Read relevant skill only + `ponytail-mindset` | Debugger |
+| Code review | `engineering-workflow` + `impeccable-design` (if UI) | Staff Engineer |
+| Architecture decision | `system-design` + `ddd` + `microservices` + `decisions` | Architect |
+| Full-stack feature | All domain-relevant skills | CEO → Architect → Senior Dev |
+
+---
+
+## 🔗 Skill Interaction Map
+
+How the 6 core skills work together:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    EVERY TASK                               │
+│                                                             │
+│  gstack-roles ──────────────────────────────────────────── │
+│  (Declares role per phase, sets mindset)                    │
+│                                                             │
+│  engineering-workflow ──────────────────────────────────── │
+│  (Enforces DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP)           │
+└──────────────────────────────┬──────────────────────────────┘
+                               │
+              ┌────────────────┴────────────────┐
+              │                                 │
+    ┌─────────▼──────────┐           ┌──────────▼─────────┐
+    │   FRONTEND TASKS   │           │   BACKEND TASKS    │
+    │                    │           │                    │
+    │ ui-ux-pro          │           │ system-design      │
+    │ (PLAN phase guide) │           │ (PLAN phase guide) │
+    │         ↓          │           │         ↓          │
+    │ ponytail-mindset   │           │ ponytail-mindset   │
+    │ (BUILD phase)      │           │ (BUILD phase)      │
+    │         ↓          │           │         ↓          │
+    │ impeccable-design  │           │ security (audit)   │
+    │ (REVIEW checklist) │           │ (REVIEW checklist) │
+    └────────────────────┘           └────────────────────┘
+```
+
+### Synergy Rules
+
+1. **gstack-roles + engineering-workflow**: Every phase switch = role switch. Announce it.
+2. **ui-ux-pro → impeccable-design**: `ui-ux-pro` is the planning guide. `impeccable-design` is the QA validator at review. Never confuse them.
+3. **ponytail-mindset + any BUILD**: Always run the 7-rung ladder FIRST. Prevents over-engineering before it starts.
+4. **system-design + ponytail-mindset**: Reason at scale (system-design), then implement minimally (ponytail). Both apply.
+5. **security is never optional**: Any route that touches user data requires security skill to be active.
+
+---
+
+## 🛡 Non-Negotiable Rules (Always Active)
+
+These rules apply regardless of which skills are loaded:
+
+### Code Quality
+- Business logic NEVER lives in API route handlers → always in `services/` or `use-cases/`
+- No `// TODO` in committed code — create a tracked issue instead
+- All async operations have explicit error handling
+- No secrets hardcoded — use environment variables
+
+### Security
+- Auth check BEFORE any data access — no exceptions
+- All user input validated and sanitized before processing
+- SQL queries use parameterized form — no string concatenation
+
+### Design
+- No arbitrary Tailwind values (`gap-[17px]`) — use scale utilities
+- No hardcoded z-indexes (`z-[999]`) — use Radix/shadcn Portals
+- Every list/table/feed has a designed empty state
+
+### Engineering
+- No code before spec + plan are approved (engineering-workflow Iron Rule)
+- Blast radius limited to files in current task's plan
+- One atomic commit per task
+
+---
+
+## 📝 Decision Records
+
+When making significant architectural decisions (choosing a DB, framework, auth strategy, caching layer):
+
+1. Create `docs/decisions/NNNN-decision-name.md`
+2. Include: **Decision | Why | Alternatives considered | Trade-offs | Impact on other skills**
+3. All future tasks must respect existing decision records
+
+Load the `decisions` skill when writing decision records.
+
+---
+
+## 📚 Quick Reference: What to Load for Common Tasks
+
+```bash
+# "Add a login page"
+Skills: nextjs + react + typescript + ui-ux-pro + security + engineering-workflow
+Roles: DEFINE[PM] → PLAN[Architect] → BUILD[Sr Dev] → REVIEW[Staff Eng + Sr Designer]
+
+# "Design the notification system"
+Skills: system-design + node + security + decisions + engineering-workflow
+Roles: DEFINE[PM] → PLAN[Architect+CEO] → BUILD[Sr Dev] → REVIEW[Staff Eng]
+
+# "Fix the button hover animation"
+Skills: impeccable-design + ui-ux-pro (A1-A8 rules only)
+Roles: REVIEW[Senior Designer] → BUILD[Senior Developer]
+
+# "Optimize page load time"
+Skills: performance + nextjs + web-accessibility + engineering-workflow
+Roles: PLAN[Performance Engineer] → BUILD[Sr Dev] → REVIEW[Staff Eng]
+
+# "Refactor user service to use DDD"
+Skills: ddd + system-design + decisions + engineering-workflow
+Roles: DEFINE[Architect] → PLAN[Architect] → BUILD[Sr Dev] → REVIEW[Staff Eng]
+```
