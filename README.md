@@ -41,30 +41,30 @@ npx koko-contextos-agents --skip-compile  # Skip auto-compilation step
 
 | Category | Skill | What It Does |
 |----------|-------|-------------|
-| 🔑 Core | `gstack-roles` | 23 specialist roles (PM, Architect, QA Lead, etc.) — AI declares its role before each task |
-| 🔑 Core | `engineering-workflow` | Enforces DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP pipeline. No code before spec is approved. |
-| 🔑 Core | `ponytail-mindset` | 7-rung decision ladder before writing any code. Reduces code output ~54%. |
-| 🎨 Frontend | `ui-ux-pro` | Planning guide for UI: color systems, typography, Framer Motion, shadcn/ui patterns |
-| 🎨 Frontend | `impeccable-design` | 50 deterministic QA rules for design review (typography, color, layout, animation) |
-| 🎨 Frontend | `react` | React component patterns |
-| 🎨 Frontend | `nextjs` | Next.js App Router, Server Actions, routing |
-| 🎨 Frontend | `typescript` | Type-safe code, generics, config |
-| 🎨 Frontend | `ui-design` | Component library design, design tokens |
-| 🎨 Frontend | `ux-design` | User flow design, interaction patterns |
-| 🎨 Frontend | `web-accessibility` | ARIA, WCAG compliance |
-| 🏗 Backend | `system-design` | Pre-design checklist, Serverless/Edge patterns, BFF/Server Actions, DDD isolation |
-| 🏗 Backend | `node` | Node.js server patterns |
-| 🏗 Backend | `fastapi` | FastAPI / Python backend |
-| 🏗 Backend | `nestjs` | NestJS framework |
-| 🏗 Backend | `microservices` | Service decomposition, bounded contexts |
-| 🏗 Backend | `ddd` | Domain-Driven Design, domain modeling |
-| ⚙️ Cross | `security` | Auth patterns, input validation, SQL injection prevention |
-| ⚙️ Cross | `performance` | Core Web Vitals, optimization strategies |
-| ⚙️ Cross | `decisions` | Architectural decision records format |
-| ⚙️ Cross | `adapters` | System integration patterns |
-| ⚙️ Cross | `generators` | Code generation patterns |
-| ⚙️ Cross | `context-manager` | Context loading optimization |
-| ⚙️ Cross | `context-os` | ContextOS meta-skill |
+| Core | `gstack-roles` | 23 specialist roles (PM, Architect, QA Lead, etc.) — AI declares its role before each task |
+| Core | `engineering-workflow` | Enforces DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP pipeline. No code before spec is approved. |
+| Core | `ponytail-mindset` | 7-rung decision ladder before writing any code. Reduces code output ~54%. |
+| Frontend | `ui-ux-pro` | Planning guide for UI: color systems, typography, Framer Motion, shadcn/ui patterns |
+| Frontend | `impeccable-design` | 50 deterministic QA rules for design review (typography, color, layout, animation) |
+| Frontend | `react` | React component patterns |
+| Frontend | `nextjs` | Next.js App Router, Server Actions, routing |
+| Frontend | `typescript` | Type-safe code, generics, config |
+| Frontend | `ui-design` | Component library design, design tokens |
+| Frontend | `ux-design` | User flow design, interaction patterns |
+| Frontend | `web-accessibility` | ARIA, WCAG compliance |
+| Backend | `system-design` | Pre-design checklist, Serverless/Edge patterns, BFF/Server Actions, DDD isolation |
+| Backend | `node` | Node.js server patterns |
+| Backend | `fastapi` | FastAPI / Python backend |
+| Backend | `nestjs` | NestJS framework |
+| Backend | `microservices` | Service decomposition, bounded contexts |
+| Backend | `ddd` | Domain-Driven Design, domain modeling |
+| Cross | `security` | Auth patterns, input validation, SQL injection prevention |
+| Cross | `performance` | Core Web Vitals, optimization strategies |
+| Cross | `decisions` | Architectural decision records format |
+| Cross | `adapters` | System integration patterns |
+| Cross | `generators` | Code generation patterns |
+| Cross | `context-manager` | Context loading optimization |
+| Cross | `context-os` | ContextOS meta-skill |
 
 ## CLI — Context Compiler (`ctx.js`)
 
