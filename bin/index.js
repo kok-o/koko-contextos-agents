@@ -49,9 +49,9 @@ const targetPath = path.join(process.cwd(), '.agents');
 
 // ── Dry run ───────────────────────────────────────────────────────────────────
 if (flags.dryRun) {
-  console.log('🔍 Dry run — no files will be written.\n');
+  console.log('[DRY-RUN] No files will be written.\n');
   if (!fs.existsSync(sourcePath)) {
-    console.error('❌ Source .agents/ folder not found in package.');
+    console.error('[ERROR] Source .agents/ folder not found in package.');
     process.exit(1);
   }
   const countFiles = (dir) => {
@@ -63,39 +63,39 @@ if (flags.dryRun) {
   };
   const total = countFiles(sourcePath);
   if (fs.existsSync(targetPath)) {
-    console.log(`⚠️  .agents/ already exists — would be updated (--force mode).`);
+    console.log(`[WARN] .agents/ already exists — would be updated (--force mode).`);
   } else {
-    console.log(`✅ Would create .agents/ in: ${process.cwd()}`);
+    console.log(`[OK] Would create .agents/ in: ${process.cwd()}`);
   }
-  console.log(`📦 ${total} files would be copied from the package.`);
+  console.log(`[INFO] ${total} files would be copied from the package.`);
   console.log('\nRun without --dry-run to apply changes.');
   process.exit(0);
 }
 
 // ── Main install ──────────────────────────────────────────────────────────────
-console.log('⏳ Installing AI assistant skills (.agents/)...');
+console.log('Installing AI assistant skills (.agents/)...');
 
 try {
   if (!fs.existsSync(sourcePath)) {
-    console.error('❌ Error: Source .agents/ folder not found in package.');
+    console.error('[ERROR] Source .agents/ folder not found in package.');
     process.exit(1);
   }
 
   if (fs.existsSync(targetPath) && !flags.force) {
-    console.log('⚠️  Warning: .agents/ already exists. Files will be updated.');
-    console.log('   Use --force to suppress this warning.');
+    console.log('[WARN] .agents/ already exists. Files will be updated.');
+    console.log('       Use --force to suppress this warning.');
   }
 
   fs.cpSync(sourcePath, targetPath, { recursive: true, force: true });
 
-  console.log('✅ .agents/ successfully installed in your project!');
-  console.log('🤖 Your AI assistant now has skills and rules configured.\n');
+  console.log('[OK] .agents/ successfully installed in your project!');
+  console.log('[OK] Your AI assistant now has skills and rules configured.\n');
 
   // ── Auto-compile skills ───────────────────────────────────────────────────
   if (!flags.skipCompile) {
     const ctxPath = path.join(targetPath, 'ctx.js');
     if (fs.existsSync(ctxPath)) {
-      console.log('⚙️  Compiling skills for Gemini...');
+      console.log('Compiling skills for Gemini...');
       try {
         const { execSync } = require('child_process');
         execSync(`node "${ctxPath}" export gemini`, {
@@ -103,12 +103,12 @@ try {
           stdio: 'inherit',
         });
       } catch (e) {
-        console.warn('⚠️  Skill compilation failed — run manually:');
-        console.warn('   node .agents/ctx.js export gemini');
+        console.warn('[WARN] Skill compilation failed — run manually:');
+        console.warn('       node .agents/ctx.js export gemini');
       }
     }
   } else {
-    console.log('💡 Tip: Run `node .agents/ctx.js export gemini` to compile skills.');
+    console.log('Tip: Run `node .agents/ctx.js export gemini` to compile skills.');
   }
 
   console.log('\n📚 Next steps:');
@@ -118,6 +118,6 @@ try {
   console.log('  4. See README for ctx.js CLI commands\n');
 
 } catch (error) {
-  console.error('❌ Installation failed:', error.message);
+  console.error('[ERROR] Installation failed:', error.message);
   process.exit(1);
 }
