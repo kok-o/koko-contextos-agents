@@ -10,37 +10,46 @@ description: >
 ---
 name: impeccable-design
 description: >
-  Visual design quality enforcement. 46 deterministic anti-pattern rules preventing
+  Visual design quality enforcement. 50 deterministic anti-pattern rules preventing
   AI design slop. Bans generic fonts, pure colors, nested cards, dated animations.
-  Makes interfaces feel premium, not AI-generated.
+  Adapted for Tailwind CSS v4, shadcn/ui, and Framer Motion stacks.
 ---
 
 # Impeccable Design — Visual Quality Enforcement
 
-Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — 46 deterministic detector rules for AI-generated frontend design.
+Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — deterministic detector rules for AI-generated frontend design.
 
 ## Core Principle
 
 > Every model is trained on the same SaaS templates. Skip this guidance and you get the same handful of tells on every project. Impeccable eliminates them.
 
+## Role in the Pipeline
+
+> **This skill acts as a QA-designer at the `/review` phase.** `ui-ux-pro` is the planning guideline; `impeccable-design` is the hard checklist that runs before merge.
+
 ---
 
-## The 46 Anti-Pattern Rules
+## Anti-Pattern Rules
 
 ### Typography (Rules T1–T10)
 
 | Rule | Anti-Pattern | Correct Approach |
 |------|-------------|-----------------|
-| T1 | Using Inter for all text | Use Inter for UI, pair with a distinct display font for headings |
+| T1 | Using Inter for all text | Use Inter for UI body, pair with a distinct display font for headings OR with `JetBrains Mono` for technical/number accents (premium SaaS pattern) |
 | T2 | Using Arial or Helvetica | Use a curated Google Font pairing |
 | T3 | All text same weight | Use weight contrast: 700 headings, 400 body, 500 labels |
 | T4 | Line height = 1 (tight) | Body: 1.6–1.8, Headings: 1.1–1.3 |
-| T5 | No letter-spacing on caps | Uppercase labels: `letter-spacing: 0.08em` |
-| T6 | Text too wide | Max line length: 60–75 characters (use `max-width: 65ch`) |
-| T7 | Monospace only for code | Use `font-variant-numeric: tabular-nums` for number tables |
-| T8 | Random font sizing | Use a consistent modular scale (1.25× or 1.333×) |
-| T9 | Body text too small | Minimum 15px body, 13px captions, never smaller |
+| T5 | No letter-spacing on caps | Uppercase labels: `letter-spacing: 0.08em` (Tailwind: `tracking-widest`) |
+| T6 | Text too wide | Max line length: 60–75 characters — use `max-w-prose` or `max-w-[65ch]` |
+| T7 | Monospace only for code | Use `tabular-nums` Tailwind class for number tables and data grids |
+| T8 | Random font sizing | Use a consistent modular scale (1.25× or 1.333×) — use Tailwind's `text-*` scale |
+| T9 | Body text too small | Minimum `text-sm` (14px) for body, never smaller than 12px |
 | T10 | Bold everywhere | Bold is for emphasis. Diluted if overused. |
+
+**Tailwind typography utilities:**
+- `text-balance` — for headlines (prevents orphan words)
+- `text-pretty` — for body paragraphs (smart line-breaks)
+- `tabular-nums` — for numerical data tables
 
 ### Color (Rules C1–C12)
 
@@ -53,50 +62,54 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — 46 dete
 | C5 | Neon primary colors | Neon = accent only, never primary surface or text |
 | C6 | Too many colors | 3 colors max: primary, neutral, semantic (success/error) |
 | C7 | All links same blue `#0000EE` | Style links with brand color, preserve underline |
-| C8 | Disabled state = gray only | Disabled: opacity 0.4 + `cursor: not-allowed` |
+| C8 | Disabled state = gray only | Disabled: `opacity-40` + `cursor-not-allowed` |
 | C9 | Success always green, Error always red | Check brand conflicts. Use accessible variants |
-| C10 | Dark mode = inverted light mode | Dark mode needs separate palette, not CSS invert |
-| C11 | No hover state change | Hover: shift lightness 8–12%, add subtle transition |
+| C10 | Dark mode = inverted light mode | Dark mode needs separate palette — use `@layer base { .dark { ... } }` |
+| C11 | No hover state change | Hover: shift lightness 8–12%, add `transition-colors duration-150` |
 | C12 | Brand color on dark surface loses identity | Adjust saturation/lightness for dark bg context |
 
-### Layout & Spacing (Rules L1–L10)
+### Layout & Spacing (Rules L1–L11)
 
 | Rule | Anti-Pattern | Correct Approach |
 |------|-------------|-----------------|
 | L1 | Cards inside cards | One level of card depth maximum |
 | L2 | Icon tile above every heading | Use icons inline, in context, not decoratively above text |
-| L3 | Centered long paragraphs | Center-align max 2 lines. Left-align body copy |
-| L4 | Inconsistent spacing | Use spacing scale: 4, 8, 12, 16, 24, 32, 48, 64, 96px |
-| L5 | Zero whitespace between sections | Sections need breathing room: 64–96px between |
-| L6 | Content touching edges | Always minimum 16px horizontal padding on mobile |
+| L3 | Centered long paragraphs | `text-center` max 2 lines only. Use `text-pretty` + left-align for body |
+| L4 | Inconsistent spacing | Use Tailwind spacing utilities only. **Never arbitrary values** like `gap-[17px]` |
+| L5 | Zero whitespace between sections | Sections need `py-16` to `py-24` breathing room |
+| L6 | Content touching edges | Always `px-4` minimum on mobile |
 | L7 | Same visual weight everywhere | Use hierarchy: primary > secondary > tertiary zones |
 | L8 | Grid breaks on tablet | Test at 768px. Use 4-col on tablet, 12-col on desktop |
-| L9 | Full-width everything | Max content width: 1200–1440px, centered |
-| L10 | Missing grid alignment | Use CSS Grid, not floats or manual positioning |
+| L9 | Full-width everything | Max content width: `max-w-7xl` centered |
+| L10 | Missing grid alignment | Use CSS Grid or Tailwind `grid` — not absolute positioning |
+| L11 | Arbitrary high z-indexes | **NEVER** use `z-[999]` or `z-50` manually. Rely on DOM order + Radix/shadcn Portals which already handle modal elevation correctly |
 
-### Components (Rules K1–K8)
+### Components (Rules K1–K11)
 
 | Rule | Anti-Pattern | Correct Approach |
 |------|-------------|-----------------|
-| K1 | Two filled buttons side-by-side | Primary filled + Ghost secondary |
-| K2 | Button without loading state | Always add spinner/disabled state during async actions |
-| K3 | Modal without backdrop blur | Add `backdrop-filter: blur(4px)` to overlays |
-| K4 | Empty states left blank | Design empty states with illustration + CTA |
-| K5 | No skeleton screens | Use skeleton loaders (not spinners) for content areas |
-| K6 | Tooltip on click (not hover) | Tooltips on hover, modals on click |
-| K7 | Dropdown without keyboard nav | Arrow keys must work. Escape must close. |
-| K8 | Table without row hover | Add hover: `background: rgba(255,255,255,0.03)` |
+| K1 | Two filled buttons side-by-side | `<Button variant="default">` + `<Button variant="outline">` or `variant="ghost"` |
+| K2 | Button without loading state | Always add spinner + `disabled` during async actions |
+| K3 | Modal without backdrop blur | shadcn `<Dialog>` handles this. Don't override with plain divs |
+| K4 | Empty states left blank | **Always** design empty states: illustration + helpful message + primary CTA |
+| K5 | No skeleton screens | Use `<Skeleton>` from shadcn for content areas, not just spinners |
+| K6 | Tooltip on click (not hover) | Tooltips on hover, modals on click — use shadcn `<Tooltip>` + `<Dialog>` |
+| K7 | Dropdown without keyboard nav | Use shadcn `<DropdownMenu>` — keyboard nav is built-in |
+| K8 | Table without row hover | shadcn `<TableRow>` handles hover state automatically. Do **not** override it |
+| K9 | Building complex UI from scratch | **Check shadcn/ui first**. If the component exists, generate the CLI command: `npx shadcn@latest add dialog`. Never manually rewrite what shadcn already provides |
+| K10 | Native `<select>` or `<input type="date">` in premium UI | Native form controls cannot be styled consistently across Chrome/Safari/Firefox. Use `shadcn <Select>` and `shadcn <DatePicker>` for cross-browser consistency |
+| K11 | Form without error state styling | Every input must have error state: red border + error message below |
 
 ### Animation (Rules A1–A8)
 
 | Rule | Anti-Pattern | Correct Approach |
 |------|-------------|-----------------|
-| A1 | Bounce/elastic easing | Use cubic-bezier easing, never spring physics in CSS |
+| A1 | CSS bounce/elastic/spring easing | CSS spring animations are forbidden. **Exception**: If using Framer Motion, highly damped springs are encouraged: `{ type: "spring", stiffness: 400, damping: 30 }` for modals and popovers — this creates a premium, physical feel like Vercel/Linear |
 | A2 | Animations that take > 400ms | Micro: 100–150ms, Components: 200–300ms, Pages: 300–400ms |
 | A3 | Animations everywhere | Animate max 2–3 elements simultaneously |
 | A4 | Same animation for enter and exit | Enter: ease-out (decelerate), Exit: ease-in (accelerate) |
 | A5 | Animating expensive properties | Only animate `transform` and `opacity` — never `height`, `width`, `top` |
-| A6 | No animation on mobile | Respect `prefers-reduced-motion: reduce` |
+| A6 | No animation on mobile | Respect `prefers-reduced-motion: reduce` — wrap in `@media` or use `useReducedMotion()` |
 | A7 | Scroll-triggered animations that block | Don't block content visibility for scroll reveals |
 | A8 | Hover animations on touch devices | Wrap hover effects in `@media (hover: hover)` |
 
@@ -105,13 +118,13 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — 46 dete
 | Rule | Anti-Pattern | Correct Approach |
 |------|-------------|-----------------|
 | I1 | Decorative icons on every list item | Icons add meaning, not decoration. Use selectively. |
-| I2 | Mix of icon styles | Pick one icon set. Stick with it. |
+| I2 | Mix of icon styles | Pick one icon set (e.g., Lucide for shadcn). Stick with it. |
 | I3 | Low-contrast icons | Icons need ≥ 3:1 contrast ratio |
-| I4 | Images without aspect-ratio | Always set `aspect-ratio` to prevent layout shifts |
-| I5 | No image loading state | Use low-res blur placeholder or skeleton |
+| I4 | Images without aspect-ratio | Always set `aspect-video` or `aspect-square` to prevent layout shifts |
+| I5 | No image loading state | Use `<Skeleton>` placeholder or blur hash |
 | I6 | SVG icons inline without aria | Add `aria-hidden="true"` or `aria-label` |
 | I7 | Stock photo generic humans | Use illustrations, abstract art, or genuine brand photography |
-| I8 | Unoptimized images | WebP/AVIF, properly sized, lazy-loaded below fold |
+| I8 | Unoptimized images | WebP/AVIF, properly sized, `loading="lazy"` below fold |
 
 ---
 
@@ -126,28 +139,30 @@ Start every new design with:
 **Target audience**: [who are they? what do they value?]
 **Brand tone**: [professional/playful/bold/minimal/technical]
 **Anti-references**: [designs this should NOT look like]
-**Primary font**: [chosen font + why]
-**Color palette**: [3 semantic colors + hex/hsl]
-**Component library**: [none/shadcn/radix/custom]
+**Primary font**: [chosen font + why + Framer Motion / shadcn pairing]
+**Color palette**: [3 semantic colors + HSL values for light AND dark]
+**Component library**: [shadcn/ui | radix | custom]
+**Animation library**: [CSS only | Framer Motion | GSAP]
 ```
 
 ---
 
-## Design Review Commands
+## Design Review Audits
 
-Before shipping any frontend, run through these audits:
+### Quick Audit (before PR)
+- Typography: Is there clear visual hierarchy? Are fonts intentional? Is Inter paired properly?
+- Color: Any pure black/white? Contrast failures? Too many colors? Dark mode?
+- Spacing: Consistent Tailwind scale? No arbitrary values? Enough whitespace?
+- Animation: Any CSS bounce/elastic? Too slow (>400ms)? Too many simultaneous?
+- Components: Any native `<select>` or `<input type="date">` that should be shadcn?
+- Z-index: Any hardcoded `z-[999]` or `z-50`?
 
-### Quick Audit
-- Typography: Is there clear visual hierarchy? Are fonts intentional?
-- Color: Any pure black/white? Contrast failures? Too many colors?
-- Spacing: Consistent scale? Enough whitespace?
-- Animation: Any bounce/elastic? Too slow? Too many?
-
-### Full Audit
-- Accessibility: Run axe DevTools or Lighthouse
+### Full Audit (before release)
+- Accessibility: Run axe DevTools or Lighthouse — target 90+ score
 - Responsiveness: Test at 375px, 768px, 1280px, 1440px
-- Dark mode: Does the palette hold up?
-- Edge cases: Empty states, loading, errors, long text, RTL
+- Dark mode: Does the full palette hold up? No inverted-only shortcuts?
+- Empty states: Does every list/table have a designed empty state?
+- Edge cases: Loading states, error states, long text overflow, RTL
 
 ---
 
@@ -155,10 +170,10 @@ Before shipping any frontend, run through these audits:
 
 These details separate premium from mediocre:
 
-1. **Consistent border radius** — pick one and use it everywhere (4px/8px/12px)
+1. **Consistent border radius** — pick one and use it everywhere (`rounded-md` = 6px, `rounded-lg` = 8px)
 2. **Intentional drop shadows** — darker near surface, lighter for floating elements
 3. **Micro-copy quality** — button labels are verbs: "Save changes" not "Submit"
-4. **Focus ring styling** — custom focus rings matching brand color
-5. **Smooth color transitions** — hover states use CSS transitions, not instant jumps
-6. **Optical alignment** — icon + text optically centered, not mathematically
+4. **Focus ring styling** — `focus-visible:ring-2 focus-visible:ring-primary` matching brand
+5. **Smooth color transitions** — `transition-colors duration-150` on all interactive elements
+6. **Optical alignment** — icon + text optically centered, not mathematically (`items-center gap-1.5`)
 

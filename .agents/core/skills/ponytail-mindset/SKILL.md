@@ -31,14 +31,16 @@ Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 1. Does this need to exist?
    → No: YAGNI — skip it entirely. Don't build for "future use."
 
-2. Already in this codebase?
+2. Already in this codebase or component library?
    → Yes: Reuse it. Don't rewrite. Call the existing function/component/module.
+   → **For UI**: Check shadcn/ui FIRST. Before building a complex UI element from scratch, check if it exists in the component library. If yes, generate the install command: `npx shadcn@latest add dialog` — never manually rewrite what shadcn already provides.
 
 3. Standard library does it?
    → Yes: Use it. Don't write `formatDate()` — use Intl.DateTimeFormat or dayjs.
 
 4. Native platform feature?
    → Yes: Use it. Don't install flatpickr when <input type="date"> exists.
+   → **Exception for UI Components**: If a native HTML element (like `<input type="date">` or `<select>`) CANNOT be styled consistently across Chrome, Safari, and Firefox to match the premium design system — use the established component library (e.g., shadcn/ui `<DatePicker>`, `<Select>`) instead. Cross-browser inconsistency is a legitimate reason to NOT use native.
              Don't install lodash.debounce when setTimeout exists.
 
 5. Already-installed dependency?
@@ -178,13 +180,25 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 // Creates: ApiConfig.js (configuration layer)
 ```
 
-✅ **Ponytail** (rung 3 — stdlib):
+✅ **Ponytail** (rung 3 — stdlib for client APIs):
 ```javascript
 // fetch is built-in. Use it directly.
 const user = await fetch(`/api/users/${id}`).then(r => r.json());
 ```
 
----
+✅ **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
+```typescript
+// Instead of: /api/users/[id]/route.ts + fetch wrapper
+// Use a Server Action directly — no API endpoint needed:
+"use server"
+export async function updateUser(id: string, data: UpdateUserInput) {
+  const session = await getSession() // auth check — never skip
+  if (session.userId !== id) throw new Error("Forbidden")
+  return db.users.update(id, data) // one line
+}
+// Caller: just import and call updateUser() directly from the component
+```
+
 
 ## Decision Log Format
 

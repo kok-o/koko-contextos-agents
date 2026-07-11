@@ -4,6 +4,7 @@ description: >
   Scalable architecture skill based on the System Design Primer.
   Before designing any backend, reason about load balancers, caching,
   DB partitioning, CAP theorem, and microservices trade-offs.
+  Adapted for Serverless/Edge, Next.js App Router, BFF, and DDD patterns.
 ---
 
 # System Design — Scalable Architecture Thinking
@@ -26,6 +27,7 @@ Before architecting any backend system, answer these questions:
 4. **Read/Write ratio**: Is it read-heavy (cache it!) or write-heavy (shard it!)?
 5. **Latency requirements**: Real-time (<100ms)? Near-real-time (<1s)? Batch?
 6. **Global distribution**: Single region or multi-region?
+7. **Deployment model**: Traditional servers, Serverless, or Edge functions?
 
 ---
 
@@ -58,6 +60,29 @@ Cache decision ladder (check in order):
 - **Write-behind**: write to cache → async flush to DB (performance > consistency)
 
 **Invalidation**: Use TTL + event-driven invalidation. Never stale-forever.
+
+**Modern framework-native caching (Next.js App Router)**:  
+Before spinning up a dedicated Redis instance for caching API responses, check if Next.js built-in mechanisms are sufficient:
+- `revalidatePath('/dashboard')` — invalidate all cache for a route
+- `revalidateTag('user-profile')` — fine-grained tagged cache invalidation
+- `unstable_cache()` — server-side data caching with TTL
+
+```typescript
+// ✅ Use Next.js native caching first
+import { revalidateTag } from 'next/cache'
+
+const getUser = unstable_cache(
+  async (id: string) => db.users.findById(id),
+  ['user'],
+  { tags: ['user-profile'], revalidate: 3600 }
+)
+
+// Invalidate on mutation:
+await db.users.update(id, data)
+revalidateTag('user-profile')
+
+// ❌ Don't add Redis for simple SSR caching when Next.js handles it
+```
 
 ### Database Architecture
 
@@ -111,6 +136,116 @@ When to split into microservices:
 Service communication:
 - **Sync (REST/gRPC)**: when caller needs immediate response
 - **Async (events/queue)**: when caller can tolerate delay, or decoupling is needed
+- **BFF / Server Actions**: for web apps, prefer typed client-server contracts (see below)
+
+---
+
+## Modern Stack Patterns (Serverless, Edge, Next.js)
+
+### Serverless & Edge Architecture
+
+When deploying to serverless (Vercel Functions, AWS Lambda) or edge (Vercel Edge, Cloudflare Workers), the classical "App Server + Load Balancer" model changes:
+
+**Cold Start Problem**:
+- Serverless functions spin up from zero on first request — this can add 100–1000ms
+- **Never** do heavy initialization at module level (DB connections, config loading, crypto keys)
+- **Always** initialize lazily inside the handler, or use a connection pooling service
+
+```typescript
+// ❌ Wrong: Module-level initialization (runs on cold start, hangs the function)
+const db = new DatabaseClient({ ... })  // top of file
+
+// ✅ Correct: Lazy initialization with caching
+let db: DatabaseClient | null = null
+function getDb() {
+  if (!db) db = new DatabaseClient({ ... })
+  return db
+}
+```
+
+**DB Connection Pooling in Serverless**:
+- Traditional in-process pools (pg-pool, knex) do NOT work in serverless — each invocation is ephemeral
+- Use **Prisma Accelerate**, **PlanetScale**, **Neon** pooling, or **Supabase** — they handle pooling at the infrastructure level
+- Rule: If deploying to Vercel/serverless, NEVER assume `max_connections` is managed by your app process
+
+**Edge Functions limitations**:
+- No Node.js APIs (no `fs`, no `crypto.randomBytes`, limited DNS)
+- Latency must be < 50ms — no heavy DB queries
+- Use edge for: auth token verification, A/B testing, geo-routing, lightweight transformations
+
+### BFF Pattern & Server Actions (Type-Safe Client-Server)
+
+When building web apps, prefer typed client-server communication over generic REST endpoints:
+
+**Option 1: Server Actions (Next.js App Router)**  
+For mutations that touch the database directly, skip the API route entirely:
+
+```typescript
+// ✅ Server Action: No API route needed, fully type-safe
+"use server"
+export async function updateUser(id: string, data: UpdateUserInput) {
+  // Input validation (always!)
+  const validated = UpdateUserSchema.parse(data)
+  
+  // Auth check (always before data access!)
+  const session = await getSession()
+  if (session.userId !== id && !session.isAdmin) {
+    throw new Error("Forbidden")
+  }
+  
+  return db.users.update(id, validated)
+}
+
+// ❌ Over-engineering: Don't create /api/users/[id] + fetch wrapper for simple mutations
+```
+
+**Option 2: tRPC (Full-stack type safety)**  
+For complex APIs with many routes, use tRPC to get end-to-end type safety from DB to UI without code generation.
+
+**Option 3: REST (When appropriate)**  
+When building a public API consumed by external clients or mobile apps — use REST with OpenAPI spec.
+
+**Decision rule**:
+- Internal web-to-DB mutation → **Server Action**
+- Internal complex API → **tRPC**
+- Public/mobile API → **REST + OpenAPI**
+
+### Domain-Driven Design (DDD) — Business Logic Isolation
+
+**Rule**: NEVER write business logic inside API route handlers, Server Actions, or controllers. Always extract to dedicated services/use-cases.
+
+```
+❌ Wrong structure:
+app/api/orders/route.ts  ← contains: validation + auth + business logic + DB query
+
+✅ Correct structure:
+app/api/orders/route.ts  ← only: parse request, call service, return response
+src/services/order.service.ts  ← all business logic, testable without HTTP context
+src/repositories/order.repo.ts  ← all DB queries
+```
+
+Example:
+
+```typescript
+// ❌ Business logic in route (untestable, bloated)
+export async function POST(req: Request) {
+  const data = await req.json()
+  if (data.quantity <= 0) return new Response("Invalid", { status: 400 })
+  const inventory = await db.inventory.findById(data.productId)
+  if (inventory.stock < data.quantity) return new Response("Out of stock", { status: 400 })
+  const total = inventory.price * data.quantity
+  // ... 40 more lines
+}
+
+// ✅ Thin route, fat service
+export async function POST(req: Request) {
+  const data = await req.json()
+  const result = await orderService.createOrder(data)
+  return Response.json(result)
+}
+
+// orderService.createOrder() — pure function, fully unit-testable without HTTP
+```
 
 ---
 
@@ -140,10 +275,8 @@ CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
 ```
 
 ### Database Connection Pooling
-Never create new DB connections per request. Use a pool:
-- PostgreSQL: PgBouncer
-- MySQL: ProxySQL
-- Node.js: pg-pool, knex
+- **Traditional servers**: Use pg-pool, knex, Prisma connection pool
+- **Serverless**: Use Prisma Accelerate, PlanetScale, Neon, or Supabase pooling — NOT in-process pools
 
 ---
 
@@ -152,7 +285,7 @@ Never create new DB connections per request. Use a pool:
 **You can only guarantee 2 of 3**: Consistency, Availability, Partition Tolerance
 
 | System | Chooses | Example |
-|--------|---------|---------|
+|--------|---------|---------| 
 | Traditional SQL | CP | PostgreSQL |
 | Distributed NoSQL | AP | DynamoDB, Cassandra |
 | Cache | AP (tunable) | Redis with replication |
@@ -169,14 +302,20 @@ When proposing any backend architecture, include:
 ## System Design Decision
 
 **Scale Target**: [X RPS, Y GB data, Z users]
-**CAP Choice**: [CP/AP/CA] because [reason]
+**Deployment Model**: [Traditional servers | Serverless | Edge]
+**CAP Choice**: [CP/AP] because [reason]
 **Read/Write Ratio**: [X:Y]
 
 ### Components
-- **API Layer**: [Technology] behind [Load Balancer]
-- **Cache**: [Redis/Memcached] for [what] with [TTL strategy]
-- **Database**: [SQL/NoSQL] - [single/sharded/replicated] because [reason]
+- **API Layer**: [REST/tRPC/Server Actions] — [why this choice]
+- **Cache**: [Next.js native | Redis] for [what] with [TTL/tags strategy]
+- **Database**: [SQL/NoSQL] - [pooling solution for serverless if applicable]
 - **Async**: [Queue tech] for [what operations]
+
+### Business Logic Isolation
+- Services: [list key service files]
+- Repositories: [list key repo files]
+- Routes/Actions: [thin handlers only]
 
 ### Trade-offs Accepted
 - [Trade-off 1]: [Why acceptable]
