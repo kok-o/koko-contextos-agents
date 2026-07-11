@@ -1,0 +1,45 @@
+# Profile: Hackathon
+# 24-48 hours to ship something impressive
+
+id: hackathon
+name: Hackathon
+description: "Ship something impressive in 24-48 hours. No ceremony, just build."
+
+generate_docs:
+  - TASKS          # What to build, in order
+  - PROJECT_GRAPH  # Quick module map
+
+skip_docs:
+  - PRD
+  - ARCHITECTURE
+  - DATABASE
+  - API
+  - UI
+  - ROADMAP
+  - DEPLOYMENT
+
+prefer_skills:
+  - sqlite
+  - react
+  - typescript
+
+exclude_skills:
+  - ddd
+  - microservices
+  - kubernetes
+  - monitoring
+  - cicd
+  - security  # Sorry, security — not today
+  - testing   # Sorry, tests — not today
+
+enforce:
+  adr: false
+  testing: false
+  security_audit: false
+  code_review: false
+
+defaults:
+  architecture: single-file  # or monolith
+  database: sqlite
+  auth: none  # or simple-jwt
+  hosting: vercel

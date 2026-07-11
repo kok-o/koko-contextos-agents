@@ -1,0 +1,10 @@
+id: node
+name: Node.js
+category: backend
+tags: [backend, javascript, runtime, server, express, fastify]
+requires: [typescript]
+optional: [postgres, redis, docker]
+conflicts: []
+weight: 7
+documents:
+  - node.md

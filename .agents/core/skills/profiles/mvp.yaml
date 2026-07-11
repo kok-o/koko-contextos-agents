@@ -1,0 +1,43 @@
+# Profile: MVP
+# Minimum viable product — speed is everything
+
+id: mvp
+name: MVP
+description: "Ship the fastest possible working version. Cut everything non-essential."
+
+generate_docs:
+  - PRD        # Must know what to build
+  - TASKS      # Must know task order
+  - PROJECT_GRAPH  # Must know module structure
+
+skip_docs:
+  - ARCHITECTURE   # Keep it simple, decide as you go
+  - DATABASE       # Schema emerges from code (Prisma/SQLAlchemy)
+  - API            # API emerges from implementation
+  - UI             # Build directly, iterate fast
+  - ROADMAP        # No long-term planning yet
+  - DEPLOYMENT     # Deploy later
+
+prefer_skills:
+  - sqlite        # Simplest database
+  - simple-auth   # Minimal auth (email + password)
+
+exclude_skills:
+  - ddd
+  - microservices
+  - kubernetes
+  - monitoring
+  - cicd
+  - cqrs
+
+enforce:
+  adr: false
+  testing: false        # Tests are nice, but not blocking
+  security_audit: false
+  code_review: false
+
+defaults:
+  architecture: monolith
+  database: sqlite
+  auth: simple-jwt
+  hosting: vercel

@@ -1,0 +1,10 @@
+id: system-design
+name: System Design
+category: architecture
+tags: [architecture, system-design, scalability, distributed-systems]
+requires: []
+optional: [security, postgres, redis, docker]
+conflicts: []
+weight: 8
+documents:
+  - system-design.md

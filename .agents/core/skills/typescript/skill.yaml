@@ -1,0 +1,10 @@
+id: typescript
+name: TypeScript
+category: frontend
+tags: [frontend, backend, types, static-analysis]
+requires: []
+optional: [zod, prisma]
+conflicts: []
+weight: 9
+documents:
+  - typescript.md

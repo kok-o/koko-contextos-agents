@@ -1,0 +1,10 @@
+id: ddd
+name: Domain-Driven Design
+category: architecture
+tags: [architecture, ddd, domain, bounded-context, aggregate]
+requires: []
+optional: [microservices, system-design]
+conflicts: []
+weight: 6
+documents:
+  - ddd.md

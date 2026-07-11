@@ -1,0 +1,46 @@
+# Profile: Enterprise
+# Maximum rigor and documentation
+
+id: enterprise
+name: Enterprise
+description: "Full documentation, DDD, ADR, security audits, comprehensive testing."
+
+generate_docs:
+  - PRD
+  - ARCHITECTURE
+  - DATABASE
+  - API
+  - UI
+  - ROADMAP
+  - TASKS
+  - PROJECT_GRAPH
+  - DEPLOYMENT
+
+skip_docs: []  # Generate everything
+
+prefer_skills:
+  - postgres
+  - redis
+  - docker
+  - ddd
+  - microservices
+  - security
+
+exclude_skills: []  # Nothing excluded
+
+enforce:
+  adr: true                # Every decision must be recorded
+  testing: true             # Tests required, min coverage 80%
+  security_audit: true      # OWASP check on every PR
+  code_review: true         # Mandatory review
+  accessibility_audit: true # WCAG 2.1 AA compliance
+
+defaults:
+  architecture: microservices  # or modular-monolith
+  database: postgresql
+  auth: oauth2-jwt
+  hosting: kubernetes
+  orm: typeorm  # or prisma
+  monitoring: prometheus-grafana
+  logging: elk-stack
+  ci_cd: github-actions

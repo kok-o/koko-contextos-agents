@@ -1,0 +1,10 @@
+id: nestjs
+name: NestJS
+category: backend
+tags: [backend, nodejs, typescript, enterprise, di, decorators]
+requires: [typescript, node]
+optional: [postgres, redis, docker, graphql]
+conflicts: [fastapi, express]
+weight: 8
+documents:
+  - nestjs.md

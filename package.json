@@ -1,0 +1,22 @@
+{
+  "name": "koko-contextos-agents",
+  "version": "1.0.0",
+  "description": "CLI для установки настроек .agents для ИИ-ассистентов",
+  "bin": {
+    "koko-contextos-agents": "./bin/index.js"
+  },
+  "files": [
+    "bin",
+    ".agents"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "contextos"
+  ],
+  "author": "",
+  "license": "ISC"
+}

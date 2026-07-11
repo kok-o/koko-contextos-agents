@@ -1,0 +1,10 @@
+id: performance
+name: Web Performance
+category: frontend
+tags: [frontend, performance, core-web-vitals, optimization]
+requires: []
+optional: [react, nextjs]
+conflicts: []
+weight: 6
+documents:
+  - performance.md
