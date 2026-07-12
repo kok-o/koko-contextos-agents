@@ -26,8 +26,10 @@ function printHelp() {
   console.log('');
   console.log('Plugin ref formats:');
   console.log('  username/repo                    GitHub repo root SKILL.md');
+  console.log('  username/repo@commit             GitHub repo pinned to a commit');
   console.log('  username/repo/path/to/skill      GitHub subpath skill');
   console.log('  npm-package-name                 npm package');
+  console.log('  @scope/npm-package               scoped npm package');
   console.log('');
   console.log('Examples:');
   console.log('  node .agents/ctx.js skill add alice/my-cool-skill');

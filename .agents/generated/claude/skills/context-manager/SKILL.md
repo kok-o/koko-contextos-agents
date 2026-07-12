@@ -18,6 +18,7 @@ task:
 ### Step 2: Consult the Project Graph
 
 If `docs/PROJECT_GRAPH.md` exists:
+
 1. Find the module this task belongs to
 2. Get the module's dependencies
 3. Get the module's required skills
@@ -58,6 +59,7 @@ context:
 ### Step 5: Validate Budget
 
 Check total token count. If over budget (see context-rules.md):
+
 1. Trim Level 1 docs to summaries
 2. Load only affected sections of Level 2 docs
 3. Keep Level 3 (skills) at full detail
@@ -74,6 +76,7 @@ After first compilation for a module, cache the result:
 ```
 
 Invalidate cache when:
+
 - A document is updated
 - A skill is added/removed
 - The Project Graph changes

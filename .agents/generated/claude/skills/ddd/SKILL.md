@@ -5,12 +5,14 @@
 ## When to Use DDD
 
 **Use when:**
+
 - Complex business logic that goes beyond CRUD
 - Multiple domain experts with different vocabularies
 - The domain model is the competitive advantage
 - Enterprise-grade applications
 
 **Don't use when:**
+
 - Simple CRUD applications
 - Hackathon/MVP (overkill)
 - No domain expert available
@@ -18,9 +20,11 @@
 ## Strategic Design
 
 ### Bounded Contexts
+
 The single most important DDD concept. A Bounded Context is a boundary within which a particular model is defined and applicable.
 
 **Example — E-Commerce:**
+
 ```
 [Order Context]          [Payment Context]       [Shipping Context]
   - Order                  - Payment               - Shipment
@@ -30,11 +34,13 @@ The single most important DDD concept. A Bounded Context is a boundary within wh
 ```
 
 `Customer` means different things in each context:
+
 - Order Context: name, email, shipping preference
 - Payment Context: billing info, payment methods
 - Support Context: ticket history, satisfaction score
 
 ### Context Map
+
 ```
 [Order] ←→ [Payment]     # Partnership
 [Order] → [Shipping]     # Customer-Supplier
@@ -44,7 +50,9 @@ The single most important DDD concept. A Bounded Context is a boundary within wh
 ## Tactical Design
 
 ### Entities
+
 Objects with identity. Two entities with the same attributes but different IDs are different.
+
 ```typescript
 class User {
   readonly id: UserId;
@@ -54,7 +62,9 @@ class User {
 ```
 
 ### Value Objects
+
 Objects defined by their attributes, not identity. Immutable.
+
 ```typescript
 class Email {
   constructor(readonly value: string) {
@@ -67,6 +77,7 @@ class Email {
 ```
 
 ### Aggregates
+
 A cluster of entities and value objects with a single root entity (Aggregate Root). All access goes through the root.
 
 ```typescript
@@ -86,12 +97,15 @@ class Order {  // Aggregate Root
 ```
 
 **Aggregate Rules:**
+
 1. Reference other aggregates by ID only
 2. One aggregate per transaction
 3. Eventual consistency between aggregates
 
 ### Domain Events
+
 Something that happened in the domain that domain experts care about.
+
 ```typescript
 class OrderPlaced implements DomainEvent {
   constructor(
@@ -104,7 +118,9 @@ class OrderPlaced implements DomainEvent {
 ```
 
 ### Domain Services
+
 Business logic that doesn't naturally belong to an entity or value object.
+
 ```typescript
 class PricingService {
   calculatePrice(order: Order, customer: Customer, promotions: Promotion[]): Money {
@@ -114,7 +130,9 @@ class PricingService {
 ```
 
 ### Repositories
+
 Abstraction over data access. One repository per aggregate root.
+
 ```typescript
 interface OrderRepository {
   findById(id: OrderId): Promise<Order | null>;

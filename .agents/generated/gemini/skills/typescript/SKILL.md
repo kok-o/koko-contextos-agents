@@ -21,6 +21,7 @@ description: >
 ## Strict Mode
 
 Always use strict TypeScript configuration:
+
 ```json
 {
   "compilerOptions": {
@@ -96,6 +97,7 @@ interface Repository<T extends { id: string }> {
 ## Strict Mode
 
 Always use strict TypeScript configuration:
+
 ```json
 {
   "compilerOptions": {

@@ -13,7 +13,7 @@ ContextOS is agent-agnostic. This skill generates the right config format for an
 ## Supported Agents
 
 | Agent | Config File | Format |
-|---|---|---|
+| --- | --- | --- |
 | **Gemini** | `.agents/AGENTS.md` + `.agents/skills/` | Markdown + YAML skills |
 | **Claude Code** | `CLAUDE.md` | Single markdown file |
 | **GitHub Copilot / Codex** | `AGENTS.md` (root) | Markdown |
@@ -35,6 +35,7 @@ ContextOS is agent-agnostic. This skill generates the right config format for an
 ### For Claude Code (`CLAUDE.md`)
 
 Compile into a single markdown file:
+
 1. Project overview from `docs/PRD.md` (summary only)
 2. Architecture summary from `docs/ARCHITECTURE.md`
 3. Coding rules from loaded skills
@@ -44,6 +45,7 @@ Compile into a single markdown file:
 ### For Gemini (`.agents/AGENTS.md`)
 
 Already native format. Just ensure:
+
 1. `AGENTS.md` references the skill directory
 2. Skills have proper SKILL.md with frontmatter
 3. Context Manager rules are in AGENTS.md
@@ -51,6 +53,7 @@ Already native format. Just ensure:
 ### For Cursor (`.cursorrules`)
 
 Compile into a flat text file:
+
 1. Project context (condensed)
 2. Coding style rules
 3. Framework-specific instructions

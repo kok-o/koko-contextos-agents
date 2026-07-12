@@ -171,6 +171,29 @@ describe('plugins — parseRef and deriveSkillName logic', () => {
       assert.ok(path.isAbsolute(d), `Path should be absolute: ${d}`);
     }
   });
+
+  test('recognizes scoped npm package references', () => {
+    const parsed = plugins.parseRef('@scope/my-skill');
+    assert.equal(parsed.type, 'npm');
+    assert.equal(parsed.package, '@scope/my-skill');
+  });
+
+  test('supports a pinned GitHub commit reference', () => {
+    const parsed = plugins.parseRef('alice/my-skill@abcdef1/skills/api');
+    assert.equal(parsed.type, 'github');
+    assert.equal(parsed.gitRef, 'abcdef1');
+    assert.equal(parsed.subPath, 'skills/api');
+    assert.equal(parsed.isPinned, true);
+  });
+
+  test('rejects path traversal in GitHub plugin references', () => {
+    assert.throws(() => plugins.parseRef('alice/my-skill/../other'));
+  });
+
+  test('accepts only safe plugin directory names', () => {
+    assert.equal(plugins.isSafeSkillName('my-skill'), true);
+    assert.equal(plugins.isSafeSkillName('../core'), false);
+  });
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -199,6 +222,21 @@ describe('plugins — lock file (plugins.json)', () => {
     } catch (err) {
       assert.ok(err.status !== 0, 'Should exit non-zero for missing plugin');
     }
+  });
+
+  test('skill remove rejects traversal and preserves files outside plugins/', () => {
+    const ctxInSandbox = path.join(sandbox.agentsDir, 'ctx.js');
+    const sentinel = path.join(sandbox.agentsDir, 'keep.txt');
+    fs.writeFileSync(sentinel, 'keep');
+
+    assert.throws(
+      () => execSync(`node "${ctxInSandbox}" skill remove ..`, {
+        cwd: sandbox.tmpDir,
+        stdio: 'pipe',
+        env: { ...process.env, NO_COLOR: '1' },
+      })
+    );
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'keep');
   });
 });
 

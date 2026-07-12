@@ -36,14 +36,16 @@ Options:
   --help, -h          Show this help message
   --version, -v       Show version number
   --dry-run           Preview what will be copied without making changes
-  --force             Overwrite existing .agents/ without confirmation warning
+  --force             Overwrite an existing .agents/ folder
   --skip-compile      Skip running ctx.js export after installation
   --add-skill <ref>   Install a community plugin skill after setup
 
 Plugin ref formats:
   username/repo                    GitHub repo with a SKILL.md at the root
+  username/repo@commit             GitHub repo pinned to a commit
   username/repo/path/to/skill      GitHub skill in a subdirectory
   npm-package-name                 A skill published as an npm package
+  @scope/npm-package               A scoped npm skill package
 
 Examples:
   npx koko-contextos-agents                          Install .agents/ into current project
@@ -88,7 +90,7 @@ if (flags.dryRun) {
   };
   const total = countFiles(sourcePath);
   if (fs.existsSync(targetPath)) {
-    console.log(`[WARN] .agents/ already exists — would be updated (--force mode).`);
+    console.log(`[WARN] .agents/ already exists — would be overwritten with --force.`);
   } else {
     console.log(`[OK] Would create .agents/ in: ${process.cwd()}`);
   }
@@ -107,8 +109,9 @@ try {
   }
 
   if (fs.existsSync(targetPath) && !flags.force) {
-    console.log('[WARN] .agents/ already exists. Files will be updated.');
-    console.log('       Use --force to suppress this warning.');
+    console.error('[ERROR] .agents/ already exists. Refusing to overwrite it.');
+    console.error('        Re-run with --force only after backing up your custom skills.');
+    process.exit(1);
   }
 
   fs.cpSync(sourcePath, targetPath, { recursive: true, force: true });
@@ -122,8 +125,8 @@ try {
     if (fs.existsSync(ctxPath)) {
       console.log('Compiling skills for Gemini...');
       try {
-        const { execSync } = require('child_process');
-        execSync(`node "${ctxPath}" export gemini`, {
+        const { execFileSync } = require('child_process');
+        execFileSync(process.execPath, [ctxPath, 'export', 'gemini'], {
           cwd: process.cwd(),
           stdio: 'inherit',
         });
@@ -156,8 +159,8 @@ try {
     if (fs.existsSync(ctxPath)) {
       console.log(`Installing plugin skill: ${flags.addSkill}`);
       try {
-        const { execSync } = require('child_process');
-        execSync(`node "${ctxPath}" skill add "${flags.addSkill}"`, {
+        const { execFileSync } = require('child_process');
+        execFileSync(process.execPath, [ctxPath, 'skill', 'add', flags.addSkill], {
           cwd: process.cwd(),
           stdio: 'inherit',
         });

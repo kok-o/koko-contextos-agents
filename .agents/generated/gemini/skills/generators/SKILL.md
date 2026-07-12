@@ -54,12 +54,14 @@ Generate development plan from existing PRD:
 ## Template Usage
 
 Each template contains:
+
 - **Section headers** — required sections for the document
 - **Placeholder prompts** — `{{description}}` markers that guide content generation
 - **Examples** — sample content to illustrate the expected format
 - **Validation rules** — what must be present for the document to be valid
 
 When generating a document:
+
 1. Read the template
 2. Fill in each section based on the user's idea and clarifying answers
 3. Replace all `{{placeholders}}` with real content

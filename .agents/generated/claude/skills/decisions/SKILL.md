@@ -5,6 +5,7 @@ You manage **Architecture Decision Records** (ADRs).
 ## Why Decisions Matter
 
 Without ADRs, the AI agent sees:
+
 - "Database: PostgreSQL" — but doesn't know WHY
 - "Auth: JWT" — but doesn't know what alternatives were considered
 - "Framework: Next.js" — but doesn't know the tradeoffs
@@ -27,6 +28,7 @@ When an architectural choice is made during any pipeline stage:
 ### Query Decisions
 
 Before making changes that touch architecture:
+
 1. Check `docs/decisions/` for related decisions
 2. If a decision exists, follow it
 3. If a decision needs to change, create a new ADR that **supersedes** the old one
@@ -45,6 +47,7 @@ proposed → accepted → [deprecated | superseded]
 ## Auto-Detection
 
 The Decision Engine should suggest creating an ADR when it detects:
+
 - A new database/ORM is introduced
 - A new framework is added
 - Authentication strategy changes

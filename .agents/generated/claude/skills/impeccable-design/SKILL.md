@@ -17,7 +17,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Typography (Rules T1–T10)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | T1 | Using Inter for all text | Use Inter for UI body, pair with a distinct display font for headings OR with `JetBrains Mono` for technical/number accents (premium SaaS pattern) |
 | T2 | Using Arial or Helvetica | Use a curated Google Font pairing |
 | T3 | All text same weight | Use weight contrast: 700 headings, 400 body, 500 labels |
@@ -30,6 +30,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 | T10 | Bold everywhere | Bold is for emphasis. Diluted if overused. |
 
 **Tailwind typography utilities:**
+
 - `text-balance` — for headlines (prevents orphan words)
 - `text-pretty` — for body paragraphs (smart line-breaks)
 - `tabular-nums` — for numerical data tables
@@ -37,7 +38,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Color (Rules C1–C12)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | C1 | Pure black `#000` | Tint toward brand: `hsl(240, 10%, 4%)` |
 | C2 | Pure white `#fff` for surfaces | Near-white with warmth: `hsl(40, 30%, 97%)` |
 | C3 | Gray on colored background | Check contrast — likely fails WCAG. Use white/dark |
@@ -54,7 +55,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Layout & Spacing (Rules L1–L11)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | L1 | Cards inside cards | One level of card depth maximum |
 | L2 | Icon tile above every heading | Use icons inline, in context, not decoratively above text |
 | L3 | Centered long paragraphs | `text-center` max 2 lines only. Use `text-pretty` + left-align for body |
@@ -70,7 +71,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Components (Rules K1–K11)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | K1 | Two filled buttons side-by-side | `<Button variant="default">` + `<Button variant="outline">` or `variant="ghost"` |
 | K2 | Button without loading state | Always add spinner + `disabled` during async actions |
 | K3 | Modal without backdrop blur | shadcn `<Dialog>` handles this. Don't override with plain divs |
@@ -86,7 +87,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Animation (Rules A1–A8)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | A1 | CSS bounce/elastic/spring easing | CSS spring animations are forbidden. **Exception**: If using Framer Motion, highly damped springs are encouraged: `{ type: "spring", stiffness: 400, damping: 30 }` for modals and popovers — this creates a premium, physical feel like Vercel/Linear |
 | A2 | Animations that take > 400ms | Micro: 100–150ms, Components: 200–300ms, Pages: 300–400ms |
 | A3 | Animations everywhere | Animate max 2–3 elements simultaneously |
@@ -99,7 +100,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Images & Icons (Rules I1–I8)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | I1 | Decorative icons on every list item | Icons add meaning, not decoration. Use selectively. |
 | I2 | Mix of icon styles | Pick one icon set (e.g., Lucide for shadcn). Stick with it. |
 | I3 | Low-contrast icons | Icons need ≥ 3:1 contrast ratio |
@@ -133,6 +134,7 @@ Start every new design with:
 ## Design Review Audits
 
 ### Quick Audit (before PR)
+
 - Typography: Is there clear visual hierarchy? Are fonts intentional? Is Inter paired properly?
 - Color: Any pure black/white? Contrast failures? Too many colors? Dark mode?
 - Spacing: Consistent Tailwind scale? No arbitrary values? Enough whitespace?
@@ -141,6 +143,7 @@ Start every new design with:
 - Z-index: Any hardcoded `z-[999]` or `z-50`?
 
 ### Full Audit (before release)
+
 - Accessibility: Run axe DevTools or Lighthouse — target 90+ score
 - Responsiveness: Test at 375px, 768px, 1280px, 1440px
 - Dark mode: Does the full palette hold up? No inverted-only shortcuts?

@@ -12,7 +12,7 @@ description: >
 ## Core Web Vitals
 
 | Metric | Target | What it measures |
-|---|---|---|
+| --- | --- | --- |
 | LCP (Largest Contentful Paint) | < 2.5s | Loading performance |
 | INP (Interaction to Next Paint) | < 200ms | Responsiveness |
 | CLS (Cumulative Layout Shift) | < 0.1 | Visual stability |
@@ -45,7 +45,7 @@ description: >
 ## Caching Strategy
 
 | Asset | Cache | Strategy |
-|---|---|---|
+| --- | --- | --- |
 | HTML | Short (5min) | Revalidate |
 | JS/CSS (hashed) | Long (1 year) | Immutable |
 | Images | Long (1 year) | Immutable |
@@ -77,7 +77,7 @@ description: >
 ## Core Web Vitals
 
 | Metric | Target | What it measures |
-|---|---|---|
+| --- | --- | --- |
 | LCP (Largest Contentful Paint) | < 2.5s | Loading performance |
 | INP (Interaction to Next Paint) | < 200ms | Responsiveness |
 | CLS (Cumulative Layout Shift) | < 0.1 | Visual stability |
@@ -110,7 +110,7 @@ description: >
 ## Caching Strategy
 
 | Asset | Cache | Strategy |
-|---|---|---|
+| --- | --- | --- |
 | HTML | Short (5min) | Revalidate |
 | JS/CSS (hashed) | Long (1 year) | Immutable |
 | Images | Long (1 year) | Immutable |

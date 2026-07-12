@@ -60,6 +60,20 @@ describe('bin/index.js — installer', () => {
     assert.ok(fs.existsSync(path.join(agentsDir, 'ctx.js')), 'ctx.js should exist');
   });
 
+  test('refuses to overwrite an existing .agents/ folder without --force', () => {
+    const testDir = path.join(tmpDir, 'preserve-existing-test');
+    const existingAgents = path.join(testDir, '.agents');
+    fs.mkdirSync(existingAgents, { recursive: true });
+    const sentinel = path.join(existingAgents, 'custom-skill.md');
+    fs.writeFileSync(sentinel, 'do not overwrite');
+
+    assert.throws(
+      () => execSync(`node "${BIN_PATH}" --skip-compile`, { cwd: testDir, stdio: 'pipe' }),
+      'Installer should require --force when .agents/ already exists'
+    );
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'do not overwrite');
+  });
+
   test('--force flag installs without warning output', () => {
     const testDir = path.join(tmpDir, 'force-test');
     fs.mkdirSync(path.join(testDir, '.agents'), { recursive: true });

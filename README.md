@@ -23,7 +23,7 @@ The script will automatically create the `.agents` folder, copy all skills, and 
 npx koko-contextos-agents --help        # Show all options
 npx koko-contextos-agents --version     # Show version
 npx koko-contextos-agents --dry-run     # Preview what will be installed
-npx koko-contextos-agents --force       # Overwrite existing .agents/ silently
+npx koko-contextos-agents --force       # Overwrite an existing .agents/ folder
 npx koko-contextos-agents --skip-compile  # Skip auto-compilation step
 ```
 
@@ -102,6 +102,11 @@ node .agents/ctx.js export all       # Compile for all agents
 ```bash
 npm run build   # alias for: node .agents/ctx.js export all
 ```
+
+`generated/` is compiled output used by Gemini and Claude. Keep it in the
+published package; edit the source skills under `core/skills/`, then regenerate
+the output with the command above. `adapters/` contains the generators and must
+also remain in the package.
 
 ## Testing
 

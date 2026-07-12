@@ -22,7 +22,8 @@
 const fs      = require('fs');
 const path    = require('path');
 const https   = require('https');
-const { execSync } = require('child_process');
+const crypto  = require('crypto');
+const { execFileSync } = require('child_process');
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
 const ROOT           = process.cwd();
@@ -31,6 +32,8 @@ const CORE_SKILLS    = path.join(AGENTS_DIR, 'core', 'skills');
 const PLUGINS_DIR    = path.join(AGENTS_DIR, 'plugins');          // installed third-party skills
 const PLUGINS_JSON   = path.join(AGENTS_DIR, 'plugins.json');     // local lock file
 const REGISTRY_URL   = 'https://raw.githubusercontent.com/kok-o/koko-contextos-agents/main/registry.json';
+const MAX_DOWNLOAD_BYTES = 5 * 1024 * 1024;
+const SAFE_SKILL_NAME = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
 
 // ── ANSI helpers ──────────────────────────────────────────────────────────────
 const NO_COLOR = process.env.NO_COLOR || !process.stdout.isTTY;
@@ -61,17 +64,31 @@ function writeLock(lock) {
 // ── HTTP fetch helper (no deps) ───────────────────────────────────────────────
 function fetchText(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers: { 'User-Agent': 'koko-contextos-agents' } }, (res) => {
+    const request = https.get(url, { headers: { 'User-Agent': 'koko-contextos-agents' } }, (res) => {
       if (res.statusCode === 301 || res.statusCode === 302) {
-        return fetchText(res.headers.location).then(resolve).catch(reject);
+        const redirect = new URL(res.headers.location, url);
+        if (redirect.protocol !== 'https:' || redirect.hostname !== 'raw.githubusercontent.com') {
+          return reject(new Error('Refusing redirect outside raw.githubusercontent.com'));
+        }
+        return fetchText(redirect.toString()).then(resolve).catch(reject);
       }
       if (res.statusCode !== 200) {
         return reject(new Error(`HTTP ${res.statusCode} for ${url}`));
       }
       let data = '';
-      res.on('data', chunk => { data += chunk; });
+      let bytes = 0;
+      res.on('data', chunk => {
+        bytes += chunk.length;
+        if (bytes > MAX_DOWNLOAD_BYTES) {
+          request.destroy(new Error(`Download exceeds ${MAX_DOWNLOAD_BYTES} bytes`));
+          return;
+        }
+        data += chunk;
+      });
       res.on('end', () => resolve(data));
-    }).on('error', reject);
+    });
+    request.setTimeout(15_000, () => request.destroy(new Error('Download timed out')));
+    request.on('error', reject);
   });
 }
 
@@ -85,13 +102,31 @@ function fetchText(url) {
  *   my-npm-package                   → npm: install package, copy skill dir
  */
 function parseRef(ref) {
+  if (typeof ref !== 'string' || !ref.trim()) {
+    throw new Error('A plugin reference is required');
+  }
+
+  // Scoped packages contain a slash but are npm packages, not GitHub refs.
+  if (ref.startsWith('@')) {
+    return { type: 'npm', package: ref, raw: ref };
+  }
+
   // GitHub: contains a slash
   if (ref.includes('/')) {
     const parts    = ref.split('/');
     const owner    = parts[0];
-    const repo     = parts[1];
+    const repoRef  = parts[1];
     const subPath  = parts.slice(2).join('/'); // may be empty
-    return { type: 'github', owner, repo, subPath, raw: ref };
+    const [repo, gitRef = 'main'] = repoRef.split('@');
+    const safeSegment = /^[A-Za-z0-9._-]+$/;
+
+    const isSafePathPart = part => part !== '.' && part !== '..' && safeSegment.test(part);
+    if (!owner || !repo || !isSafePathPart(owner) || !isSafePathPart(repo) ||
+        !isSafePathPart(gitRef) || parts.slice(2).some(part => !isSafePathPart(part))) {
+      throw new Error('Invalid GitHub plugin reference');
+    }
+
+    return { type: 'github', owner, repo, gitRef, isPinned: repoRef.includes('@'), subPath, raw: ref };
   }
   // npm package
   return { type: 'npm', package: ref, raw: ref };
@@ -99,20 +134,24 @@ function parseRef(ref) {
 
 // ── GitHub installer ──────────────────────────────────────────────────────────
 async function installFromGitHub(descriptor, skillName, dryRun) {
-  const { owner, repo, subPath } = descriptor;
+  const { owner, repo, gitRef, isPinned, subPath } = descriptor;
   const skillPath  = subPath || '';
-  const base       = `https://raw.githubusercontent.com/${owner}/${repo}/main`;
+  const base       = `https://raw.githubusercontent.com/${owner}/${repo}/${gitRef}`;
   const skillMdUrl = skillPath
     ? `${base}/${skillPath}/SKILL.md`
     : `${base}/SKILL.md`;
 
   console.log(c.dim(`  Fetching: ${skillMdUrl}`));
+  if (!isPinned) {
+    console.log(c.yellow('  [WARN] Unpinned GitHub ref: prefer owner/repo@<commit> for reproducible installs.'));
+  }
 
   let skillMdContent;
   try {
     skillMdContent = await fetchText(skillMdUrl);
   } catch (err) {
-    // Try /master branch fallback
+    if (gitRef !== 'main') throw err;
+    // Try /master branch fallback only for the legacy default branch behavior.
     const masterUrl = skillMdUrl.replace('/main/', '/master/');
     console.log(c.dim(`  Retrying on master branch: ${masterUrl}`));
     skillMdContent = await fetchText(masterUrl);
@@ -153,8 +192,10 @@ async function installFromGitHub(descriptor, skillName, dryRun) {
     type:    'github',
     owner,
     repo,
+    gitRef,
     subPath: skillPath,
     ref:     descriptor.raw,
+    sha256:  crypto.createHash('sha256').update(skillMdContent).digest('hex'),
     installedAt: new Date().toISOString(),
   }, null, 2));
 
@@ -173,7 +214,10 @@ function installFromNpm(descriptor, skillName, dryRun) {
   }
 
   console.log(c.dim(`  Installing npm package: ${pkgName}`));
-  execSync(`npm install --no-save ${pkgName}`, { cwd: ROOT, stdio: 'pipe' });
+  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  execFileSync(npm, [
+    'install', '--no-save', '--ignore-scripts', '--package-lock=false', '--no-audit', '--no-fund', pkgName,
+  ], { cwd: ROOT, stdio: 'pipe' });
 
   const nmPath    = path.join(ROOT, 'node_modules', pkgName);
   const skillSrc  = fs.existsSync(path.join(nmPath, 'SKILL.md'))
@@ -208,6 +252,10 @@ function deriveSkillName(ref) {
   return parts[parts.length - 1].toLowerCase().replace(/[^a-z0-9-]/g, '-');
 }
 
+function isSafeSkillName(skillName) {
+  return typeof skillName === 'string' && SAFE_SKILL_NAME.test(skillName);
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
 //  COMMANDS
 // ═════════════════════════════════════════════════════════════════════════════
@@ -224,6 +272,10 @@ async function add(ref, { dryRun = false } = {}) {
 
   const descriptor = parseRef(ref);
   const skillName  = deriveSkillName(ref);
+
+  if (!isSafeSkillName(skillName)) {
+    throw new Error(`Invalid plugin name derived from reference: '${skillName}'`);
+  }
 
   console.log('');
   console.log(c.bold(`Installing skill: ${c.cyan(skillName)}`));
@@ -287,6 +339,11 @@ async function add(ref, { dryRun = false } = {}) {
 function remove(skillName) {
   if (!skillName) {
     console.error(c.red('Usage: ctx.js skill remove <name>'));
+    process.exit(1);
+  }
+
+  if (!isSafeSkillName(skillName)) {
+    console.error(c.red(`[ERROR] Invalid plugin name: '${skillName}'`));
     process.exit(1);
   }
 
@@ -439,4 +496,4 @@ function collectAllSkillDirs() {
   return dirs;
 }
 
-module.exports = { add, remove, list, search, collectAllSkillDirs, readLock, PLUGINS_DIR };
+module.exports = { add, remove, list, search, collectAllSkillDirs, readLock, parseRef, deriveSkillName, isSafeSkillName, PLUGINS_DIR };

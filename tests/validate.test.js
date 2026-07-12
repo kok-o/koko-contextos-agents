@@ -8,14 +8,14 @@
 
 const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
-const fs     = require('fs');
-const path   = require('path');
-const os     = require('os');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 const { execSync } = require('child_process');
 
-const CTX_PATH      = path.join(__dirname, '..', '.agents', 'ctx.js');
+const CTX_PATH = path.join(__dirname, '..', '.agents', 'ctx.js');
 const VALIDATE_PATH = path.join(__dirname, '..', '.agents', 'validate.js');
-const ROOT          = path.join(__dirname, '..');
+const ROOT = path.join(__dirname, '..');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -32,17 +32,17 @@ function runValidate(cwd = ROOT) {
     return {
       stdout: (err.stdout || Buffer.alloc(0)).toString(),
       stderr: (err.stderr || Buffer.alloc(0)).toString(),
-      code:   err.status || 1,
+      code: err.status || 1,
     };
   }
 }
 
 /** Create a temp skill sandbox for isolation tests */
 function makeSandbox() {
-  const tmpDir    = fs.mkdtempSync(path.join(os.tmpdir(), 'contextos-test-'));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'contextos-test-'));
   const agentsDir = path.join(tmpDir, '.agents');
   const coreSkills = path.join(agentsDir, 'core', 'skills');
-  const generated  = path.join(agentsDir, 'generated');
+  const generated = path.join(agentsDir, 'generated');
 
   fs.mkdirSync(coreSkills, { recursive: true });
   fs.mkdirSync(path.join(generated, 'gemini', 'skills'), { recursive: true });
@@ -63,15 +63,15 @@ function writeSkillMd(dir, { name = 'test-skill', description = 'A test skill', 
 /** Write a valid skill.yaml */
 function writeSkillYaml(dir, fields = {}) {
   const {
-    id          = 'test-skill',
-    name        = 'test-skill',
+    id = 'test-skill',
+    name = 'test-skill',
     description = 'A test skill',
-    requires    = [],
-    conflicts   = [],
-    version     = '1.0.0',
+    requires = [],
+    conflicts = [],
+    version = '1.0.0',
   } = fields;
 
-  const requiresLine  = requires.length  ? `requires: [${requires.join(', ')}]`  : 'requires: []';
+  const requiresLine = requires.length ? `requires: [${requires.join(', ')}]` : 'requires: []';
   const conflictsLine = conflicts.length ? `conflicts: [${conflicts.join(', ')}]` : 'conflicts: []';
 
   fs.mkdirSync(dir, { recursive: true });
@@ -98,7 +98,7 @@ describe('validate — real project', () => {
       'Should produce a validation report'
     );
     // Errors in our own skills are a hard failure
-    assert.equal(code, 0, `Validator exited with code ${code} — check errors above\nSTDOUT: ${stdout}`);
+    assert.equal(code, 0, `Validator exited with code ${code} — check errors above`);
   });
 
   test('output includes the PASSED banner', () => {
@@ -147,10 +147,10 @@ describe('validate — unit: frontmatter checks', () => {
     ].join('\n');
     fs.writeFileSync(path.join(skillDir, 'SKILL.md'), body);
 
-    const content        = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+    const content = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
     const hasFrontmatter = content.startsWith('---');
     // indexOf starting at position 3 should find nothing — there is no closing ---
-    const closingIdx     = content.indexOf('---', 3);
+    const closingIdx = content.indexOf('---', 3);
     assert.ok(hasFrontmatter, 'File starts with ---');
     assert.equal(closingIdx, -1, 'No closing --- should be present in this malformed file');
   });
@@ -160,13 +160,13 @@ describe('validate — unit: frontmatter checks', () => {
     const skillDir = path.join(coreSkills, 'good-skill');
     writeSkillMd(skillDir);
 
-    const content      = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
-    const closingIdx   = content.indexOf('---', 3);
-    const frontmatter  = content.slice(3, closingIdx);
+    const content = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+    const closingIdx = content.indexOf('---', 3);
+    const frontmatter = content.slice(3, closingIdx);
 
-    assert.ok(closingIdx > 3,                         'Should have closing ---');
-    assert.ok(frontmatter.includes('name:'),          'Should have name:');
-    assert.ok(frontmatter.includes('description:'),   'Should have description:');
+    assert.ok(closingIdx > 3, 'Should have closing ---');
+    assert.ok(frontmatter.includes('name:'), 'Should have name:');
+    assert.ok(frontmatter.includes('description:'), 'Should have description:');
   });
 
   test('detects missing name: in frontmatter', () => {
@@ -177,8 +177,8 @@ describe('validate — unit: frontmatter checks', () => {
       path.join(skillDir, 'SKILL.md'),
       `---\ndescription: Has description but no name\n---\n\nBody text here for the skill.`
     );
-    const content     = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
-    const closingIdx  = content.indexOf('---', 3);
+    const content = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+    const closingIdx = content.indexOf('---', 3);
     const frontmatter = content.slice(3, closingIdx);
     assert.ok(!frontmatter.match(/^name:\s*.+/m), 'Should not have name:');
   });
@@ -198,9 +198,9 @@ describe('validate — unit: dependency graph', () => {
     writeSkillMd(skillDir, { name: 'react', description: 'React skill' });
     writeSkillYaml(skillDir, { id: 'react', name: 'react', requires: ['typescript'] });
 
-    const yamlText   = fs.readFileSync(path.join(skillDir, 'skill.yaml'), 'utf8');
+    const yamlText = fs.readFileSync(path.join(skillDir, 'skill.yaml'), 'utf8');
     const requiresRe = /^requires:\s*\[([^\]]*)\]/m;
-    const match      = yamlText.match(requiresRe);
+    const match = yamlText.match(requiresRe);
     assert.ok(match, 'Should have requires: field');
     assert.ok(match[1].includes('typescript'), 'Should require typescript');
   });
@@ -209,14 +209,14 @@ describe('validate — unit: dependency graph', () => {
     const { coreSkills } = makeSandbox();
     const skillDir = path.join(coreSkills, 'bad-skill');
     writeSkillYaml(skillDir, {
-      id:        'bad-skill',
-      name:      'bad-skill',
+      id: 'bad-skill',
+      name: 'bad-skill',
       conflicts: ['bad-skill'],
     });
 
-    const yamlText    = fs.readFileSync(path.join(skillDir, 'skill.yaml'), 'utf8');
+    const yamlText = fs.readFileSync(path.join(skillDir, 'skill.yaml'), 'utf8');
     const conflictsRe = /^conflicts:\s*\[([^\]]*)\]/m;
-    const match       = yamlText.match(conflictsRe);
+    const match = yamlText.match(conflictsRe);
     assert.ok(match, 'Should have conflicts: field');
     // The field value equals the skill's own id — detect self-conflict
     assert.ok(match[1].includes('bad-skill'), 'Skill conflicts with itself');
@@ -233,7 +233,7 @@ describe('validate — unit: sync checks', () => {
 
     // But generated/gemini/skills/my-skill is absent
     const genGemini = path.join(generated, 'gemini', 'skills');
-    const compiled  = fs.readdirSync(genGemini);
+    const compiled = fs.readdirSync(genGemini);
     assert.ok(!compiled.includes('my-skill'), 'Should not be compiled yet');
   });
 
@@ -254,7 +254,7 @@ describe('validate — unit: sync checks', () => {
 describe('validate — npm script', () => {
   test('"npm run validate" script is defined in package.json', () => {
     const pkgPath = path.join(ROOT, 'package.json');
-    const pkg     = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
     assert.ok(pkg.scripts && pkg.scripts.validate, 'package.json should have a validate script');
     assert.ok(
       pkg.scripts.validate.includes('validate'),

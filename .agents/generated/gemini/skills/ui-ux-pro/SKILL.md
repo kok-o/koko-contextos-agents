@@ -28,6 +28,7 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 ## ❌ Absolute Prohibitions (Never Do These)
 
 ### Typography Anti-Patterns
+
 - **NEVER** use Arial, Helvetica, or system-ui defaults as primary fonts
 - **NEVER** use Inter as the ONLY font — it is the #1 "AI-generated" visual tell when used alone
   - ✅ **CORRECT**: If using Inter for primary UI text, ALWAYS pair it with a strong monospace font like `JetBrains Mono` for numbers, code blocks, and technical accents to create a premium SaaS aesthetic (see Vercel, Linear)
@@ -36,6 +37,7 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 - **ALWAYS** import proper fonts from Google Fonts or similar
 
 ### Color Anti-Patterns
+
 - **NEVER** use pure black `#000000` — always tint toward brand hue (e.g. `#0A0A0F`)
 - **NEVER** use pure gray `#808080` — tint it (e.g. `#6B7280` has blue undertones)
 - **NEVER** use purple-to-blue gradients — it is the #1 "AI generated" visual tell
@@ -43,12 +45,14 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 - **ALWAYS** use HSL-based semantic palettes with clear naming
 
 ### Layout Anti-Patterns
+
 - **NEVER** nest cards inside cards (card-in-card = instant slop flag)
 - **NEVER** put a rounded-square icon tile above every heading
 - **NEVER** center-align long paragraphs (> 2 lines)
 - **NEVER** use gray text on colored backgrounds (contrast failure)
 
 ### Animation Anti-Patterns
+
 - **NEVER** use bounce or elastic easing in raw CSS — it feels dated (circa 2014)
 - **NEVER** add animations just to show they work
 - **ALWAYS** use `ease-out` for enter, `ease-in` for exit, `ease-in-out` for continuous
@@ -58,7 +62,9 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 ## ✅ Required Standards
 
 ### Accessibility Checklist
+
 Before shipping any UI, verify:
+
 - [ ] Text contrast ratio ≥ 4.5:1 for normal text (WCAG AA)
 - [ ] Text contrast ratio ≥ 3:1 for large text (≥ 18px bold or ≥ 24px)
 - [ ] All interactive elements have `aria-label` or visible text
@@ -121,7 +127,9 @@ Generate palettes in the format compatible with shadcn/ui's `globals.css`. Alway
 > **Rule**: NEVER define colors as raw hex/rgb. ALWAYS use HSL space values so Tailwind opacity modifiers (`text-primary/80`) work correctly.
 
 ### Spacing System (Tailwind)
+
 Use Tailwind spacing utilities. **Never use arbitrary values** like `gap-[17px]`:
+
 - `gap-1` / `p-1` — 4px micro gaps
 - `gap-2` / `p-2` — 8px component internal
 - `gap-4` / `p-4` — 16px standard padding
@@ -131,6 +139,7 @@ Use Tailwind spacing utilities. **Never use arbitrary values** like `gap-[17px]`
 - `gap-20` / `py-20` — 80px hero spacing
 
 ### Typography Scale
+
 Use a modular type scale (1.25 or 1.333 ratio):
 
 ```
@@ -145,6 +154,7 @@ xl:  24px / 1.5rem    (text-xl)
 ```
 
 Typography utilities:
+
 - Long headlines: use `text-balance` (prevents orphan words)
 - Body paragraphs: use `text-pretty` (smart line breaks)
 - Number tables: use `tabular-nums` class (not custom CSS)
@@ -154,6 +164,7 @@ Typography utilities:
 ## Design Domains
 
 ### Product UI (SaaS / Dashboard / App)
+
 - Functional over decorative
 - Dense information where needed (use compact variants)
 - Table zebra striping: use `5%` opacity, not hard borders
@@ -165,12 +176,14 @@ Typography utilities:
   3. A clear primary action CTA ("Create your first project →")
 
 ### Marketing / Landing Pages
+
 - Hero: full viewport height, one clear CTA
 - Social proof above the fold when possible
 - CTA buttons: filled primary + ghost secondary (never two filled)
 - Testimonials: real photos, full name, company
 
 ### Forms
+
 - Label above field (not placeholder-as-label)
 - Inline validation (show errors on blur, not on submit)
 - Group related fields visually
@@ -181,6 +194,7 @@ Typography utilities:
 ## UI Style Toolkit
 
 ### Glassmorphism (Use Sparingly)
+
 ```css
 background: rgba(255, 255, 255, 0.05);
 backdrop-filter: blur(20px);
@@ -188,6 +202,7 @@ border: 1px solid rgba(255, 255, 255, 0.1);
 ```
 
 ### Subtle Shadows (Dark UI)
+
 ```css
 /* Card elevation */
 box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.6);
@@ -198,6 +213,7 @@ box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
 ### Micro-animations
 
 **CSS (for simple, lightweight elements):**
+
 ```css
 /* Standard transition */
 transition: all 0.15s ease-out;
@@ -240,6 +256,7 @@ transition={{ type: "spring", stiffness: 200, damping: 8 }} // WRONG
 ## Domain Search Guide
 
 When choosing styles, reference these domains:
+
 - `style` — UI style options (glassmorphism, neobrutalism, minimalism)
 - `typography` — Font pairing recommendations  
 - `color` — Color palettes by product type
@@ -249,6 +266,7 @@ When choosing styles, reference these domains:
 ## Role Integration
 
 This skill is used at two stages in the pipeline:
+
 - **Planning stage** (`/plan`): Use as a design guideline when speccing UI components
 - **Review stage** (`/review`): Use as a strict QA checklist — audit every rule before shipping
 

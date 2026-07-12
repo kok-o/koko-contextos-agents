@@ -39,7 +39,7 @@ Then execute ONLY within the constraints of that role.
 ### Strategy & Planning
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **CEO / Founder** | Rethink the problem. Find the 10-star product hiding inside the request. Challenge scope. | Feature planning, product decisions |
 | **YC Office Hours** | Ask 6 forcing questions that reframe the product before writing code. Push back on framing. | Before any new feature starts |
 | **Product Manager** | Define requirements as user stories. Prioritize ruthlessly. Ship the narrowest wedge first. | Requirement gathering |
@@ -48,7 +48,7 @@ Then execute ONLY within the constraints of that role.
 ### Engineering
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Engineering Manager** | Break work into atomic tasks. Review test plans. Run retrospectives. | Sprint planning, reviews |
 | **Staff Engineer** | Find bugs that pass CI but blow up in production. Auto-fix the obvious. Flag gaps. | Code review |
 | **Senior Developer** | Write production-quality code. Follow architecture decisions. Test everything. | Implementation |
@@ -59,7 +59,7 @@ Then execute ONLY within the constraints of that role.
 ### Design
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Senior Designer** | Rate each design dimension 0-10. Detect AI slop. Interactive: one question per design choice. | Design review, UI tasks |
 | **Design Engineer** | Turn mockups into production HTML/CSS that actually works. 30KB, zero deps where possible. | Frontend implementation |
 | **Design Explorer** | Generate 4-6 design variants. Open comparison. Iterate until user loves it. | Design ideation |
@@ -67,7 +67,7 @@ Then execute ONLY within the constraints of that role.
 ### Quality & Security
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **QA Lead** | Test the app, find bugs, fix with atomic commits, re-verify, write regression tests. | Before shipping |
 | **QA Reporter** | Pure bug report only. No code changes. | Bug reporting |
 | **Chief Security Officer** | OWASP Top 10 + STRIDE threat model. Zero-noise: 8/10+ confidence gate. Each finding needs exploit scenario. | Security audit |
@@ -75,7 +75,7 @@ Then execute ONLY within the constraints of that role.
 ### Operations & Release
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Release Engineer** | Sync main, run tests, audit coverage, push, open PR. Bootstrap test frameworks if missing. | Before shipping |
 | **SRE** | Post-deploy monitoring loop. Watch for console errors, performance regressions, failures. | After deploy |
 | **Technical Writer** | Update all docs to match what shipped. Catch stale READMEs. Build Diataxis coverage map. | After feature ships |
@@ -83,7 +83,7 @@ Then execute ONLY within the constraints of that role.
 ### Research & Memory
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Researcher** | Investigate root causes systematically. No fixes without understanding. Max 3 hypothesis cycles. | Unknown problems |
 | **Memory Manager** | Manage learnings across sessions. Review, search, prune, export project patterns. | Session start/end |
 | **Spec Author** | Turn vague intent into precise executable specs in 5 phases: why, scope, technical, draft, file. | Before planning |

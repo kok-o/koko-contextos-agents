@@ -351,7 +351,7 @@ ContextOS is agent-agnostic. This skill generates the right config format for an
 ## Supported Agents
 
 | Agent | Config File | Format |
-|---|---|---|
+| --- | --- | --- |
 | **Gemini** | `.agents/AGENTS.md` + `.agents/skills/` | Markdown + YAML skills |
 | **Claude Code** | `CLAUDE.md` | Single markdown file |
 | **GitHub Copilot / Codex** | `AGENTS.md` (root) | Markdown |
@@ -373,6 +373,7 @@ ContextOS is agent-agnostic. This skill generates the right config format for an
 ### For Claude Code (`CLAUDE.md`)
 
 Compile into a single markdown file:
+
 1. Project overview from `docs/PRD.md` (summary only)
 2. Architecture summary from `docs/ARCHITECTURE.md`
 3. Coding rules from loaded skills
@@ -382,6 +383,7 @@ Compile into a single markdown file:
 ### For Gemini (`.agents/AGENTS.md`)
 
 Already native format. Just ensure:
+
 1. `AGENTS.md` references the skill directory
 2. Skills have proper SKILL.md with frontmatter
 3. Context Manager rules are in AGENTS.md
@@ -389,6 +391,7 @@ Already native format. Just ensure:
 ### For Cursor (`.cursorrules`)
 
 Compile into a flat text file:
+
 1. Project context (condensed)
 2. Coding style rules
 3. Framework-specific instructions
@@ -435,6 +438,7 @@ task:
 ### Step 2: Consult the Project Graph
 
 If `docs/PROJECT_GRAPH.md` exists:
+
 1. Find the module this task belongs to
 2. Get the module's dependencies
 3. Get the module's required skills
@@ -475,6 +479,7 @@ context:
 ### Step 5: Validate Budget
 
 Check total token count. If over budget (see context-rules.md):
+
 1. Trim Level 1 docs to summaries
 2. Load only affected sections of Level 2 docs
 3. Keep Level 3 (skills) at full detail
@@ -491,6 +496,7 @@ After first compilation for a module, cache the result:
 ```
 
 Invalidate cache when:
+
 - A document is updated
 - A skill is added/removed
 - The Project Graph changes
@@ -545,6 +551,7 @@ For each required layer, load the skill graph:
 5. Respect project profile (if set) — apply rules from `profiles/`
 
 **Dependency resolution example:**
+
 ```
 Need: nextjs
   → requires: react, typescript
@@ -560,17 +567,20 @@ Suggested: [tailwind, prisma, next-auth]
 Assemble context from three levels:
 
 **Level 1 — Vision (always available):**
+
 - `docs/PRD.md` — what are we building
 - `docs/ROADMAP.md` — where are we going
 - `docs/PROJECT_GRAPH.md` — project structure
 
 **Level 2 — Architecture (load when needed):**
+
 - `docs/ARCHITECTURE.md` — system design
 - `docs/DATABASE.md` — data model
 - `docs/API.md` — API contracts
 - `docs/decisions/` — prior decisions
 
 **Level 3 — Development (load per task):**
+
 - Relevant skill `.md` files
 - `docs/UI.md` — for frontend tasks
 - `docs/TASKS.md` — current sprint
@@ -581,6 +591,7 @@ See `references/context-rules.md` for the full mapping of task types to required
 ### Stage 4: Prompt Optimization
 
 Before sending to the AI agent:
+
 1. Remove sections not relevant to the current task
 2. Prioritize: current task context > architecture > vision
 3. Include recent Decision Records that affect the current task
@@ -589,7 +600,7 @@ Before sending to the AI agent:
 ## Commands
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `ctx init` | Analyze project idea, generate all docs |
 | `ctx plan` | Generate development plan from PRD |
 | `ctx compile` | Compile context for a specific task |
@@ -646,12 +657,14 @@ The compiler builds a dependency graph from all discovered skills and resolves i
 ## When to Use DDD
 
 **Use when:**
+
 - Complex business logic that goes beyond CRUD
 - Multiple domain experts with different vocabularies
 - The domain model is the competitive advantage
 - Enterprise-grade applications
 
 **Don't use when:**
+
 - Simple CRUD applications
 - Hackathon/MVP (overkill)
 - No domain expert available
@@ -659,9 +672,11 @@ The compiler builds a dependency graph from all discovered skills and resolves i
 ## Strategic Design
 
 ### Bounded Contexts
+
 The single most important DDD concept. A Bounded Context is a boundary within which a particular model is defined and applicable.
 
 **Example — E-Commerce:**
+
 ```
 [Order Context]          [Payment Context]       [Shipping Context]
   - Order                  - Payment               - Shipment
@@ -671,11 +686,13 @@ The single most important DDD concept. A Bounded Context is a boundary within wh
 ```
 
 `Customer` means different things in each context:
+
 - Order Context: name, email, shipping preference
 - Payment Context: billing info, payment methods
 - Support Context: ticket history, satisfaction score
 
 ### Context Map
+
 ```
 [Order] ←→ [Payment]     # Partnership
 [Order] → [Shipping]     # Customer-Supplier
@@ -685,7 +702,9 @@ The single most important DDD concept. A Bounded Context is a boundary within wh
 ## Tactical Design
 
 ### Entities
+
 Objects with identity. Two entities with the same attributes but different IDs are different.
+
 ```typescript
 class User {
   readonly id: UserId;
@@ -695,7 +714,9 @@ class User {
 ```
 
 ### Value Objects
+
 Objects defined by their attributes, not identity. Immutable.
+
 ```typescript
 class Email {
   constructor(readonly value: string) {
@@ -708,6 +729,7 @@ class Email {
 ```
 
 ### Aggregates
+
 A cluster of entities and value objects with a single root entity (Aggregate Root). All access goes through the root.
 
 ```typescript
@@ -727,12 +749,15 @@ class Order {  // Aggregate Root
 ```
 
 **Aggregate Rules:**
+
 1. Reference other aggregates by ID only
 2. One aggregate per transaction
 3. Eventual consistency between aggregates
 
 ### Domain Events
+
 Something that happened in the domain that domain experts care about.
+
 ```typescript
 class OrderPlaced implements DomainEvent {
   constructor(
@@ -745,7 +770,9 @@ class OrderPlaced implements DomainEvent {
 ```
 
 ### Domain Services
+
 Business logic that doesn't naturally belong to an entity or value object.
+
 ```typescript
 class PricingService {
   calculatePrice(order: Order, customer: Customer, promotions: Promotion[]): Money {
@@ -755,7 +782,9 @@ class PricingService {
 ```
 
 ### Repositories
+
 Abstraction over data access. One repository per aggregate root.
+
 ```typescript
 interface OrderRepository {
   findById(id: OrderId): Promise<Order | null>;
@@ -813,6 +842,7 @@ You manage **Architecture Decision Records** (ADRs).
 ## Why Decisions Matter
 
 Without ADRs, the AI agent sees:
+
 - "Database: PostgreSQL" — but doesn't know WHY
 - "Auth: JWT" — but doesn't know what alternatives were considered
 - "Framework: Next.js" — but doesn't know the tradeoffs
@@ -835,6 +865,7 @@ When an architectural choice is made during any pipeline stage:
 ### Query Decisions
 
 Before making changes that touch architecture:
+
 1. Check `docs/decisions/` for related decisions
 2. If a decision exists, follow it
 3. If a decision needs to change, create a new ADR that **supersedes** the old one
@@ -853,6 +884,7 @@ proposed → accepted → [deprecated | superseded]
 ## Auto-Detection
 
 The Decision Engine should suggest creating an ADR when it detects:
+
 - A new database/ORM is introduced
 - A new framework is added
 - Authentication strategy changes
@@ -892,11 +924,13 @@ Inspired by [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills
 ---
 
 ## Phase 1: DEFINE — /spec
+
 ### Auto-activates → `[ROLE: Product Manager]`
 
 Turn vague intent into a precise, executable specification.
 
 ### Spec Template
+
 ```markdown
 ## Feature Spec: [Feature Name]
 
@@ -929,17 +963,20 @@ Files affected:
 ---
 
 ## Phase 2: PLAN — /plan
+
 ### Auto-activates → `[ROLE: Architect]`
 
 Break the spec into atomic, independently testable tasks.
 
 ### Plan Rules
+
 - Each task must be **completable in < 2 hours** of focused work
 - Each task must be **independently testable**
 - Tasks must be **ordered by dependency** (blocking tasks first)
 - Each task gets a **test requirement** — no task without a test
 
 ### Plan Template
+
 ```markdown
 ## Implementation Plan: [Feature Name]
 
@@ -968,11 +1005,13 @@ Do not proceed to BUILD until this plan is approved.
 ---
 
 ## Phase 3: BUILD — /build
+
 ### Auto-activates → `[ROLE: Senior Developer]`
 
 Implement one task at a time. Commit after each task.
 
 ### Build Rules
+
 1. **One task per commit** — atomic, descriptive commit messages
 2. **Write the test FIRST** (TDD — red-green-refactor)
 3. **No dead code** — if it's not tested, it's not shipped
@@ -981,6 +1020,7 @@ Implement one task at a time. Commit after each task.
 6. **Limit the blast radius** — modify ONLY the files explicitly listed in the current task's plan. Do NOT rewrite adjacent components, hooks, or utilities unless strictly required AND approved. If you spot a problem in nearby code, file it as a separate task, do not fix it inline.
 
 ### Commit Message Format
+
 ```
 type(scope): short description (max 72 chars)
 
@@ -989,11 +1029,13 @@ type(scope): short description (max 72 chars)
 
 Refs: #issue-number
 ```
+
 Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
 
 ---
 
 ## Phase 4: VERIFY — /test
+
 ### Auto-activates → `[ROLE: QA Lead]`
 
 Tests are proof, not an afterthought.
@@ -1001,6 +1043,7 @@ Tests are proof, not an afterthought.
 ### Test Strategy by Code Type
 
 **Utilities, services, API routes → TDD (Red-Green-Refactor)**
+
 ```
 1. RED:      Write a failing test for the next small behavior
 2. GREEN:    Write the minimum code to make it pass
@@ -1010,7 +1053,8 @@ Tests are proof, not an afterthought.
 
 **UI Components → BDD (Behavior-Driven Development)**
 
-For complex React components, prioritize testing *user behavior* over internal state:
+For complex React components, prioritize testing _user behavior_ over internal state:
+
 - Use **React Testing Library** (`userEvent`, `screen.getByRole`) — test what the user sees
 - Use **Playwright** for critical user flows (login, checkout, form submit)
 - Do NOT test implementation details (internal state, private methods, component structure)
@@ -1034,6 +1078,7 @@ test("sets error state to true", () => {
 ```
 
 ### Test Hierarchy (Most to Least Valuable)
+
 ```
 For logic/services:  Unit Tests → Integration Tests
 For UI/flows:        RTL (component) → Playwright (e2e critical paths)
@@ -1041,7 +1086,9 @@ Skip:                Snapshot tests (brittle, low signal)
 ```
 
 ### Test Quality Gates
+
 Before moving to Review, verify:
+
 - [ ] All new code has tests
 - [ ] Tests are meaningful (not just coverage theater)
 - [ ] Edge cases are covered (null, empty, overflow, unauthorized)
@@ -1051,6 +1098,7 @@ Before moving to Review, verify:
 ---
 
 ## Phase 5: REVIEW — /review
+
 ### Auto-activates → `[ROLE: Staff Engineer]` + `[ROLE: Senior Designer]` for UI tasks
 
 Review before merging. Always.
@@ -1058,11 +1106,13 @@ Review before merging. Always.
 ### Code Review Checklist
 
 **Correctness**
+
 - [ ] Does it do what the spec says?
 - [ ] Are all acceptance criteria met?
 - [ ] Edge cases handled?
 
 **Code Quality**
+
 - [ ] Single Responsibility: each function does one thing
 - [ ] DRY: no logic duplicated across 3+ places
 - [ ] No magic numbers (use named constants)
@@ -1070,17 +1120,20 @@ Review before merging. Always.
 - [ ] Business logic is NOT in API route handlers — it lives in services/use-cases
 
 **Security**
+
 - [ ] No secrets hardcoded
 - [ ] User input is validated and sanitized
 - [ ] SQL uses parameterized queries (no string concatenation)
 - [ ] Auth checks before data access
 
 **Performance**
+
 - [ ] No N+1 query patterns
 - [ ] Expensive operations are cached or async
 - [ ] Large data sets are paginated
 
 **UI/Design** (if applicable — activate `impeccable-design` skill checklist)
+
 - [ ] Passes impeccable-design Quick Audit (typography, colors, spacing, animations)
 - [ ] Empty states are designed for all lists/tables
 - [ ] No hardcoded z-indexes
@@ -1088,11 +1141,13 @@ Review before merging. Always.
 ---
 
 ## Phase 6: SHIP — /ship
+
 ### Auto-activates → `[ROLE: Release Engineer]`
 
 Only ship when all gates are green.
 
 ### Pre-Ship Checklist
+
 - [ ] All tests pass in CI
 - [ ] No lint errors
 - [ ] Feature works in staging environment
@@ -1107,7 +1162,7 @@ Only ship when all gates are green.
 ## Anti-Patterns to Never Do
 
 | Anti-Pattern | Why It's Wrong | What To Do Instead |
-|---|---|---|
+| --- | --- | --- |
 | "I'll just write the code and we'll see" | Creates unmaintainable scope creep | Write spec first |
 | Writing code in Phase 1 (DEFINE) | Premature implementation | Stay in spec mode |
 | Skipping tests because "it's obvious" | Bugs hide in "obvious" code | Write the test anyway |
@@ -1287,12 +1342,14 @@ Generate development plan from existing PRD:
 ## Template Usage
 
 Each template contains:
+
 - **Section headers** — required sections for the document
 - **Placeholder prompts** — `{{description}}` markers that guide content generation
 - **Examples** — sample content to illustrate the expected format
 - **Validation rules** — what must be present for the document to be valid
 
 When generating a document:
+
 1. Read the template
 2. Fill in each section based on the user's idea and clarifying answers
 3. Replace all `{{placeholders}}` with real content
@@ -1343,7 +1400,7 @@ Then execute ONLY within the constraints of that role.
 ### Strategy & Planning
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **CEO / Founder** | Rethink the problem. Find the 10-star product hiding inside the request. Challenge scope. | Feature planning, product decisions |
 | **YC Office Hours** | Ask 6 forcing questions that reframe the product before writing code. Push back on framing. | Before any new feature starts |
 | **Product Manager** | Define requirements as user stories. Prioritize ruthlessly. Ship the narrowest wedge first. | Requirement gathering |
@@ -1352,7 +1409,7 @@ Then execute ONLY within the constraints of that role.
 ### Engineering
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Engineering Manager** | Break work into atomic tasks. Review test plans. Run retrospectives. | Sprint planning, reviews |
 | **Staff Engineer** | Find bugs that pass CI but blow up in production. Auto-fix the obvious. Flag gaps. | Code review |
 | **Senior Developer** | Write production-quality code. Follow architecture decisions. Test everything. | Implementation |
@@ -1363,7 +1420,7 @@ Then execute ONLY within the constraints of that role.
 ### Design
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Senior Designer** | Rate each design dimension 0-10. Detect AI slop. Interactive: one question per design choice. | Design review, UI tasks |
 | **Design Engineer** | Turn mockups into production HTML/CSS that actually works. 30KB, zero deps where possible. | Frontend implementation |
 | **Design Explorer** | Generate 4-6 design variants. Open comparison. Iterate until user loves it. | Design ideation |
@@ -1371,7 +1428,7 @@ Then execute ONLY within the constraints of that role.
 ### Quality & Security
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **QA Lead** | Test the app, find bugs, fix with atomic commits, re-verify, write regression tests. | Before shipping |
 | **QA Reporter** | Pure bug report only. No code changes. | Bug reporting |
 | **Chief Security Officer** | OWASP Top 10 + STRIDE threat model. Zero-noise: 8/10+ confidence gate. Each finding needs exploit scenario. | Security audit |
@@ -1379,7 +1436,7 @@ Then execute ONLY within the constraints of that role.
 ### Operations & Release
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Release Engineer** | Sync main, run tests, audit coverage, push, open PR. Bootstrap test frameworks if missing. | Before shipping |
 | **SRE** | Post-deploy monitoring loop. Watch for console errors, performance regressions, failures. | After deploy |
 | **Technical Writer** | Update all docs to match what shipped. Catch stale READMEs. Build Diataxis coverage map. | After feature ships |
@@ -1387,7 +1444,7 @@ Then execute ONLY within the constraints of that role.
 ### Research & Memory
 
 | Role | Mandate | When to Activate |
-|------|---------|-----------------|
+| ------ | --------- | ----------------- |
 | **Researcher** | Investigate root causes systematically. No fixes without understanding. Max 3 hypothesis cycles. | Unknown problems |
 | **Memory Manager** | Manage learnings across sessions. Review, search, prune, export project patterns. | Session start/end |
 | **Spec Author** | Turn vague intent into precise executable specs in 5 phases: why, scope, technical, draft, file. | Before planning |
@@ -1459,7 +1516,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Typography (Rules T1–T10)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | T1 | Using Inter for all text | Use Inter for UI body, pair with a distinct display font for headings OR with `JetBrains Mono` for technical/number accents (premium SaaS pattern) |
 | T2 | Using Arial or Helvetica | Use a curated Google Font pairing |
 | T3 | All text same weight | Use weight contrast: 700 headings, 400 body, 500 labels |
@@ -1472,6 +1529,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 | T10 | Bold everywhere | Bold is for emphasis. Diluted if overused. |
 
 **Tailwind typography utilities:**
+
 - `text-balance` — for headlines (prevents orphan words)
 - `text-pretty` — for body paragraphs (smart line-breaks)
 - `tabular-nums` — for numerical data tables
@@ -1479,7 +1537,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Color (Rules C1–C12)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | C1 | Pure black `#000` | Tint toward brand: `hsl(240, 10%, 4%)` |
 | C2 | Pure white `#fff` for surfaces | Near-white with warmth: `hsl(40, 30%, 97%)` |
 | C3 | Gray on colored background | Check contrast — likely fails WCAG. Use white/dark |
@@ -1496,7 +1554,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Layout & Spacing (Rules L1–L11)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | L1 | Cards inside cards | One level of card depth maximum |
 | L2 | Icon tile above every heading | Use icons inline, in context, not decoratively above text |
 | L3 | Centered long paragraphs | `text-center` max 2 lines only. Use `text-pretty` + left-align for body |
@@ -1512,7 +1570,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Components (Rules K1–K11)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | K1 | Two filled buttons side-by-side | `<Button variant="default">` + `<Button variant="outline">` or `variant="ghost"` |
 | K2 | Button without loading state | Always add spinner + `disabled` during async actions |
 | K3 | Modal without backdrop blur | shadcn `<Dialog>` handles this. Don't override with plain divs |
@@ -1528,7 +1586,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Animation (Rules A1–A8)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | A1 | CSS bounce/elastic/spring easing | CSS spring animations are forbidden. **Exception**: If using Framer Motion, highly damped springs are encouraged: `{ type: "spring", stiffness: 400, damping: 30 }` for modals and popovers — this creates a premium, physical feel like Vercel/Linear |
 | A2 | Animations that take > 400ms | Micro: 100–150ms, Components: 200–300ms, Pages: 300–400ms |
 | A3 | Animations everywhere | Animate max 2–3 elements simultaneously |
@@ -1541,7 +1599,7 @@ Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — determi
 ### Images & Icons (Rules I1–I8)
 
 | Rule | Anti-Pattern | Correct Approach |
-|------|-------------|-----------------|
+| ------ | ------------- | ----------------- |
 | I1 | Decorative icons on every list item | Icons add meaning, not decoration. Use selectively. |
 | I2 | Mix of icon styles | Pick one icon set (e.g., Lucide for shadcn). Stick with it. |
 | I3 | Low-contrast icons | Icons need ≥ 3:1 contrast ratio |
@@ -1575,6 +1633,7 @@ Start every new design with:
 ## Design Review Audits
 
 ### Quick Audit (before PR)
+
 - Typography: Is there clear visual hierarchy? Are fonts intentional? Is Inter paired properly?
 - Color: Any pure black/white? Contrast failures? Too many colors? Dark mode?
 - Spacing: Consistent Tailwind scale? No arbitrary values? Enough whitespace?
@@ -1583,6 +1642,7 @@ Start every new design with:
 - Z-index: Any hardcoded `z-[999]` or `z-50`?
 
 ### Full Audit (before release)
+
 - Accessibility: Run axe DevTools or Lighthouse — target 90+ score
 - Responsiveness: Test at 375px, 768px, 1280px, 1440px
 - Dark mode: Does the full palette hold up? No inverted-only shortcuts?
@@ -1612,12 +1672,14 @@ These details separate premium from mediocre:
 ## When to Use Microservices
 
 **Use when:**
+
 - Team > 10 engineers working on the same product
 - Independent deployment of components is critical
 - Different components have different scaling needs
 - Different components need different tech stacks
 
 **Don't use when:**
+
 - Small team (< 5 engineers)
 - MVP or prototype
 - No operational expertise (monitoring, tracing, deployment)
@@ -1626,30 +1688,37 @@ These details separate premium from mediocre:
 ## Core Principles
 
 ### 1. Single Responsibility
+
 Each service does ONE thing well.
 
 ### 2. Own Your Data
+
 Each service has its own database. No shared databases.
 
 ### 3. API Contracts
+
 Services communicate through well-defined APIs. Internal implementation is hidden.
 
 ### 4. Autonomous Deployment
+
 Each service can be deployed independently.
 
 ## Communication Patterns
 
 ### Synchronous (REST/gRPC)
+
 - **When**: Request needs immediate response
 - **Tools**: REST (HTTP), gRPC (high-performance)
 - **Risk**: Cascading failures, latency accumulation
 
 ### Asynchronous (Events/Messages)
+
 - **When**: Eventual consistency is acceptable
 - **Tools**: Kafka, RabbitMQ, Redis Streams, AWS SQS
 - **Benefit**: Loose coupling, resilience
 
 ### Saga Pattern (Distributed Transactions)
+
 ```
 Order Service → Payment Service → Inventory Service → Shipping Service
       ↓ (failure)
@@ -1659,6 +1728,7 @@ Compensating transactions reverse each step
 ## CQRS (Command Query Responsibility Segregation)
 
 Separate read and write models:
+
 ```
 Command (Write) → Write Model → Event Store → Projections → Read Model → Query (Read)
 ```
@@ -1668,35 +1738,42 @@ Command (Write) → Write Model → Event Store → Projections → Read Model �
 ## Event Sourcing
 
 Store events, not state:
+
 ```
 UserCreated → EmailUpdated → RoleChanged → PasswordReset
 ```
+
 Current state = replay all events. Full audit trail.
 
 ## Service Boundaries
 
 ### Bounded Contexts (from DDD)
+
 - Identify domain boundaries
 - Each service maps to a bounded context
 - Shared language within the context, translation at boundaries
 
 ### Anti-Corruption Layer
+
 When integrating with legacy or external systems, create an adapter that translates between models.
 
 ## Operational Concerns
 
 ### Observability (The Three Pillars)
+
 1. **Logs** — structured JSON, correlated by request ID
 2. **Metrics** — latency, error rate, throughput (RED)
 3. **Traces** — distributed tracing across services (Jaeger, Zipkin)
 
 ### Resilience
+
 - **Circuit Breaker** — stop calling failing services
 - **Retry with Backoff** — exponential backoff + jitter
 - **Timeout** — every call has a timeout
 - **Bulkhead** — isolate failures
 
 ### Deployment
+
 - **Containers** — Docker for consistency
 - **Orchestration** — Kubernetes for production
 - **CI/CD** — independent pipelines per service
@@ -1787,7 +1864,7 @@ export class CreateUserDto {
 ## Guards, Interceptors, Pipes
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | **Guards** | Authentication, authorization |
 | **Interceptors** | Logging, transformation, caching |
 | **Pipes** | Validation, transformation |
@@ -1999,7 +2076,7 @@ src/
 ## Core Web Vitals
 
 | Metric | Target | What it measures |
-|---|---|---|
+| --- | --- | --- |
 | LCP (Largest Contentful Paint) | < 2.5s | Loading performance |
 | INP (Interaction to Next Paint) | < 200ms | Responsiveness |
 | CLS (Cumulative Layout Shift) | < 0.1 | Visual stability |
@@ -2032,7 +2109,7 @@ src/
 ## Caching Strategy
 
 | Asset | Cache | Strategy |
-|---|---|---|
+| --- | --- | --- |
 | HTML | Short (5min) | Revalidate |
 | JS/CSS (hashed) | Long (1 year) | Immutable |
 | Images | Long (1 year) | Immutable |
@@ -2055,7 +2132,7 @@ src/
 
 Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 
-> *He says nothing. He writes one line. It works.*
+> _He says nothing. He writes one line. It works._
 
 **Benchmark**: 54% less code on average. 94% less in over-build scenarios. 100% safe (validation, error handling, security: never cut).
 
@@ -2105,6 +2182,7 @@ Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 The ladder applies to features and abstractions. These 4 areas are **non-negotiable** and **never simplified away**:
 
 ### 1. Input Validation
+
 ```javascript
 // ✅ Always validate — even if "internal" API
 function createUser(data) {
@@ -2121,6 +2199,7 @@ function createUser(data) {
 ```
 
 ### 2. Error Handling
+
 ```javascript
 // ✅ Always handle errors explicitly
 async function fetchUser(id) {
@@ -2143,6 +2222,7 @@ async function fetchUser(id) {
 ```
 
 ### 3. Security Guards
+
 ```javascript
 // ✅ Always check authorization before data access
 app.get('/users/:id/data', authMiddleware, async (req, res) => {
@@ -2159,6 +2239,7 @@ app.get('/users/:id/data', async (req, res) => {
 ```
 
 ### 4. Data Loss Prevention
+
 ```javascript
 // ✅ Always confirm before destructive operations
 async function deleteAccount(userId) {
@@ -2177,7 +2258,9 @@ async function deleteAccount(userId) {
 ## Practical Examples
 
 ### The Date Picker Problem
+
 ❌ **What AI usually does** (over-build):
+
 ```bash
 npm install flatpickr
 # Creates: DatePickerWrapper.jsx (45 lines)
@@ -2187,16 +2270,20 @@ npm install flatpickr
 ```
 
 ✅ **Ponytail approach** (use rung 4 — native platform):
+
 ```html
 <!-- ponytail: browser has one -->
 <input type="date" name="date" />
 ```
+
 Total: 1 line. 0 dependencies.
 
 ---
 
 ### The Utility Function Problem
+
 ❌ **Over-build**:
+
 ```javascript
 // Creates entire utilities.js module
 export const StringUtils = {
@@ -2207,6 +2294,7 @@ export const StringUtils = {
 ```
 
 ✅ **Ponytail** (rung 6 — one line, or rung 2 — already installed):
+
 ```javascript
 // If lodash is already installed (rung 5):
 import { capitalize, truncate } from 'lodash';
@@ -2218,7 +2306,9 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 ---
 
 ### The API Client Problem
+
 ❌ **Over-build**:
+
 ```javascript
 // Creates: ApiClient.js (200 lines of abstraction)
 // Creates: HttpService.js (retry logic, interceptors, "enterprise patterns")
@@ -2226,12 +2316,14 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 ```
 
 ✅ **Ponytail** (rung 3 — stdlib for client APIs):
+
 ```javascript
 // fetch is built-in. Use it directly.
 const user = await fetch(`/api/users/${id}`).then(r => r.json());
 ```
 
 ✅ **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
+
 ```typescript
 // Instead of: /api/users/[id]/route.ts + fetch wrapper
 // Use a Server Action directly — no API endpoint needed:
@@ -2260,6 +2352,7 @@ When the ponytail ladder prevents over-building, document it:
 ## What This Skill Does NOT Minimize
 
 Do NOT apply the ladder to:
+
 - **Tests** — write comprehensive tests, even if verbose
 - **Docs** — write clear documentation, even if long
 - **Error messages** — write descriptive, actionable error messages
@@ -2271,7 +2364,7 @@ Do NOT apply the ladder to:
 ## Anti-Patterns This Eliminates
 
 | Over-Build Pattern | Ponytail Response |
-|---|---|
+| --- | --- |
 | "We might need this later" | YAGNI. Ship what's needed now. |
 | Factory class for one object | Use a plain function |
 | Interface for one implementation | Skip the interface |
@@ -2311,6 +2404,7 @@ Do NOT apply the ladder to:
 ## Patterns
 
 ### Container/Presenter
+
 ```tsx
 // Container — handles logic
 function UserListContainer() {
@@ -2325,11 +2419,13 @@ function UserList({ users }: { users: User[] }) {
 ```
 
 ### Error Boundaries
+
 - Wrap major sections in Error Boundaries
 - Provide meaningful fallback UI
 - Log errors to monitoring service
 
 ### Loading States
+
 - Always handle: `loading`, `error`, `empty`, `data` states
 - Use Suspense where supported
 - Show skeleton screens, not spinners
@@ -2387,11 +2483,13 @@ types/
 ## OWASP Top 10
 
 ### 1. Injection (SQL, NoSQL, Command)
+
 - **Always use parameterized queries** — never concatenate user input into SQL
 - Use ORM (Prisma, SQLAlchemy, TypeORM) — they parameterize by default
 - Validate and sanitize all user input
 
 ### 2. Broken Authentication
+
 - Use bcrypt/argon2 for password hashing (cost factor ≥ 12)
 - JWT: short-lived access tokens (15min), refresh tokens (7 days)
 - Rate limit login attempts
@@ -2399,44 +2497,52 @@ types/
 - MFA for sensitive operations
 
 ### 3. Sensitive Data Exposure
+
 - HTTPS everywhere — redirect HTTP to HTTPS
 - Encrypt sensitive data at rest (AES-256)
 - Never log passwords, tokens, or PII
 - Use environment variables for secrets
 
 ### 4. XML/XXE
+
 - Disable external entity processing
 - Use JSON instead of XML where possible
 
 ### 5. Broken Access Control
+
 - Default deny — explicitly grant access
 - RBAC (Role-Based Access Control) or ABAC (Attribute-Based)
 - Check authorization on every request, not just UI
 - Don't rely on client-side validation for security
 
 ### 6. Security Misconfiguration
+
 - Remove default credentials
 - Disable debug mode in production
 - Security headers (see below)
 - Keep dependencies updated
 
 ### 7. XSS (Cross-Site Scripting)
+
 - Escape all output by default
 - Content-Security-Policy header
 - HttpOnly + Secure + SameSite cookies
 - Use framework's built-in XSS protection
 
 ### 8. Insecure Deserialization
+
 - Validate and schema-check all input (Zod, Pydantic, class-validator)
 - Don't deserialize untrusted data
 
 ### 9. Insufficient Logging
+
 - Log all authentication events
 - Log authorization failures
 - Log input validation failures
 - Include request ID for tracing
 
 ### 10. SSRF (Server-Side Request Forgery)
+
 - Validate and allowlist URLs
 - Don't let users control server-side HTTP requests
 
@@ -2454,6 +2560,7 @@ Permissions-Policy: camera=(), microphone=(), geolocation=()
 ## Authentication Patterns
 
 ### JWT Flow
+
 ```
 Login → Access Token (15min) + Refresh Token (7d, HttpOnly cookie)
 Request → Authorization: Bearer <access_token>
@@ -2461,6 +2568,7 @@ Expired → POST /auth/refresh (sends refresh cookie) → new access token
 ```
 
 ### OAuth2 Flow
+
 ```
 Redirect → Provider (Google, GitHub) → Callback → Create/link user → JWT
 ```
@@ -2508,9 +2616,11 @@ Before architecting any backend system, answer these questions:
 ## Core Architecture Patterns
 
 ### Load Balancing
+
 ```
 Clients → Load Balancer → [App Server 1, App Server 2, App Server N]
 ```
+
 - Use **Round Robin** for stateless services
 - Use **Least Connections** for varying request times
 - Use **IP Hash** for session affinity (or move sessions to Redis)
@@ -2519,16 +2629,20 @@ Clients → Load Balancer → [App Server 1, App Server 2, App Server N]
 **Rule**: Any service expecting > 1000 RPS needs a load balancer. No exceptions.
 
 ### Caching Strategy
+
 ```
 App → [Cache Layer: Redis/Memcached] → Database
 ```
+
 Cache decision ladder (check in order):
+
 1. Is it read > write? → Cache it
 2. Is it expensive to compute? → Cache it  
 3. Is it user-specific? → Cache with user key
 4. Is it global? → Shared cache, shorter TTL
 
 **Cache patterns**:
+
 - **Cache-aside** (lazy loading): check cache → miss → load DB → write cache
 - **Write-through**: write to DB AND cache simultaneously (consistency > performance)
 - **Write-behind**: write to cache → async flush to DB (performance > consistency)
@@ -2537,6 +2651,7 @@ Cache decision ladder (check in order):
 
 **Modern framework-native caching (Next.js App Router)**:  
 Before spinning up a dedicated Redis instance for caching API responses, check if Next.js built-in mechanisms are sufficient:
+
 - `revalidatePath('/dashboard')` — invalidate all cache for a route
 - `revalidateTag('user-profile')` — fine-grained tagged cache invalidation
 - `unstable_cache()` — server-side data caching with TTL
@@ -2561,8 +2676,9 @@ revalidateTag('user-profile')
 ### Database Architecture
 
 #### When to use SQL vs NoSQL
+
 | Scenario | Use SQL | Use NoSQL |
-|----------|---------|-----------|
+| ---------- | --------- | ----------- |
 | Complex joins, ACID transactions | ✅ | ❌ |
 | Flexible/evolving schema | ❌ | ✅ |
 | Horizontal scaling needed | Careful | ✅ |
@@ -2571,9 +2687,11 @@ revalidateTag('user-profile')
 | Time-series data | TimescaleDB | InfluxDB |
 
 #### Scaling Databases
+
 **Vertical scaling**: Bigger machine. Easy but has ceiling.  
 **Read replicas**: Route SELECT to replicas, writes to primary.  
 **Sharding (horizontal partitioning)**:
+
 - Hash sharding: `user_id % N` — even distribution, hard to rebalance
 - Range sharding: user_id 1-1M on shard 1 — easy range queries, hotspots risk
 - Directory-based: lookup table maps key → shard — flexible, but lookup is overhead
@@ -2582,10 +2700,13 @@ revalidateTag('user-profile')
 **Rule**: Don't shard until you've maxed out read replicas.
 
 ### Message Queues & Async Processing
+
 ```
 Producer → [Queue: Redis/RabbitMQ/Kafka] → Consumer Workers
 ```
+
 Use queues when:
+
 - Operation takes > 200ms (email, PDF generation, ML inference)
 - You need retry logic on failure
 - You need to decouple services
@@ -2600,6 +2721,7 @@ Use queues when:
 **Start with a monolith** unless you have > 10 engineers or proven scale need.
 
 When to split into microservices:
+
 - Independent deployment cycles needed
 - Different scaling requirements per service
 - Team autonomy (Conway's Law)
@@ -2608,6 +2730,7 @@ When to split into microservices:
 **Rule**: A microservice should be able to be rewritten in 2 weeks by 2 engineers.
 
 Service communication:
+
 - **Sync (REST/gRPC)**: when caller needs immediate response
 - **Async (events/queue)**: when caller can tolerate delay, or decoupling is needed
 - **BFF / Server Actions**: for web apps, prefer typed client-server contracts (see below)
@@ -2621,6 +2744,7 @@ Service communication:
 When deploying to serverless (Vercel Functions, AWS Lambda) or edge (Vercel Edge, Cloudflare Workers), the classical "App Server + Load Balancer" model changes:
 
 **Cold Start Problem**:
+
 - Serverless functions spin up from zero on first request — this can add 100–1000ms
 - **Never** do heavy initialization at module level (DB connections, config loading, crypto keys)
 - **Always** initialize lazily inside the handler, or use a connection pooling service
@@ -2638,11 +2762,13 @@ function getDb() {
 ```
 
 **DB Connection Pooling in Serverless**:
+
 - Traditional in-process pools (pg-pool, knex) do NOT work in serverless — each invocation is ephemeral
 - Use **Prisma Accelerate**, **PlanetScale**, **Neon** pooling, or **Supabase** — they handle pooling at the infrastructure level
 - Rule: If deploying to Vercel/serverless, NEVER assume `max_connections` is managed by your app process
 
 **Edge Functions limitations**:
+
 - No Node.js APIs (no `fs`, no `crypto.randomBytes`, limited DNS)
 - Latency must be < 50ms — no heavy DB queries
 - Use edge for: auth token verification, A/B testing, geo-routing, lightweight transformations
@@ -2680,6 +2806,7 @@ For complex APIs with many routes, use tRPC to get end-to-end type safety from D
 When building a public API consumed by external clients or mobile apps — use REST with OpenAPI spec.
 
 **Decision rule**:
+
 - Internal web-to-DB mutation → **Server Action**
 - Internal complex API → **tRPC**
 - Public/mobile API → **REST + OpenAPI**
@@ -2726,22 +2853,28 @@ export async function POST(req: Request) {
 ## Scalability Design Patterns
 
 ### CDN (Content Delivery Network)
+
 - Serve static assets (JS, CSS, images) from CDN edge nodes
 - Cache API responses that don't change per-user
 - Reduce origin server load by 80%+
 
 ### Rate Limiting
+
 Always implement for public APIs:
+
 ```
 - Token bucket: smooth bursts, allows brief spikes
 - Leaky bucket: strict rate, no bursts
 - Fixed window: simple, vulnerable to boundary spikes
 - Sliding window: most accurate, slightly more complex
 ```
+
 Store rate limit state in Redis (not in-process — it doesn't survive restarts).
 
 ### Circuit Breaker
+
 Prevent cascade failures:
+
 ```
 CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
   ↑                                               ↓
@@ -2749,6 +2882,7 @@ CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
 ```
 
 ### Database Connection Pooling
+
 - **Traditional servers**: Use pg-pool, knex, Prisma connection pool
 - **Serverless**: Use Prisma Accelerate, PlanetScale, Neon, or Supabase pooling — NOT in-process pools
 
@@ -2759,7 +2893,7 @@ CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
 **You can only guarantee 2 of 3**: Consistency, Availability, Partition Tolerance
 
 | System | Chooses | Example |
-|--------|---------|---------| 
+| -------- | --------- | --------- |
 | Traditional SQL | CP | PostgreSQL |
 | Distributed NoSQL | AP | DynamoDB, Cassandra |
 | Cache | AP (tunable) | Redis with replication |
@@ -2811,6 +2945,7 @@ When proposing any backend architecture, include:
 ## Strict Mode
 
 Always use strict TypeScript configuration:
+
 ```json
 {
   "compilerOptions": {
@@ -2920,24 +3055,28 @@ interface Repository<T extends { id: string }> {
 ## Component Patterns
 
 ### Buttons
+
 - Clear hierarchy: Primary > Secondary > Ghost/Text
 - Consistent sizing: sm (32px), md (40px), lg (48px)
 - States: default, hover, active, disabled, loading
 - Always accessible: sufficient contrast, focus indicator
 
 ### Forms
+
 - Labels above inputs (not floating labels for critical forms)
 - Clear error states with inline messages
 - Logical tab order
 - Progressive disclosure — don't show all fields at once
 
 ### Cards
+
 - Don't nest cards inside cards
 - Clear visual hierarchy within the card
 - Consistent padding and spacing
 - Interactive cards need hover state
 
 ### Navigation
+
 - Maximum 7±2 items in primary nav
 - Clear active state
 - Mobile: bottom nav or hamburger (not both)
@@ -2985,6 +3124,7 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 ## ❌ Absolute Prohibitions (Never Do These)
 
 ### Typography Anti-Patterns
+
 - **NEVER** use Arial, Helvetica, or system-ui defaults as primary fonts
 - **NEVER** use Inter as the ONLY font — it is the #1 "AI-generated" visual tell when used alone
   - ✅ **CORRECT**: If using Inter for primary UI text, ALWAYS pair it with a strong monospace font like `JetBrains Mono` for numbers, code blocks, and technical accents to create a premium SaaS aesthetic (see Vercel, Linear)
@@ -2993,6 +3133,7 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 - **ALWAYS** import proper fonts from Google Fonts or similar
 
 ### Color Anti-Patterns
+
 - **NEVER** use pure black `#000000` — always tint toward brand hue (e.g. `#0A0A0F`)
 - **NEVER** use pure gray `#808080` — tint it (e.g. `#6B7280` has blue undertones)
 - **NEVER** use purple-to-blue gradients — it is the #1 "AI generated" visual tell
@@ -3000,12 +3141,14 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 - **ALWAYS** use HSL-based semantic palettes with clear naming
 
 ### Layout Anti-Patterns
+
 - **NEVER** nest cards inside cards (card-in-card = instant slop flag)
 - **NEVER** put a rounded-square icon tile above every heading
 - **NEVER** center-align long paragraphs (> 2 lines)
 - **NEVER** use gray text on colored backgrounds (contrast failure)
 
 ### Animation Anti-Patterns
+
 - **NEVER** use bounce or elastic easing in raw CSS — it feels dated (circa 2014)
 - **NEVER** add animations just to show they work
 - **ALWAYS** use `ease-out` for enter, `ease-in` for exit, `ease-in-out` for continuous
@@ -3015,7 +3158,9 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 ## ✅ Required Standards
 
 ### Accessibility Checklist
+
 Before shipping any UI, verify:
+
 - [ ] Text contrast ratio ≥ 4.5:1 for normal text (WCAG AA)
 - [ ] Text contrast ratio ≥ 3:1 for large text (≥ 18px bold or ≥ 24px)
 - [ ] All interactive elements have `aria-label` or visible text
@@ -3078,7 +3223,9 @@ Generate palettes in the format compatible with shadcn/ui's `globals.css`. Alway
 > **Rule**: NEVER define colors as raw hex/rgb. ALWAYS use HSL space values so Tailwind opacity modifiers (`text-primary/80`) work correctly.
 
 ### Spacing System (Tailwind)
+
 Use Tailwind spacing utilities. **Never use arbitrary values** like `gap-[17px]`:
+
 - `gap-1` / `p-1` — 4px micro gaps
 - `gap-2` / `p-2` — 8px component internal
 - `gap-4` / `p-4` — 16px standard padding
@@ -3088,6 +3235,7 @@ Use Tailwind spacing utilities. **Never use arbitrary values** like `gap-[17px]`
 - `gap-20` / `py-20` — 80px hero spacing
 
 ### Typography Scale
+
 Use a modular type scale (1.25 or 1.333 ratio):
 
 ```
@@ -3102,6 +3250,7 @@ xl:  24px / 1.5rem    (text-xl)
 ```
 
 Typography utilities:
+
 - Long headlines: use `text-balance` (prevents orphan words)
 - Body paragraphs: use `text-pretty` (smart line breaks)
 - Number tables: use `tabular-nums` class (not custom CSS)
@@ -3111,6 +3260,7 @@ Typography utilities:
 ## Design Domains
 
 ### Product UI (SaaS / Dashboard / App)
+
 - Functional over decorative
 - Dense information where needed (use compact variants)
 - Table zebra striping: use `5%` opacity, not hard borders
@@ -3122,12 +3272,14 @@ Typography utilities:
   3. A clear primary action CTA ("Create your first project →")
 
 ### Marketing / Landing Pages
+
 - Hero: full viewport height, one clear CTA
 - Social proof above the fold when possible
 - CTA buttons: filled primary + ghost secondary (never two filled)
 - Testimonials: real photos, full name, company
 
 ### Forms
+
 - Label above field (not placeholder-as-label)
 - Inline validation (show errors on blur, not on submit)
 - Group related fields visually
@@ -3138,6 +3290,7 @@ Typography utilities:
 ## UI Style Toolkit
 
 ### Glassmorphism (Use Sparingly)
+
 ```css
 background: rgba(255, 255, 255, 0.05);
 backdrop-filter: blur(20px);
@@ -3145,6 +3298,7 @@ border: 1px solid rgba(255, 255, 255, 0.1);
 ```
 
 ### Subtle Shadows (Dark UI)
+
 ```css
 /* Card elevation */
 box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.6);
@@ -3155,6 +3309,7 @@ box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
 ### Micro-animations
 
 **CSS (for simple, lightweight elements):**
+
 ```css
 /* Standard transition */
 transition: all 0.15s ease-out;
@@ -3197,6 +3352,7 @@ transition={{ type: "spring", stiffness: 200, damping: 8 }} // WRONG
 ## Domain Search Guide
 
 When choosing styles, reference these domains:
+
 - `style` — UI style options (glassmorphism, neobrutalism, minimalism)
 - `typography` — Font pairing recommendations  
 - `color` — Color palettes by product type
@@ -3206,6 +3362,7 @@ When choosing styles, reference these domains:
 ## Role Integration
 
 This skill is used at two stages in the pipeline:
+
 - **Planning stage** (`/plan`): Use as a design guideline when speccing UI components
 - **Review stage** (`/review`): Use as a strict QA checklist — audit every rule before shipping
 
@@ -3226,6 +3383,7 @@ This skill is used at two stages in the pipeline:
 ## User Flows
 
 ### Design every state
+
 Every screen has 5 states. Design ALL of them:
 
 1. **Empty state** — first visit, no data yet. Include CTA to get started
@@ -3235,6 +3393,7 @@ Every screen has 5 states. Design ALL of them:
 5. **Error state** — what went wrong and how to fix it
 
 ### Reduce cognitive load
+
 - **Progressive disclosure** — show only what's needed now
 - **Sensible defaults** — pre-fill what you can
 - **Inline help** — tooltips and contextual guidance
