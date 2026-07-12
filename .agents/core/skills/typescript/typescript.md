@@ -3,6 +3,7 @@
 ## Strict Mode
 
 Always use strict TypeScript configuration:
+
 ```json
 {
   "compilerOptions": {

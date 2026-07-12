@@ -44,6 +44,7 @@ Brief explanation of the source/inspiration.
 ```
 
 **Rules for skill content:**
+
 - Must have valid YAML frontmatter with `name:` and `description:`
 - Must have at least one `## Section` heading
 - Must be > 100 bytes (not empty)
@@ -90,6 +91,7 @@ cat .agents/AGENTS.md
 ```
 
 To unlink when done:
+
 ```bash
 npm unlink koko-contextos-agents
 ```
@@ -99,7 +101,7 @@ npm unlink koko-contextos-agents
 ## CLI Commands Reference
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `node .agents/ctx.js export gemini` | Compile skills for Gemini / Antigravity |
 | `node .agents/ctx.js export claude` | Compile skills for Claude Code |
 | `node .agents/ctx.js export cursor` | Compile → `.cursorrules` |
@@ -146,11 +148,13 @@ You can share your skill with the community in three ways:
 1. Create a public GitHub repo (e.g. `alice/my-cool-skill`)
 2. Put your `SKILL.md` (and optional `skill.yaml`) at the repo root
 3. Users install it with:
+
    ```bash
    node .agents/ctx.js skill add alice/my-cool-skill
    ```
 
 If your skill lives in a subdirectory of a monorepo:
+
 ```bash
 node .agents/ctx.js skill add alice/my-monorepo/skills/docker
 ```
@@ -158,6 +162,7 @@ node .agents/ctx.js skill add alice/my-monorepo/skills/docker
 ### Option B — npm package
 
 1. Create a package with this structure:
+
    ```
    my-skill-package/
    ├── SKILL.md          ← required
@@ -166,6 +171,7 @@ node .agents/ctx.js skill add alice/my-monorepo/skills/docker
    ```
 
 2. `package.json` must have a `contextos` field:
+
    ```json
    {
      "name": "contextos-skill-docker",
@@ -180,6 +186,7 @@ node .agents/ctx.js skill add alice/my-monorepo/skills/docker
 3. Publish to npm: `npm publish`
 
 4. Users install it with:
+
    ```bash
    node .agents/ctx.js skill add contextos-skill-docker
    ```
@@ -203,6 +210,7 @@ Submit a PR to add your skill to [`registry.json`](./registry.json):
 ```
 
 This makes your skill discoverable via:
+
 ```bash
 node .agents/ctx.js skill search docker
 ```
@@ -210,6 +218,7 @@ node .agents/ctx.js skill search docker
 ### Plugin Skill Requirements
 
 Your `SKILL.md` must:
+
 - Have valid YAML frontmatter with `name:` and `description:`
 - Have at least one `## Section` heading
 - Be > 100 bytes

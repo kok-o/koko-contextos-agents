@@ -35,24 +35,28 @@
 ## Component Patterns
 
 ### Buttons
+
 - Clear hierarchy: Primary > Secondary > Ghost/Text
 - Consistent sizing: sm (32px), md (40px), lg (48px)
 - States: default, hover, active, disabled, loading
 - Always accessible: sufficient contrast, focus indicator
 
 ### Forms
+
 - Labels above inputs (not floating labels for critical forms)
 - Clear error states with inline messages
 - Logical tab order
 - Progressive disclosure — don't show all fields at once
 
 ### Cards
+
 - Don't nest cards inside cards
 - Clear visual hierarchy within the card
 - Consistent padding and spacing
 - Interactive cards need hover state
 
 ### Navigation
+
 - Maximum 7±2 items in primary nav
 - Clear active state
 - Mobile: bottom nav or hamburger (not both)

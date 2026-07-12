@@ -15,11 +15,13 @@
 ## Alternatives Considered
 
 ### {{Alternative 1}}
+
 - **Pros:** {{advantages}}
 - **Cons:** {{disadvantages}}
 - **Why rejected:** {{reason}}
 
 ### {{Alternative 2}}
+
 - **Pros:** {{advantages}}
 - **Cons:** {{disadvantages}}
 - **Why rejected:** {{reason}}
@@ -27,7 +29,7 @@
 ## Tradeoffs
 
 | Aspect | Gain | Cost |
-|---|---|---|
+| --- | --- | --- |
 | {{aspect_1}} | {{what_we_gain}} | {{what_we_lose}} |
 | {{aspect_2}} | {{what_we_gain}} | {{what_we_lose}} |
 
@@ -39,5 +41,6 @@
 - **Reversibility:** {{easy | moderate | hard | irreversible}}
 
 ## References
+
 - {{link_1}}
 - {{link_2}}

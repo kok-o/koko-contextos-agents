@@ -10,6 +10,7 @@
 ## User Flows
 
 ### Design every state
+
 Every screen has 5 states. Design ALL of them:
 
 1. **Empty state** — first visit, no data yet. Include CTA to get started
@@ -19,6 +20,7 @@ Every screen has 5 states. Design ALL of them:
 5. **Error state** — what went wrong and how to fix it
 
 ### Reduce cognitive load
+
 - **Progressive disclosure** — show only what's needed now
 - **Sensible defaults** — pre-fill what you can
 - **Inline help** — tooltips and contextual guidance

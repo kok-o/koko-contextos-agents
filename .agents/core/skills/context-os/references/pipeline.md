@@ -24,6 +24,7 @@
 **Output:** PRD.md, UI.md, ROADMAP.md, PROJECT_GRAPH.md
 
 Process:
+
 1. Intent Analysis — parse the user's request
 2. Clarifying questions — fill gaps
 3. Generate PRD with clear requirements
@@ -38,6 +39,7 @@ Process:
 **Output:** ARCHITECTURE.md, DATABASE.md, API.md, TASKS.md
 
 Process:
+
 1. Choose architecture based on profile + requirements
 2. Design database schema
 3. Define API contracts
@@ -52,6 +54,7 @@ Process:
 **Output:** Source code, migrations, configurations
 
 Process:
+
 1. Pick next task from TASKS.md
 2. Context Compiler loads only relevant skills and docs
 3. Write code following loaded skill instructions
@@ -66,6 +69,7 @@ Process:
 **Output:** Tests, coverage reports
 
 Process:
+
 1. Write tests for new code
 2. Run existing tests — ensure nothing broke
 3. Check edge cases
@@ -79,6 +83,7 @@ Process:
 **Output:** Review comments, approved changes
 
 Process:
+
 1. Self-review against coding standards
 2. Security scan (if security skill loaded)
 3. Accessibility audit (if frontend)
@@ -93,6 +98,7 @@ Process:
 **Output:** Deployment, decision records, release notes
 
 Process:
+
 1. Record any architectural decisions made (ADR)
 2. Update ROADMAP.md — mark completed items
 3. Update TASKS.md — close completed tasks
@@ -106,7 +112,7 @@ Process:
 Different profiles customize the pipeline:
 
 | Profile | Skips | Adds |
-|---|---|---|
+| --- | --- | --- |
 | **Hackathon** | REVIEW, detailed PLAN | Speed shortcuts |
 | **MVP** | Detailed REVIEW, DEPLOY | Quick iterations |
 | **Startup** | Heavy docs | Balance of speed and quality |

@@ -78,7 +78,7 @@ export class CreateUserDto {
 ## Guards, Interceptors, Pipes
 
 | Type | Purpose |
-|---|---|
+| --- | --- |
 | **Guards** | Authentication, authorization |
 | **Interceptors** | Logging, transformation, caching |
 | **Pipes** | Validation, transformation |

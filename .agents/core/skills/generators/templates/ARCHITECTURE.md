@@ -10,7 +10,7 @@
 ## Tech Stack
 
 | Layer | Technology | Reason |
-|---|---|---|
+| --- | --- | --- |
 | Frontend | {{e.g., Next.js + React}} | {{reason}} |
 | Backend | {{e.g., Node.js + Express}} | {{reason}} |
 | Database | {{e.g., PostgreSQL}} | {{reason}} |
@@ -21,11 +21,13 @@
 ## System Components
 
 ### {{Component 1 Name}}
+
 - **Responsibility:** {{what it does}}
 - **Interfaces:** {{what it exposes}}
 - **Dependencies:** {{what it depends on}}
 
 ### {{Component 2 Name}}
+
 - **Responsibility:** {{what it does}}
 - **Interfaces:** {{what it exposes}}
 - **Dependencies:** {{what it depends on}}

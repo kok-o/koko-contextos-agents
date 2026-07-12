@@ -98,7 +98,7 @@ describe('validate — real project', () => {
       'Should produce a validation report'
     );
     // Errors in our own skills are a hard failure
-    assert.equal(code, 0, `Validator exited with code ${code} — check errors above`);
+    assert.equal(code, 0, `Validator exited with code ${code} — check errors above\nSTDOUT: ${stdout}`);
   });
 
   test('output includes the PASSED banner', () => {

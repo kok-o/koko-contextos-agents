@@ -3,13 +3,16 @@
 ## Current Sprint: {{sprint_name}}
 
 ### In Progress
+
 - [ ] {{task}} `[{{module}}]` `[{{size: S/M/L/XL}}]`
 
 ### To Do
+
 - [ ] {{task}} `[{{module}}]` `[{{size}}]`
 - [ ] {{task}} `[{{module}}]` `[{{size}}]`
 
 ### Done
+
 - [x] {{completed_task}} `[{{module}}]`
 
 ---
@@ -17,6 +20,7 @@
 ## Task Format
 
 Each task should include:
+
 - **Description**: What needs to be done
 - **Module**: Which Project Graph module this belongs to
 - **Size**: S (< 1hr), M (1-4hr), L (4-8hr), XL (> 8hr)

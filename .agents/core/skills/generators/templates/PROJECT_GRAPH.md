@@ -1,6 +1,7 @@
 # {{Project Name}} — Project Graph
 
 ## Project
+
 ```yaml
 name: "{{project_name}}"
 type: {{webapp | api | mobile | cli | saas | crm | ecommerce}}
@@ -11,6 +12,7 @@ pack: {{skill_pack_name}}
 ## Modules
 
 ### {{module_name}}
+
 ```yaml
 module: {{module_name}}
 description: "{{what this module does}}"
@@ -38,7 +40,7 @@ depends_on: [{{other_module}}]
 ## File → Module Mapping
 
 | File Pattern | Module | Skills |
-|---|---|---|
+| --- | --- | --- |
 | `src/modules/{{module}}/**` | {{module}} | {{skills}} |
 | `src/shared/**` | shared | {{skills}} |
 | `src/config/**` | config | — |
@@ -48,6 +50,7 @@ depends_on: [{{other_module}}]
 ## Feature → Task Mapping
 
 ### {{Feature Name}} `[{{module}}]`
+
 - [ ] {{task_1}} → `{{file_path}}`
 - [ ] {{task_2}} → `{{file_path}}`
 - [ ] {{task_3}} → `{{file_path}}`

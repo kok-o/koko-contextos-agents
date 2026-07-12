@@ -3,7 +3,7 @@
 ## Task Type → Document Mapping
 
 | Task Type | Level 1 (Always) | Level 2 (If exists) | Level 3 (Per task) |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **New project** | PRD, ROADMAP | ARCHITECTURE, DATABASE, API | UI, TASKS, all relevant skills |
 | **New feature** | PRD | ARCHITECTURE, API | PROJECT_GRAPH, relevant skills |
 | **Frontend** | — | ARCHITECTURE, API | UI, frontend skills |
@@ -17,7 +17,7 @@
 ## Skill Category → Document Mapping
 
 | Skill Category | Required Documents | Optional Documents |
-|---|---|---|
+| --- | --- | --- |
 | `frontend` | UI.md, API.md | ARCHITECTURE.md |
 | `backend` | API.md, DATABASE.md | ARCHITECTURE.md |
 | `design` | UI.md | PRD.md |
@@ -31,7 +31,7 @@
 To prevent context window overflow, apply these limits:
 
 | Priority | Max tokens | Content |
-|---|---|---|
+| --- | --- | --- |
 | 1 (Critical) | 2000 | Current task description + relevant skill instructions |
 | 2 (Important) | 3000 | Architecture + API contracts for affected modules |
 | 3 (Context) | 2000 | Decision records + project graph (affected branch) |
@@ -40,6 +40,7 @@ To prevent context window overflow, apply these limits:
 **Total budget: ~8000 tokens of context per task.**
 
 If context exceeds budget:
+
 1. Trim Level 1 docs to summaries only
 2. Load only affected sections of Level 2 docs
 3. Keep Level 3 (skills) at full detail — they contain the actual instructions

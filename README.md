@@ -28,6 +28,7 @@ npx koko-contextos-agents --skip-compile  # Skip auto-compilation step
 ```
 
 ## Why Use This? (Benefits)
+
 - **Save Tokens & Context:** ContextOS dynamically loads only the required skills (e.g., loads UI skills for frontend tasks, skips backend rules). This prevents context window bloat and saves token costs.
 - **Superior Code Quality:** Pre-configured skills force the AI to use modern design patterns (DDD, microservices) and professional UI standards (no pure black colors, semantic palettes) rather than generic internet code.
 - **Save Time:** Stop writing massive system prompts or arguing with the AI. The assistant instantly knows your architectural decisions and coding standards from the start.
@@ -35,12 +36,13 @@ npx koko-contextos-agents --skip-compile  # Skip auto-compilation step
 ## What's Inside?
 
 ### Master Orchestrator
+
 - **AGENTS.md** — The core ruleset. Automatically routes skills by task type and technology detected in your codebase.
 
 ### Skills (25 total)
 
 | Category | Skill | What It Does |
-|----------|-------|-------------|
+| ---------- | ------- | ------------- |
 | Core | `gstack-roles` | 23 specialist roles (PM, Architect, QA Lead, etc.) — AI declares its role before each task |
 | Core | `engineering-workflow` | Enforces DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP pipeline. No code before spec is approved. |
 | Core | `ponytail-mindset` | 7-rung decision ladder before writing any code. Reduces code output ~54%. |
@@ -96,6 +98,7 @@ node .agents/ctx.js export all       # Compile for all agents
 | Claude Code | `export claude` | `.agents/generated/claude/skills/` |
 
 **Run after editing skills:**
+
 ```bash
 npm run build   # alias for: node .agents/ctx.js export all
 ```
@@ -115,6 +118,7 @@ npm test
 ```
 
 **Test coverage:**
+
 - `tests/install.test.js` — installer CLI flags (--help, --dry-run, --force)
 - `tests/export.test.js` — ctx.js export for gemini, claude, and all
 - `tests/skills.test.js` — validates all 25 skill source files
@@ -124,6 +128,7 @@ npm test
 We are open to pull requests! See [CONTRIBUTING.md](./CONTRIBUTING.md) for a step-by-step guide on how to add a new skill.
 
 Quick start:
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingSkill`)
 3. Add your skill in `.agents/core/skills/<name>/SKILL.md`
@@ -132,4 +137,5 @@ Quick start:
 6. Push and open a Pull Request
 
 ## License
+
 Distributed under the MIT License. You can freely use, modify, and distribute this code.

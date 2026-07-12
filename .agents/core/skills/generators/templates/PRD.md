@@ -11,7 +11,7 @@
 <!-- Who will use this? Define user personas -->
 
 | Persona | Description | Key Needs |
-|---|---|---|
+| --- | --- | --- |
 | {{persona_1}} | {{description}} | {{needs}} |
 | {{persona_2}} | {{description}} | {{needs}} |
 
@@ -34,6 +34,7 @@
 ## User Flows
 
 ### {{Primary Flow Name}}
+
 ```
 Step 1: {{action}}
 Step 2: {{action}}
@@ -43,7 +44,7 @@ Step 3: {{action}}
 ## Non-Functional Requirements
 
 | Requirement | Target |
-|---|---|
+| --- | --- |
 | Performance | {{e.g., page load < 2s}} |
 | Availability | {{e.g., 99.9%}} |
 | Security | {{e.g., OWASP Top 10 compliance}} |

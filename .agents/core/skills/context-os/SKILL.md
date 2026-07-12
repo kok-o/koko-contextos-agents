@@ -45,6 +45,7 @@ For each required layer, load the skill graph:
 5. Respect project profile (if set) — apply rules from `profiles/`
 
 **Dependency resolution example:**
+
 ```
 Need: nextjs
   → requires: react, typescript
@@ -60,17 +61,20 @@ Suggested: [tailwind, prisma, next-auth]
 Assemble context from three levels:
 
 **Level 1 — Vision (always available):**
+
 - `docs/PRD.md` — what are we building
 - `docs/ROADMAP.md` — where are we going
 - `docs/PROJECT_GRAPH.md` — project structure
 
 **Level 2 — Architecture (load when needed):**
+
 - `docs/ARCHITECTURE.md` — system design
 - `docs/DATABASE.md` — data model
 - `docs/API.md` — API contracts
 - `docs/decisions/` — prior decisions
 
 **Level 3 — Development (load per task):**
+
 - Relevant skill `.md` files
 - `docs/UI.md` — for frontend tasks
 - `docs/TASKS.md` — current sprint
@@ -81,6 +85,7 @@ See `references/context-rules.md` for the full mapping of task types to required
 ### Stage 4: Prompt Optimization
 
 Before sending to the AI agent:
+
 1. Remove sections not relevant to the current task
 2. Prioritize: current task context > architecture > vision
 3. Include recent Decision Records that affect the current task
@@ -89,7 +94,7 @@ Before sending to the AI agent:
 ## Commands
 
 | Command | Action |
-|---|---|
+| --- | --- |
 | `ctx init` | Analyze project idea, generate all docs |
 | `ctx plan` | Generate development plan from PRD |
 | `ctx compile` | Compile context for a specific task |

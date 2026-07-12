@@ -85,6 +85,7 @@ modules:
 ## Automatic Updates
 
 The Project Graph should be updated when:
+
 - New modules are added
 - Features are completed
 - File structure changes significantly
@@ -95,6 +96,7 @@ Use `ctx graph` to regenerate the Project Graph from the current codebase.
 ## Graph Queries
 
 The Context Compiler can answer questions like:
+
 - "What modules does this file belong to?"
 - "What skills are needed for this module?"
 - "What other modules will be affected if I change this?"

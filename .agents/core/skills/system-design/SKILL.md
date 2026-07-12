@@ -34,9 +34,11 @@ Before architecting any backend system, answer these questions:
 ## Core Architecture Patterns
 
 ### Load Balancing
+
 ```
 Clients → Load Balancer → [App Server 1, App Server 2, App Server N]
 ```
+
 - Use **Round Robin** for stateless services
 - Use **Least Connections** for varying request times
 - Use **IP Hash** for session affinity (or move sessions to Redis)
@@ -45,16 +47,20 @@ Clients → Load Balancer → [App Server 1, App Server 2, App Server N]
 **Rule**: Any service expecting > 1000 RPS needs a load balancer. No exceptions.
 
 ### Caching Strategy
+
 ```
 App → [Cache Layer: Redis/Memcached] → Database
 ```
+
 Cache decision ladder (check in order):
+
 1. Is it read > write? → Cache it
 2. Is it expensive to compute? → Cache it  
 3. Is it user-specific? → Cache with user key
 4. Is it global? → Shared cache, shorter TTL
 
 **Cache patterns**:
+
 - **Cache-aside** (lazy loading): check cache → miss → load DB → write cache
 - **Write-through**: write to DB AND cache simultaneously (consistency > performance)
 - **Write-behind**: write to cache → async flush to DB (performance > consistency)
@@ -63,6 +69,7 @@ Cache decision ladder (check in order):
 
 **Modern framework-native caching (Next.js App Router)**:  
 Before spinning up a dedicated Redis instance for caching API responses, check if Next.js built-in mechanisms are sufficient:
+
 - `revalidatePath('/dashboard')` — invalidate all cache for a route
 - `revalidateTag('user-profile')` — fine-grained tagged cache invalidation
 - `unstable_cache()` — server-side data caching with TTL
@@ -87,8 +94,9 @@ revalidateTag('user-profile')
 ### Database Architecture
 
 #### When to use SQL vs NoSQL
+
 | Scenario | Use SQL | Use NoSQL |
-|----------|---------|-----------|
+| ---------- | --------- | ----------- |
 | Complex joins, ACID transactions | ✅ | ❌ |
 | Flexible/evolving schema | ❌ | ✅ |
 | Horizontal scaling needed | Careful | ✅ |
@@ -97,9 +105,11 @@ revalidateTag('user-profile')
 | Time-series data | TimescaleDB | InfluxDB |
 
 #### Scaling Databases
+
 **Vertical scaling**: Bigger machine. Easy but has ceiling.  
 **Read replicas**: Route SELECT to replicas, writes to primary.  
 **Sharding (horizontal partitioning)**:
+
 - Hash sharding: `user_id % N` — even distribution, hard to rebalance
 - Range sharding: user_id 1-1M on shard 1 — easy range queries, hotspots risk
 - Directory-based: lookup table maps key → shard — flexible, but lookup is overhead
@@ -108,10 +118,13 @@ revalidateTag('user-profile')
 **Rule**: Don't shard until you've maxed out read replicas.
 
 ### Message Queues & Async Processing
+
 ```
 Producer → [Queue: Redis/RabbitMQ/Kafka] → Consumer Workers
 ```
+
 Use queues when:
+
 - Operation takes > 200ms (email, PDF generation, ML inference)
 - You need retry logic on failure
 - You need to decouple services
@@ -126,6 +139,7 @@ Use queues when:
 **Start with a monolith** unless you have > 10 engineers or proven scale need.
 
 When to split into microservices:
+
 - Independent deployment cycles needed
 - Different scaling requirements per service
 - Team autonomy (Conway's Law)
@@ -134,6 +148,7 @@ When to split into microservices:
 **Rule**: A microservice should be able to be rewritten in 2 weeks by 2 engineers.
 
 Service communication:
+
 - **Sync (REST/gRPC)**: when caller needs immediate response
 - **Async (events/queue)**: when caller can tolerate delay, or decoupling is needed
 - **BFF / Server Actions**: for web apps, prefer typed client-server contracts (see below)
@@ -147,6 +162,7 @@ Service communication:
 When deploying to serverless (Vercel Functions, AWS Lambda) or edge (Vercel Edge, Cloudflare Workers), the classical "App Server + Load Balancer" model changes:
 
 **Cold Start Problem**:
+
 - Serverless functions spin up from zero on first request — this can add 100–1000ms
 - **Never** do heavy initialization at module level (DB connections, config loading, crypto keys)
 - **Always** initialize lazily inside the handler, or use a connection pooling service
@@ -164,11 +180,13 @@ function getDb() {
 ```
 
 **DB Connection Pooling in Serverless**:
+
 - Traditional in-process pools (pg-pool, knex) do NOT work in serverless — each invocation is ephemeral
 - Use **Prisma Accelerate**, **PlanetScale**, **Neon** pooling, or **Supabase** — they handle pooling at the infrastructure level
 - Rule: If deploying to Vercel/serverless, NEVER assume `max_connections` is managed by your app process
 
 **Edge Functions limitations**:
+
 - No Node.js APIs (no `fs`, no `crypto.randomBytes`, limited DNS)
 - Latency must be < 50ms — no heavy DB queries
 - Use edge for: auth token verification, A/B testing, geo-routing, lightweight transformations
@@ -206,6 +224,7 @@ For complex APIs with many routes, use tRPC to get end-to-end type safety from D
 When building a public API consumed by external clients or mobile apps — use REST with OpenAPI spec.
 
 **Decision rule**:
+
 - Internal web-to-DB mutation → **Server Action**
 - Internal complex API → **tRPC**
 - Public/mobile API → **REST + OpenAPI**
@@ -252,22 +271,28 @@ export async function POST(req: Request) {
 ## Scalability Design Patterns
 
 ### CDN (Content Delivery Network)
+
 - Serve static assets (JS, CSS, images) from CDN edge nodes
 - Cache API responses that don't change per-user
 - Reduce origin server load by 80%+
 
 ### Rate Limiting
+
 Always implement for public APIs:
+
 ```
 - Token bucket: smooth bursts, allows brief spikes
 - Leaky bucket: strict rate, no bursts
 - Fixed window: simple, vulnerable to boundary spikes
 - Sliding window: most accurate, slightly more complex
 ```
+
 Store rate limit state in Redis (not in-process — it doesn't survive restarts).
 
 ### Circuit Breaker
+
 Prevent cascade failures:
+
 ```
 CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
   ↑                                               ↓
@@ -275,6 +300,7 @@ CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
 ```
 
 ### Database Connection Pooling
+
 - **Traditional servers**: Use pg-pool, knex, Prisma connection pool
 - **Serverless**: Use Prisma Accelerate, PlanetScale, Neon, or Supabase pooling — NOT in-process pools
 
@@ -285,7 +311,7 @@ CLOSED (normal) → [failures > threshold] → OPEN (fail fast)
 **You can only guarantee 2 of 3**: Consistency, Availability, Partition Tolerance
 
 | System | Chooses | Example |
-|--------|---------|---------| 
+| -------- | --------- | --------- |
 | Traditional SQL | CP | PostgreSQL |
 | Distributed NoSQL | AP | DynamoDB, Cassandra |
 | Cache | AP (tunable) | Redis with replication |

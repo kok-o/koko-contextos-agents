@@ -1,11 +1,13 @@
 # {{Project Name}} — Roadmap
 
 ## Vision
+
 {{one_sentence_vision}}
 
 ## Milestones
 
 ### v0.1 — MVP ({{target_date}})
+
 **Goal:** {{what_mvp_achieves}}
 
 - [ ] {{feature_1}}
@@ -17,6 +19,7 @@
 ---
 
 ### v0.2 — {{milestone_name}} ({{target_date}})
+
 **Goal:** {{what_this_milestone_achieves}}
 
 - [ ] {{feature_4}}
@@ -25,6 +28,7 @@
 ---
 
 ### v1.0 — Production ({{target_date}})
+
 **Goal:** {{what_production_means}}
 
 - [ ] {{feature_6}}
@@ -41,6 +45,7 @@
 - {{idea_2}}
 
 ## Risks
+
 | Risk | Impact | Mitigation |
 |---|---|---|
 | {{risk_1}} | {{high/medium/low}} | {{mitigation}} |

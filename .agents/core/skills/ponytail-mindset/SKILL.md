@@ -10,7 +10,7 @@ description: >
 
 Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 
-> *He says nothing. He writes one line. It works.*
+> _He says nothing. He writes one line. It works._
 
 **Benchmark**: 54% less code on average. 94% less in over-build scenarios. 100% safe (validation, error handling, security: never cut).
 
@@ -60,6 +60,7 @@ Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 The ladder applies to features and abstractions. These 4 areas are **non-negotiable** and **never simplified away**:
 
 ### 1. Input Validation
+
 ```javascript
 // ✅ Always validate — even if "internal" API
 function createUser(data) {
@@ -76,6 +77,7 @@ function createUser(data) {
 ```
 
 ### 2. Error Handling
+
 ```javascript
 // ✅ Always handle errors explicitly
 async function fetchUser(id) {
@@ -98,6 +100,7 @@ async function fetchUser(id) {
 ```
 
 ### 3. Security Guards
+
 ```javascript
 // ✅ Always check authorization before data access
 app.get('/users/:id/data', authMiddleware, async (req, res) => {
@@ -114,6 +117,7 @@ app.get('/users/:id/data', async (req, res) => {
 ```
 
 ### 4. Data Loss Prevention
+
 ```javascript
 // ✅ Always confirm before destructive operations
 async function deleteAccount(userId) {
@@ -132,7 +136,9 @@ async function deleteAccount(userId) {
 ## Practical Examples
 
 ### The Date Picker Problem
+
 ❌ **What AI usually does** (over-build):
+
 ```bash
 npm install flatpickr
 # Creates: DatePickerWrapper.jsx (45 lines)
@@ -142,16 +148,20 @@ npm install flatpickr
 ```
 
 ✅ **Ponytail approach** (use rung 4 — native platform):
+
 ```html
 <!-- ponytail: browser has one -->
 <input type="date" name="date" />
 ```
+
 Total: 1 line. 0 dependencies.
 
 ---
 
 ### The Utility Function Problem
+
 ❌ **Over-build**:
+
 ```javascript
 // Creates entire utilities.js module
 export const StringUtils = {
@@ -162,6 +172,7 @@ export const StringUtils = {
 ```
 
 ✅ **Ponytail** (rung 6 — one line, or rung 2 — already installed):
+
 ```javascript
 // If lodash is already installed (rung 5):
 import { capitalize, truncate } from 'lodash';
@@ -173,7 +184,9 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 ---
 
 ### The API Client Problem
+
 ❌ **Over-build**:
+
 ```javascript
 // Creates: ApiClient.js (200 lines of abstraction)
 // Creates: HttpService.js (retry logic, interceptors, "enterprise patterns")
@@ -181,12 +194,14 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 ```
 
 ✅ **Ponytail** (rung 3 — stdlib for client APIs):
+
 ```javascript
 // fetch is built-in. Use it directly.
 const user = await fetch(`/api/users/${id}`).then(r => r.json());
 ```
 
 ✅ **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
+
 ```typescript
 // Instead of: /api/users/[id]/route.ts + fetch wrapper
 // Use a Server Action directly — no API endpoint needed:
@@ -215,6 +230,7 @@ When the ponytail ladder prevents over-building, document it:
 ## What This Skill Does NOT Minimize
 
 Do NOT apply the ladder to:
+
 - **Tests** — write comprehensive tests, even if verbose
 - **Docs** — write clear documentation, even if long
 - **Error messages** — write descriptive, actionable error messages
@@ -226,7 +242,7 @@ Do NOT apply the ladder to:
 ## Anti-Patterns This Eliminates
 
 | Over-Build Pattern | Ponytail Response |
-|---|---|
+| --- | --- |
 | "We might need this later" | YAGNI. Ship what's needed now. |
 | Factory class for one object | Use a plain function |
 | Interface for one implementation | Skip the interface |

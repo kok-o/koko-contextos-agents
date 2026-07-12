@@ -33,6 +33,7 @@ description: >
 ## Patterns
 
 ### Container/Presenter
+
 ```tsx
 // Container — handles logic
 function UserListContainer() {
@@ -47,11 +48,13 @@ function UserList({ users }: { users: User[] }) {
 ```
 
 ### Error Boundaries
+
 - Wrap major sections in Error Boundaries
 - Provide meaningful fallback UI
 - Log errors to monitoring service
 
 ### Loading States
+
 - Always handle: `loading`, `error`, `empty`, `data` states
 - Use Suspense where supported
 - Show skeleton screens, not spinners
