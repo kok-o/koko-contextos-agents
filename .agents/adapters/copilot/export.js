@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
-const CORE_SKILLS_PATH = path.join(__dirname, '..', '..', 'core', 'skills');
-const AGENTS_MD_PATH   = path.join(__dirname, '..', '..', 'AGENTS.md');
+const { AGENTS_MD_PATH, collectSkillDirectories, extractYamlField, stripFrontmatter } = require('../shared.js');
 
 // GitHub Copilot reads from .github/copilot-instructions.md
 const OUTPUT_FILE = path.join(process.cwd(), '.github', 'copilot-instructions.md');
@@ -16,16 +14,6 @@ const OUTPUT_FILE = path.join(process.cwd(), '.github', 'copilot-instructions.md
  *
  * Format spec: https://docs.github.com/en/copilot/customizing-copilot/adding-repository-instructions
  */
-
-function stripFrontmatter(content) {
-  return content.replace(/^---[\s\S]*?---\n/, '').trimStart();
-}
-
-function extractYamlField(yamlText, field) {
-  const regex = new RegExp(`^${field}:\\s*(.+)$`, 'm');
-  const match = yamlText.match(regex);
-  return match ? match[1].trim() : null;
-}
 
 function buildSkillSection(skillDir) {
   const skillName  = path.basename(skillDir);
@@ -72,12 +60,10 @@ function run() {
   lines.push(`The following skills define specialist knowledge.\n`);
   lines.push(`Reference the relevant skill when working on a task.\n`);
 
-  const skills = fs.readdirSync(CORE_SKILLS_PATH);
+  const skills = collectSkillDirectories();
   let count = 0;
   for (const skill of skills) {
-    const fullPath = path.join(CORE_SKILLS_PATH, skill);
-    if (!fs.statSync(fullPath).isDirectory()) continue;
-    const section = buildSkillSection(fullPath);
+    const section = buildSkillSection(skill);
     if (section) {
       lines.push(section);
       count++;

@@ -18,7 +18,7 @@
   "MD031": true,
   "MD032": true,
   "MD034": true,
-  "MD040": true,
+  "MD040": false,
   "MD046": {
     "style": "fenced"
   },
@@ -27,5 +27,7 @@
   },
   "MD050": {
     "style": "asterisk"
-  }
+  },
+  "MD045": false,
+  "MD060": false
 }

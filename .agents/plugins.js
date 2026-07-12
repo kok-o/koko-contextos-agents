@@ -20,6 +20,7 @@
 'use strict';
 
 const fs      = require('fs');
+const os      = require('os');
 const path    = require('path');
 const https   = require('https');
 const crypto  = require('crypto');
@@ -215,30 +216,40 @@ function installFromNpm(descriptor, skillName, dryRun) {
 
   console.log(c.dim(`  Installing npm package: ${pkgName}`));
   const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-  execFileSync(npm, [
-    'install', '--no-save', '--ignore-scripts', '--package-lock=false', '--no-audit', '--no-fund', pkgName,
-  ], { cwd: ROOT, stdio: 'pipe' });
+  const temporaryPrefix = fs.mkdtempSync(path.join(os.tmpdir(), 'contextos-plugin-'));
 
-  const nmPath    = path.join(ROOT, 'node_modules', pkgName);
-  const skillSrc  = fs.existsSync(path.join(nmPath, 'SKILL.md'))
-    ? nmPath
-    : path.join(nmPath, 'skill'); // try skill/ subfolder
+  try {
+    // `--prefix` keeps both node_modules and npm metadata outside the user's
+    // project. Lifecycle scripts remain disabled for untrusted packages.
+    execFileSync(npm, [
+      'install', '--prefix', temporaryPrefix, '--no-save', '--ignore-scripts',
+      '--package-lock=false', '--no-audit', '--no-fund', pkgName,
+    ], { cwd: temporaryPrefix, stdio: 'pipe' });
 
-  if (!fs.existsSync(path.join(skillSrc, 'SKILL.md'))) {
-    throw new Error(`Package '${pkgName}' does not contain a SKILL.md at its root or skill/ subdirectory`);
+    const nmPath    = path.join(temporaryPrefix, 'node_modules', pkgName);
+    const skillSrc  = fs.existsSync(path.join(nmPath, 'SKILL.md'))
+      ? nmPath
+      : path.join(nmPath, 'skill'); // try skill/ subfolder
+
+    if (!fs.existsSync(path.join(skillSrc, 'SKILL.md'))) {
+      throw new Error(`Package '${pkgName}' does not contain a SKILL.md at its root or skill/ subdirectory`);
+    }
+
+    const targetDir = path.join(PLUGINS_DIR, skillName);
+    fs.rmSync(targetDir, { recursive: true, force: true });
+    fs.mkdirSync(targetDir, { recursive: true });
+    fs.cpSync(skillSrc, targetDir, { recursive: true, force: true });
+
+    // Write source marker
+    fs.writeFileSync(path.join(targetDir, '.source'), JSON.stringify({
+      type:        'npm',
+      package:     pkgName,
+      ref:         descriptor.raw,
+      installedAt: new Date().toISOString(),
+    }, null, 2));
+  } finally {
+    fs.rmSync(temporaryPrefix, { recursive: true, force: true });
   }
-
-  const targetDir = path.join(PLUGINS_DIR, skillName);
-  fs.mkdirSync(targetDir, { recursive: true });
-  fs.cpSync(skillSrc, targetDir, { recursive: true, force: true });
-
-  // Write source marker
-  fs.writeFileSync(path.join(targetDir, '.source'), JSON.stringify({
-    type:        'npm',
-    package:     pkgName,
-    ref:         descriptor.raw,
-    installedAt: new Date().toISOString(),
-  }, null, 2));
 
   console.log(c.green(`  ✓ Installed from npm: ${pkgName}`));
 }

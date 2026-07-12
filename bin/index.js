@@ -74,6 +74,50 @@ Plugin commands (after installation):
 const sourcePath = path.join(__dirname, '..', '.agents');
 const targetPath = path.join(process.cwd(), '.agents');
 
+function uniqueSiblingPath(basePath, suffix) {
+  let candidate = `${basePath}.${suffix}`;
+  let index = 1;
+  while (fs.existsSync(candidate)) {
+    candidate = `${basePath}.${suffix}-${index++}`;
+  }
+  return candidate;
+}
+
+/**
+ * Copy into a staging directory then replace the target with rollback. A
+ * partially copied .agents directory would otherwise leave an installation
+ * unusable if the process is interrupted or the disk is full.
+ */
+function installAtomically(source, target) {
+  const stagingPath = uniqueSiblingPath(target, 'staging');
+  const backupPath = uniqueSiblingPath(target, 'backup');
+  let movedExisting = false;
+
+  try {
+    fs.cpSync(source, stagingPath, { recursive: true, force: true });
+    if (fs.existsSync(target)) {
+      fs.renameSync(target, backupPath);
+      movedExisting = true;
+    }
+    fs.renameSync(stagingPath, target);
+    if (movedExisting) {
+      try {
+        fs.rmSync(backupPath, { recursive: true, force: true });
+      } catch {
+        // The new installation is already valid. Preserve the backup rather
+        // than reporting a failed install or risking the replacement.
+        console.warn(`[WARN] Installed successfully; backup retained at ${backupPath}`);
+      }
+    }
+  } catch (error) {
+    fs.rmSync(stagingPath, { recursive: true, force: true });
+    if (movedExisting && !fs.existsSync(target) && fs.existsSync(backupPath)) {
+      fs.renameSync(backupPath, target);
+    }
+    throw error;
+  }
+}
+
 // ── Dry run ───────────────────────────────────────────────────────────────────
 if (flags.dryRun) {
   console.log('[DRY-RUN] No files will be written.\n');
@@ -114,7 +158,12 @@ try {
     process.exit(1);
   }
 
-  fs.cpSync(sourcePath, targetPath, { recursive: true, force: true });
+  if (path.resolve(sourcePath) === path.resolve(targetPath)) {
+    console.error('[ERROR] Refusing to install the package into itself. Run this command from the target project.');
+    process.exit(1);
+  }
+
+  installAtomically(sourcePath, targetPath);
 
   console.log('[OK] .agents/ successfully installed in your project!');
   console.log('[OK] Your AI assistant now has skills and rules configured.\n');

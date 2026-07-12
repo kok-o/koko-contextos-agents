@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/koko-contextos-agents.svg)](https://www.npmjs.com/package/koko-contextos-agents)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D16.7.0-brightgreen.svg)](https://nodejs.org/)
-[![Tests](https://img.shields.io/badge/tests-19%20passing-brightgreen.svg)](#testing)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)](#testing)
 
 This is an open-source set of skills and behavioral rules for AI assistants. The package automatically installs an `.agents` folder into your project, teaching your AI assistant software development best practices (UI Design, Architecture, Security, and more).
 
@@ -127,6 +127,31 @@ npm test
 - `tests/install.test.js` — installer CLI flags (--help, --dry-run, --force)
 - `tests/export.test.js` — ctx.js export for gemini, claude, and all
 - `tests/skills.test.js` — validates all 25 skill source files
+
+## Gemini benchmark: with skills vs. without skills
+
+The repository includes a paired, reproducible code-quality benchmark. It discovers **20 real, closed JavaScript GitHub Issues** that have a linked merged pull request, checks out the parent commit of each merge, and asks the same Gemini model to fix each task twice:
+
+- baseline: no ContextOS skill guidance;
+- treatment: the ContextOS operating rules plus engineering, architecture, Node.js, security, and TypeScript skills.
+
+The controller, not the model, applies unified diffs and runs tests. A model can request up to eight repository files per turn but never receives shell access. Each result records test status, source-change scope, an independent Gemini code-review score, and turns until the model marks the task ready. The final JSON and Markdown reports include pass rates, average score, average turns, and the paired score delta.
+
+Discovery needs a GitHub token because resolving 20 issue-to-pull-request links exceeds anonymous API limits. Executing a benchmark also needs a Gemini key and an explicit opt-in before it can clone external repositories or run their declared tests:
+
+```bash
+set GITHUB_TOKEN=...       # PowerShell: $env:GITHUB_TOKEN = "..."
+set GEMINI_API_KEY=...     # PowerShell: $env:GEMINI_API_KEY = "..."
+node benchmarks/gemini-issues.js --allow-commands
+```
+
+The run first writes an immutable task manifest to `benchmarks/results/`. Re-run exactly the same tasks later to compare models or ContextOS revisions:
+
+```bash
+node benchmarks/gemini-issues.js --tasks benchmarks/results/tasks-<timestamp>.json --allow-commands
+```
+
+Use `--dry-run` to discover and validate the 20 tasks without calling Gemini, cloning repositories, or running code. See `node benchmarks/gemini-issues.js --help` for model, query, turn-limit, and output options.
 
 ## Contributing
 

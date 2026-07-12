@@ -76,7 +76,9 @@ describe('bin/index.js — installer', () => {
 
   test('--force flag installs without warning output', () => {
     const testDir = path.join(tmpDir, 'force-test');
-    fs.mkdirSync(path.join(testDir, '.agents'), { recursive: true });
+    const oldAgents = path.join(testDir, '.agents');
+    fs.mkdirSync(oldAgents, { recursive: true });
+    fs.writeFileSync(path.join(oldAgents, 'old-custom-file.txt'), 'old configuration');
 
     // Should not throw even though .agents/ exists
     const output = execSync(`node "${BIN_PATH}" --force --skip-compile`, {
@@ -84,5 +86,12 @@ describe('bin/index.js — installer', () => {
     }).toString();
 
     assert.ok(!output.includes('Warning:'), '--force should suppress the warning');
+    assert.ok(fs.existsSync(path.join(oldAgents, 'AGENTS.md')), 'Atomic replacement should install complete new content');
+    assert.ok(!fs.existsSync(path.join(oldAgents, 'old-custom-file.txt')), 'Old content should not leak into replacement');
+    assert.deepEqual(
+      fs.readdirSync(testDir).filter(name => name.startsWith('.agents.backup') || name.startsWith('.agents.staging')),
+      [],
+      'Successful replacement should clean temporary backup and staging directories'
+    );
   });
 });

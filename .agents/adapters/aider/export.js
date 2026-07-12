@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
-const CORE_SKILLS_PATH = path.join(__dirname, '..', '..', 'core', 'skills');
-const AGENTS_MD_PATH   = path.join(__dirname, '..', '..', 'AGENTS.md');
+const { AGENTS_MD_PATH, collectSkillDirectories, extractYamlField, stripFrontmatter } = require('../shared.js');
 
 // Aider config goes to project root
 const CONF_FILE        = path.join(process.cwd(), '.aider.conf.yml');
@@ -20,16 +18,6 @@ const CONVENTIONS_FILE = path.join(process.cwd(), 'CONVENTIONS.md');
  *
  * Format spec: https://aider.chat/docs/config/aider_conf.html
  */
-
-function stripFrontmatter(content) {
-  return content.replace(/^---[\s\S]*?---\n/, '').trimStart();
-}
-
-function extractYamlField(yamlText, field) {
-  const regex = new RegExp(`^${field}:\\s*(.+)$`, 'm');
-  const match = yamlText.match(regex);
-  return match ? match[1].trim() : null;
-}
 
 function buildSkillSection(skillDir) {
   const skillName  = path.basename(skillDir);
@@ -97,12 +85,10 @@ function run() {
 
   // Skills
   sections.push('\n---\n\n# Skills\n');
-  const skills = fs.readdirSync(CORE_SKILLS_PATH);
+  const skills = collectSkillDirectories();
   let count = 0;
   for (const skill of skills) {
-    const fullPath = path.join(CORE_SKILLS_PATH, skill);
-    if (!fs.statSync(fullPath).isDirectory()) continue;
-    const section = buildSkillSection(fullPath);
+    const section = buildSkillSection(skill);
     if (section) {
       sections.push(section);
       count++;

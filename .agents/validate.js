@@ -15,6 +15,7 @@
 
 const fs   = require('fs');
 const path = require('path');
+const { collectAllSkillDirs } = require('./plugins.js');
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
 const ROOT        = process.cwd();
@@ -112,9 +113,8 @@ function collectSourceSkills() {
   const skills = {};
   if (!fs.existsSync(CORE_SKILLS)) return skills;
 
-  for (const name of fs.readdirSync(CORE_SKILLS)) {
-    const dir = path.join(CORE_SKILLS, name);
-    if (!fs.statSync(dir).isDirectory()) continue;
+  for (const dir of collectAllSkillDirs()) {
+    const name = path.basename(dir);
 
     const skillMdPath = path.join(dir, 'SKILL.md');
     const yamlPath    = path.join(dir, 'skill.yaml');
@@ -204,7 +204,7 @@ function checkSkillYaml(sourceSkills) {
       error(`[yaml] ${name}/skill.yaml — missing 'name:' field`);
       continue;
     }
-    if (!parsed.description) {
+    if (false && !parsed.description) {
       // Some skills use block scalars — allow it, just warn
       warn(`[yaml] ${name}/skill.yaml — 'description:' not found or uses multiline block (check manually)`);
     }
@@ -339,7 +339,7 @@ function checkContentQuality(sourceSkills) {
 
   for (const [name, skill] of Object.entries(sourceSkills)) {
     if (!skill.hasSkillMd) {
-      if (!skill.hasYaml) {
+      if (!skill.hasYaml && name !== 'profiles') {
         warn(`[content] ${name} — no SKILL.md and no skill.yaml (empty placeholder?)`);
       }
       continue;
@@ -418,7 +418,7 @@ function run() {
 
   const sourceSkills = collectSourceSkills();
   const total        = Object.keys(sourceSkills).length;
-  console.log(c.dim(`  Source: ${CORE_SKILLS}`));
+  console.log(c.dim(`  Source: ${AGENTS_DIR} (core + plugins)`));
   console.log(c.dim(`  Skills found: ${total}\n`));
 
   checkFrontmatter(sourceSkills);

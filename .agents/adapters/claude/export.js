@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+const { collectSkillDirectories, resetDirectory } = require('../shared.js');
 
-const CORE_SKILLS_PATH = path.join(__dirname, '..', '..', 'core', 'skills');
 const GENERATED_SKILLS_PATH = path.join(__dirname, '..', '..', 'generated', 'claude', 'skills');
 
 /**
@@ -33,14 +33,11 @@ function generateClaudeSkill(skillDir) {
 
 function run() {
   console.log('Starting Claude adapter export...');
-  fs.mkdirSync(GENERATED_SKILLS_PATH, { recursive: true });
+  resetDirectory(GENERATED_SKILLS_PATH);
 
-  const skills = fs.readdirSync(CORE_SKILLS_PATH);
+  const skills = collectSkillDirectories();
   for (const skill of skills) {
-    const fullPath = path.join(CORE_SKILLS_PATH, skill);
-    if (fs.statSync(fullPath).isDirectory()) {
-      generateClaudeSkill(fullPath);
-    }
+    generateClaudeSkill(skill);
   }
   console.log('Export complete. Skills are in generated/claude/skills');
 }

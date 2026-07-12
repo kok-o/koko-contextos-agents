@@ -20,6 +20,7 @@ const CURSOR_FILE  = path.join(ROOT, '.cursorrules');
 const COPILOT_FILE = path.join(ROOT, '.github', 'copilot-instructions.md');
 const AIDER_CONF   = path.join(ROOT, '.aider.conf.yml');
 const CONVENTIONS  = path.join(ROOT, 'CONVENTIONS.md');
+const PLUGIN_DIR   = path.join(ROOT, '.agents', 'plugins', 'export-test-plugin');
 
 describe('ctx.js — context compiler', () => {
   test('exits with error when no arguments given', () => {
@@ -208,6 +209,35 @@ describe('ctx.js — context compiler', () => {
       assert.ok(output.includes('copilot') || output.includes('Copilot'), 'Should mention Copilot');
       assert.ok(output.includes('aider') || output.includes('Aider'), 'Should mention Aider');
       assert.ok(output.includes('All exports complete'), 'Should confirm all exports complete');
+    });
+  });
+
+  describe('plugin skill export', () => {
+    before(() => {
+      fs.mkdirSync(PLUGIN_DIR, { recursive: true });
+      fs.writeFileSync(path.join(PLUGIN_DIR, 'SKILL.md'), '# Export test plugin\n\nPlugin instructions unique-marker-export-test.\n');
+      execSync(`node "${CTX_PATH}" export all`, { cwd: ROOT });
+    });
+
+    after(() => {
+      fs.rmSync(PLUGIN_DIR, { recursive: true, force: true });
+      execSync(`node "${CTX_PATH}" export all`, { cwd: ROOT });
+    });
+
+    test('includes installed plugins in every adapter output', () => {
+      assert.ok(fs.existsSync(path.join(GENERATED_GEMINI, 'export-test-plugin', 'SKILL.md')));
+      assert.ok(fs.existsSync(path.join(GENERATED_CLAUDE, 'export-test-plugin', 'SKILL.md')));
+      assert.ok(fs.readFileSync(CURSOR_FILE, 'utf8').includes('unique-marker-export-test'));
+      assert.ok(fs.readFileSync(COPILOT_FILE, 'utf8').includes('unique-marker-export-test'));
+      assert.ok(fs.readFileSync(CONVENTIONS, 'utf8').includes('unique-marker-export-test'));
+    });
+
+    test('clears removed plugins from generated skill directories', () => {
+      fs.rmSync(PLUGIN_DIR, { recursive: true, force: true });
+      execSync(`node "${CTX_PATH}" export gemini`, { cwd: ROOT });
+      assert.ok(!fs.existsSync(path.join(GENERATED_GEMINI, 'export-test-plugin')));
+      fs.mkdirSync(PLUGIN_DIR, { recursive: true });
+      fs.writeFileSync(path.join(PLUGIN_DIR, 'SKILL.md'), '# Export test plugin\n\nPlugin instructions unique-marker-export-test.\n');
     });
   });
 });
