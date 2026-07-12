@@ -10,9 +10,16 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const CTX_PATH = path.join(__dirname, '..', '.agents', 'ctx.js');
+const CTX_PATH        = path.join(__dirname, '..', '.agents', 'ctx.js');
 const GENERATED_GEMINI = path.join(__dirname, '..', '.agents', 'generated', 'gemini', 'skills');
 const GENERATED_CLAUDE = path.join(__dirname, '..', '.agents', 'generated', 'claude', 'skills');
+
+// New adapters output to project root (cwd when running tests = repo root)
+const ROOT = path.join(__dirname, '..');
+const CURSOR_FILE  = path.join(ROOT, '.cursorrules');
+const COPILOT_FILE = path.join(ROOT, '.github', 'copilot-instructions.md');
+const AIDER_CONF   = path.join(ROOT, '.aider.conf.yml');
+const CONVENTIONS  = path.join(ROOT, 'CONVENTIONS.md');
 
 describe('ctx.js — context compiler', () => {
   test('exits with error when no arguments given', () => {
@@ -110,11 +117,97 @@ describe('ctx.js — context compiler', () => {
     });
   });
 
+  describe('export cursor', () => {
+    before(() => {
+      execSync(`node "${CTX_PATH}" export cursor`, { cwd: ROOT });
+    });
+
+    test('creates .cursorrules at project root', () => {
+      assert.ok(fs.existsSync(CURSOR_FILE), '.cursorrules should exist at project root');
+    });
+
+    test('.cursorrules contains the ContextOS header', () => {
+      const content = fs.readFileSync(CURSOR_FILE, 'utf8');
+      assert.ok(content.includes('ContextOS'), 'Should include ContextOS reference');
+    });
+
+    test('.cursorrules includes skill sections', () => {
+      const content = fs.readFileSync(CURSOR_FILE, 'utf8');
+      assert.ok(content.includes('## Skill:'), 'Should contain skill sections');
+    });
+
+    test('.cursorrules contains at least 5 skills', () => {
+      const content = fs.readFileSync(CURSOR_FILE, 'utf8');
+      const matches = content.match(/^## Skill:/gm) || [];
+      assert.ok(matches.length >= 5, `Expected ≥5 skill sections, got ${matches.length}`);
+    });
+  });
+
+  describe('export copilot', () => {
+    before(() => {
+      execSync(`node "${CTX_PATH}" export copilot`, { cwd: ROOT });
+    });
+
+    test('creates .github/copilot-instructions.md', () => {
+      assert.ok(fs.existsSync(COPILOT_FILE), '.github/copilot-instructions.md should exist');
+    });
+
+    test('copilot-instructions.md has correct header', () => {
+      const content = fs.readFileSync(COPILOT_FILE, 'utf8');
+      assert.ok(content.includes('GitHub Copilot Instructions'), 'Should include copilot header');
+    });
+
+    test('copilot-instructions.md contains skills library section', () => {
+      const content = fs.readFileSync(COPILOT_FILE, 'utf8');
+      assert.ok(content.includes('## Skills Library'), 'Should include Skills Library section');
+    });
+
+    test('copilot-instructions.md contains at least 5 skill subsections', () => {
+      const content = fs.readFileSync(COPILOT_FILE, 'utf8');
+      const matches = content.match(/^### /gm) || [];
+      assert.ok(matches.length >= 5, `Expected ≥5 skill entries, got ${matches.length}`);
+    });
+  });
+
+  describe('export aider', () => {
+    before(() => {
+      execSync(`node "${CTX_PATH}" export aider`, { cwd: ROOT });
+    });
+
+    test('creates .aider.conf.yml at project root', () => {
+      assert.ok(fs.existsSync(AIDER_CONF), '.aider.conf.yml should exist');
+    });
+
+    test('creates CONVENTIONS.md at project root', () => {
+      assert.ok(fs.existsSync(CONVENTIONS), 'CONVENTIONS.md should exist');
+    });
+
+    test('.aider.conf.yml references CONVENTIONS.md via read directive', () => {
+      const content = fs.readFileSync(AIDER_CONF, 'utf8');
+      assert.ok(content.includes('read:'), 'Should have a read: directive');
+      assert.ok(content.includes('CONVENTIONS.md'), 'Should reference CONVENTIONS.md');
+    });
+
+    test('CONVENTIONS.md includes project rules and skills', () => {
+      const content = fs.readFileSync(CONVENTIONS, 'utf8');
+      assert.ok(content.includes('## Skill:'), 'Should include skill sections');
+    });
+
+    test('CONVENTIONS.md has substantial content', () => {
+      const content = fs.readFileSync(CONVENTIONS, 'utf8');
+      assert.ok(content.length > 2000, 'CONVENTIONS.md should have substantial content');
+    });
+  });
+
   describe('export all', () => {
-    test('export all runs both adapters successfully', () => {
-      const output = execSync(`node "${CTX_PATH}" export all`).toString();
+    test('export all runs all five adapters successfully', () => {
+      const output = execSync(`node "${CTX_PATH}" export all`, { cwd: ROOT }).toString();
       assert.ok(output.includes('gemini') || output.includes('Gemini'), 'Should mention Gemini');
       assert.ok(output.includes('claude') || output.includes('Claude'), 'Should mention Claude');
+      assert.ok(output.includes('cursor') || output.includes('Cursor'), 'Should mention Cursor');
+      assert.ok(output.includes('copilot') || output.includes('Copilot'), 'Should mention Copilot');
+      assert.ok(output.includes('aider') || output.includes('Aider'), 'Should mention Aider');
+      assert.ok(output.includes('All exports complete'), 'Should confirm all exports complete');
     });
   });
 });

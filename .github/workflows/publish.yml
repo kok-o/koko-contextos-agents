@@ -1,0 +1,142 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# publish.yml
+# Triggered when a GitHub Release is published (tag vX.Y.Z).
+# Steps:
+#   1. Validate skills & run tests (same gates as CI)
+#   2. Sync package.json version with the git tag
+#   3. Build / compile all adapters
+#   4. Publish to npm
+#   5. Post a summary comment on the release
+#
+# Required secrets:
+#   NPM_TOKEN  — npm automation token (set in repo Settings → Secrets)
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write   # needed to update package.json version in the release commit
+
+jobs:
+  publish:
+    name: Validate → Build → Publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # needed for git tag inspection
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # ── Extract & validate version from git tag ─────────────────────────────
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          # Strip leading 'v' — e.g. v1.2.3 → 1.2.3
+          VERSION="${TAG#v}"
+          echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing version: $VERSION (from tag $TAG)"
+
+      - name: Validate semver format
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9.]+)?$'; then
+            echo "::error::Tag '${{ steps.version.outputs.tag }}' is not a valid semver (expected vX.Y.Z)"
+            exit 1
+          fi
+
+      # ── Sync package.json version ───────────────────────────────────────────
+      - name: Sync package.json version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          CURRENT=$(node -e "console.log(require('./package.json').version)")
+          if [ "$CURRENT" != "$VERSION" ]; then
+            echo "Updating package.json: $CURRENT → $VERSION"
+            npm version "$VERSION" --no-git-tag-version
+          else
+            echo "package.json already at $VERSION"
+          fi
+
+      # ── Quality gates (same as validate-skills CI) ──────────────────────────
+      - name: Run test suite
+        run: npm test
+
+      - name: Run skill validator
+        run: npm run validate
+        env:
+          NO_COLOR: "1"
+
+      - name: Lint SKILL.md frontmatter
+        run: |
+          node - << 'EOF'
+          const fs   = require('fs');
+          const path = require('path');
+
+          const SKILLS_DIR  = path.join('.agents', 'core', 'skills');
+          const KNOWN_EMPTY = ['profiles'];
+          let errors = 0;
+
+          for (const name of fs.readdirSync(SKILLS_DIR)) {
+            if (KNOWN_EMPTY.includes(name)) continue;
+            const skillMd = path.join(SKILLS_DIR, name, 'SKILL.md');
+            if (!fs.existsSync(skillMd)) continue;
+
+            const content = fs.readFileSync(skillMd, 'utf8');
+            if (!content.startsWith('---')) continue;
+
+            const closeIdx = content.indexOf('---', 3);
+            if (closeIdx === -1) {
+              console.error(`Unclosed frontmatter: ${skillMd}`);
+              errors++;
+              continue;
+            }
+            const fm = content.slice(3, closeIdx);
+            if (!fm.match(/^name:\s*.+/m))   { console.error(`Missing name: in ${skillMd}`); errors++; }
+            if (!fm.match(/^description:/m)) { console.error(`Missing description: in ${skillMd}`); errors++; }
+          }
+
+          if (errors > 0) { console.error(`${errors} error(s)`); process.exit(1); }
+          console.log('Frontmatter OK');
+          EOF
+
+      # ── Build: compile all adapters ─────────────────────────────────────────
+      - name: Build (export all adapters)
+        run: npm run build
+
+      # ── Publish ─────────────────────────────────────────────────────────────
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # ── Release summary ─────────────────────────────────────────────────────
+      - name: Write release summary
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "## ✅ Published koko-contextos-agents@${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| | |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 📦 npm | [koko-contextos-agents@${VERSION}](https://www.npmjs.com/package/koko-contextos-agents) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 🏷️ Tag | \`${{ steps.version.outputs.tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 🧪 Tests | Passed |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| ✓ Validate | Passed |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Install:**" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`bash" >> "$GITHUB_STEP_SUMMARY"
+          echo "npx koko-contextos-agents" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`\`\`" >> "$GITHUB_STEP_SUMMARY"

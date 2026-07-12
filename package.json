@@ -7,9 +7,13 @@
   },
   "files": [
     "bin",
+    "registry.json",
+    "registry.schema.json",
     ".agents/AGENTS.md",
     ".agents/skills.json",
     ".agents/ctx.js",
+    ".agents/validate.js",
+    ".agents/plugins.js",
     ".agents/adapters",
     ".agents/core",
     ".agents/generated"
@@ -17,8 +21,10 @@
   "scripts": {
     "build": "node .agents/ctx.js export all",
     "export": "node .agents/ctx.js export gemini",
-    "test": "node --test tests/install.test.js tests/export.test.js tests/skills.test.js",
-    "prepublishOnly": "npm run build"
+    "validate": "node .agents/ctx.js validate",
+    "lint:md": "markdownlint README.md CONTRIBUTING.md '.agents/core/skills/**/*.md' --ignore '.agents/generated/**' --config .markdownlint.json",
+    "test": "node --test tests/install.test.js tests/export.test.js tests/skills.test.js tests/validate.test.js tests/plugins.test.js",
+    "prepublishOnly": "npm run validate && npm run build"
   },
   "keywords": [
     "ai",

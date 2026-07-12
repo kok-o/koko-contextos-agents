@@ -1,0 +1,440 @@
+/**
+ * .agents/validate.js
+ * ContextOS — Skill Validation & Sync Checker
+ *
+ * Checks:
+ *   1. Frontmatter  — every SKILL.md with --- has name + description
+ *   2. Stale        — generated files older than their source
+ *   3. Orphans      — generated skills with no source counterpart
+ *   4. Missing      — source skills never compiled
+ *   5. Dependencies — requires: / conflicts: point to real skill IDs
+ *   6. Conflicts    — a skill does not conflict with itself
+ */
+
+'use strict';
+
+const fs   = require('fs');
+const path = require('path');
+
+// ── Paths ─────────────────────────────────────────────────────────────────────
+const ROOT        = process.cwd();
+const AGENTS_DIR  = path.join(ROOT, '.agents');
+const CORE_SKILLS = path.join(AGENTS_DIR, 'core', 'skills');
+const GENERATED   = path.join(AGENTS_DIR, 'generated');
+
+// Adapters that compile to generated/<name>/skills/
+const COMPILED_ADAPTERS = ['gemini', 'claude'];
+
+// ── Tiny ANSI helpers (no deps) ───────────────────────────────────────────────
+const NO_COLOR = process.env.NO_COLOR || !process.stdout.isTTY;
+const c = {
+  red:    (s) => NO_COLOR ? s : `\x1b[31m${s}\x1b[0m`,
+  yellow: (s) => NO_COLOR ? s : `\x1b[33m${s}\x1b[0m`,
+  green:  (s) => NO_COLOR ? s : `\x1b[32m${s}\x1b[0m`,
+  cyan:   (s) => NO_COLOR ? s : `\x1b[36m${s}\x1b[0m`,
+  bold:   (s) => NO_COLOR ? s : `\x1b[1m${s}\x1b[0m`,
+  dim:    (s) => NO_COLOR ? s : `\x1b[2m${s}\x1b[0m`,
+};
+
+// ── Result accumulator ────────────────────────────────────────────────────────
+const results = {
+  errors:   [],  // must-fix problems
+  warnings: [],  // stale / missing optional metadata
+  info:     [],  // informational passes
+};
+
+function error(msg)   { results.errors.push(msg); }
+function warn(msg)    { results.warnings.push(msg); }
+function info(msg)    { results.info.push(msg); }
+
+// ── Minimal YAML field extractor (no deps) ────────────────────────────────────
+/**
+ * Extracts top-level scalar YAML fields.
+ * Supports both `field: value` and `field: >` (block scalar) patterns.
+ * Returns null if field is absent.
+ */
+function yamlField(text, field) {
+  const re = new RegExp(`^${field}:\\s*(.+)$`, 'm');
+  const m  = text.match(re);
+  return m ? m[1].trim() : null;
+}
+
+/**
+ * Extracts an inline YAML list: `field: [a, b, c]`
+ * Returns [] if absent or empty.
+ */
+function yamlList(text, field) {
+  const re = new RegExp(`^${field}:\\s*\\[([^\\]]*)]`, 'm');
+  const m  = text.match(re);
+  if (!m || !m[1].trim()) return [];
+  return m[1].split(',').map(s => s.trim()).filter(Boolean);
+}
+
+/**
+ * Extracts a block YAML list:
+ *   field:
+ *     - item1
+ *     - item2
+ */
+function yamlBlockList(text, field) {
+  const re = new RegExp(`^${field}:\\s*\\n((?:[ \\t]+-[^\\n]*\\n?)+)`, 'm');
+  const m  = text.match(re);
+  if (!m) return [];
+  return m[1]
+    .split('\n')
+    .map(l => l.replace(/^[ \t]+-\s*/, '').trim())
+    .filter(Boolean);
+}
+
+// ── Parse SKILL.md frontmatter ────────────────────────────────────────────────
+function parseFrontmatter(content) {
+  if (!content.startsWith('---')) return null;
+  const end = content.indexOf('---', 3);
+  if (end === -1) return { raw: null, malformed: true };
+  return { raw: content.slice(3, end), malformed: false };
+}
+
+// ── Parse skill.yaml ──────────────────────────────────────────────────────────
+function parseSkillYaml(yamlText) {
+  return {
+    id:          yamlField(yamlText, 'id') || yamlField(yamlText, 'name'),
+    name:        yamlField(yamlText, 'name'),
+    description: yamlField(yamlText, 'description'),
+    version:     yamlField(yamlText, 'version'),
+    requires:    yamlList(yamlText, 'requires').concat(yamlBlockList(yamlText, 'requires')),
+    conflicts:   yamlList(yamlText, 'conflicts').concat(yamlBlockList(yamlText, 'conflicts')),
+    optional:    yamlList(yamlText, 'optional').concat(yamlBlockList(yamlText, 'optional')),
+  };
+}
+
+// ── Collect all source skills ─────────────────────────────────────────────────
+function collectSourceSkills() {
+  const skills = {};
+  if (!fs.existsSync(CORE_SKILLS)) return skills;
+
+  for (const name of fs.readdirSync(CORE_SKILLS)) {
+    const dir = path.join(CORE_SKILLS, name);
+    if (!fs.statSync(dir).isDirectory()) continue;
+
+    const skillMdPath = path.join(dir, 'SKILL.md');
+    const yamlPath    = path.join(dir, 'skill.yaml');
+
+    skills[name] = {
+      name,
+      dir,
+      skillMdPath,
+      yamlPath,
+      hasSkillMd: fs.existsSync(skillMdPath),
+      hasYaml:    fs.existsSync(yamlPath),
+      mtime:      fs.existsSync(skillMdPath)
+        ? fs.statSync(skillMdPath).mtimeMs
+        : (fs.existsSync(yamlPath) ? fs.statSync(yamlPath).mtimeMs : 0),
+    };
+  }
+  return skills;
+}
+
+// ── Collect generated skills per adapter ─────────────────────────────────────
+function collectGenerated(adapter) {
+  const base = path.join(GENERATED, adapter, 'skills');
+  if (!fs.existsSync(base)) return {};
+  const out = {};
+  for (const name of fs.readdirSync(base)) {
+    const dir      = path.join(base, name);
+    if (!fs.statSync(dir).isDirectory()) continue;
+    const skillMd  = path.join(dir, 'SKILL.md');
+    out[name] = {
+      mtime: fs.existsSync(skillMd) ? fs.statSync(skillMd).mtimeMs : 0,
+    };
+  }
+  return out;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 1 — SKILL.md Frontmatter Validation
+// ═════════════════════════════════════════════════════════════════════════════
+function checkFrontmatter(sourceSkills) {
+  let pass = 0;
+
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    if (!skill.hasSkillMd) continue;
+
+    const content = fs.readFileSync(skill.skillMdPath, 'utf8');
+    const fm      = parseFrontmatter(content);
+
+    if (!fm) {
+      // No frontmatter — only a warning if it also has no skill.yaml
+      if (!skill.hasYaml) {
+        warn(`[frontmatter] ${name}/SKILL.md — no frontmatter and no skill.yaml`);
+      }
+      continue;
+    }
+
+    if (fm.malformed) {
+      error(`[frontmatter] ${name}/SKILL.md — unclosed YAML frontmatter (missing closing ---)`);
+      continue;
+    }
+
+    if (!fm.raw.match(/^name:\s*.+/m)) {
+      error(`[frontmatter] ${name}/SKILL.md — frontmatter missing required 'name:' field`);
+    }
+    if (!fm.raw.match(/^description:/m)) {
+      error(`[frontmatter] ${name}/SKILL.md — frontmatter missing required 'description:' field`);
+    }
+
+    pass++;
+  }
+
+  info(`[frontmatter] ${pass} SKILL.md files with valid frontmatter`);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 2 — skill.yaml Validation
+// ═════════════════════════════════════════════════════════════════════════════
+function checkSkillYaml(sourceSkills) {
+  let pass = 0;
+
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    if (!skill.hasYaml) continue;
+
+    const text   = fs.readFileSync(skill.yamlPath, 'utf8');
+    const parsed = parseSkillYaml(text);
+
+    if (!parsed.name) {
+      error(`[yaml] ${name}/skill.yaml — missing 'name:' field`);
+      continue;
+    }
+    if (!parsed.description) {
+      // Some skills use block scalars — allow it, just warn
+      warn(`[yaml] ${name}/skill.yaml — 'description:' not found or uses multiline block (check manually)`);
+    }
+    pass++;
+  }
+
+  info(`[yaml] ${pass} skill.yaml files validated`);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 3 — Stale Generated Files
+// ═════════════════════════════════════════════════════════════════════════════
+function checkStale(sourceSkills) {
+  let staleCount = 0;
+
+  for (const adapter of COMPILED_ADAPTERS) {
+    const generated = collectGenerated(adapter);
+
+    for (const [name, gen] of Object.entries(generated)) {
+      const src = sourceSkills[name];
+      if (!src) continue; // orphan — handled in CHECK 4
+
+      if (src.mtime > gen.mtime + 1000) { // +1s tolerance
+        warn(`[stale] ${adapter}/${name} — source is newer than compiled output (run: node .agents/ctx.js export ${adapter})`);
+        staleCount++;
+      }
+    }
+  }
+
+  if (staleCount === 0) {
+    info('[stale] All compiled skills are up-to-date');
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 4 — Orphan & Missing Skills
+// ═════════════════════════════════════════════════════════════════════════════
+function checkSync(sourceSkills) {
+  for (const adapter of COMPILED_ADAPTERS) {
+    const generated = collectGenerated(adapter);
+    const genNames  = new Set(Object.keys(generated));
+    const srcNames  = new Set(Object.keys(sourceSkills).filter(n => sourceSkills[n].hasSkillMd));
+
+    // Orphans: compiled but no longer in source
+    for (const name of genNames) {
+      if (!srcNames.has(name)) {
+        warn(`[orphan] generated/${adapter}/${name} — no source skill found (deleted? renamed?)`);
+      }
+    }
+
+    // Missing: source skill never compiled to this adapter
+    const missing = [];
+    for (const name of srcNames) {
+      if (!genNames.has(name)) missing.push(name);
+    }
+    if (missing.length > 0) {
+      warn(`[missing] ${adapter} — ${missing.length} source skills not compiled: ${missing.join(', ')}`);
+      warn(`          Run: node .agents/ctx.js export ${adapter}`);
+    } else {
+      info(`[sync] ${adapter} — all source skills compiled`);
+    }
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 5 — Dependency Graph (requires: / conflicts:)
+// ═════════════════════════════════════════════════════════════════════════════
+function checkDependencies(sourceSkills) {
+  // knownIds = every directory name in core/skills/ plus any `id:` declared in skill.yaml
+  const knownIds = new Set();
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    knownIds.add(name); // directory name is always a valid reference
+    if (skill.hasYaml) {
+      const text = fs.readFileSync(skill.yamlPath, 'utf8');
+      const id   = yamlField(text, 'id');
+      if (id) knownIds.add(id);
+    }
+  }
+
+  // externalNames: well-known external frameworks/tools that are valid in
+  // conflicts:/optional: but are NOT ContextOS skills. We never error on these.
+  const EXTERNAL_NAMES = new Set([
+    'vue', 'angular', 'svelte', 'remix', 'express', 'koa', 'hapi', 'sails',
+    'tailwind', 'prisma', 'drizzle', 'mongoose', 'sequelize', 'typeorm',
+    'next-auth', 'react-query', 'zustand', 'redux', 'mobx', 'jotai', 'valtio',
+    'vitest', 'jest', 'mocha', 'cypress', 'playwright', 'storybook',
+    'graphql', 'trpc', 'apollo', 'relay', 'urql',
+  ]);
+
+  let depChecked = 0;
+
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    if (!skill.hasYaml) continue;
+
+    const text   = fs.readFileSync(skill.yamlPath, 'utf8');
+    const parsed = parseSkillYaml(text);
+
+    // requires: — must point to a known internal skill
+    for (const dep of parsed.requires) {
+      if (EXTERNAL_NAMES.has(dep)) continue; // external — allowed
+      if (!knownIds.has(dep)) {
+        error(`[deps] ${name}/skill.yaml — requires: '${dep}' does not match any known skill`);
+      }
+    }
+
+    // conflicts: — must point to a known internal skill OR be an external name
+    for (const dep of parsed.conflicts) {
+      if (EXTERNAL_NAMES.has(dep)) continue; // external framework conflict — valid
+      if (dep === name || dep === parsed.id) {
+        error(`[deps] ${name}/skill.yaml — conflicts with itself ('${dep}')`);
+      } else if (!knownIds.has(dep)) {
+        // Only flag as error if the name looks internal (no dots, short, matches slug pattern)
+        const looksInternal = /^[a-z][a-z0-9-]{0,40}$/.test(dep);
+        if (looksInternal) {
+          error(`[deps] ${name}/skill.yaml — conflicts: '${dep}' does not match any known skill`);
+        }
+      }
+    }
+
+    depChecked++;
+  }
+
+  info(`[deps] ${depChecked} skill.yaml dependency graphs validated`);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 6 — Minimum Content Quality
+// ═════════════════════════════════════════════════════════════════════════════
+function checkContentQuality(sourceSkills) {
+  const MIN_BYTES = 100;
+  let pass = 0;
+
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    if (!skill.hasSkillMd) {
+      if (!skill.hasYaml) {
+        warn(`[content] ${name} — no SKILL.md and no skill.yaml (empty placeholder?)`);
+      }
+      continue;
+    }
+
+    const size = fs.statSync(skill.skillMdPath).size;
+    if (size < MIN_BYTES) {
+      warn(`[content] ${name}/SKILL.md is only ${size} bytes — may be incomplete`);
+    } else {
+      pass++;
+    }
+  }
+
+  info(`[content] ${pass} SKILL.md files meet minimum size requirement (≥${MIN_BYTES}B)`);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  REPORT
+// ═════════════════════════════════════════════════════════════════════════════
+function printReport() {
+  const { errors, warnings, info: infos } = results;
+
+  console.log('');
+  console.log(c.bold('══════════════════════════════════════════'));
+  console.log(c.bold('  ContextOS — Skill Validation Report'));
+  console.log(c.bold('══════════════════════════════════════════'));
+  console.log('');
+
+  // Info (passes)
+  for (const msg of infos) {
+    console.log(`  ${c.green('✓')} ${c.dim(msg)}`);
+  }
+
+  // Warnings
+  if (warnings.length > 0) {
+    console.log('');
+    console.log(c.bold(c.yellow(`  ⚠  ${warnings.length} warning(s):`)));
+    for (const msg of warnings) {
+      console.log(`  ${c.yellow('▲')} ${msg}`);
+    }
+  }
+
+  // Errors
+  if (errors.length > 0) {
+    console.log('');
+    console.log(c.bold(c.red(`  ✗  ${errors.length} error(s):`)));
+    for (const msg of errors) {
+      console.log(`  ${c.red('✗')} ${msg}`);
+    }
+  }
+
+  console.log('');
+  console.log(c.bold('──────────────────────────────────────────'));
+
+  const status = errors.length === 0
+    ? c.green(c.bold('  ✓ PASSED'))
+    : c.red(c.bold('  ✗ FAILED'));
+
+  console.log(`  ${status}  ${c.bold(String(errors.length))} error(s)  ${c.bold(String(warnings.length))} warning(s)`);
+  console.log(c.bold('──────────────────────────────────────────'));
+  console.log('');
+
+  return errors.length === 0;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  MAIN
+// ═════════════════════════════════════════════════════════════════════════════
+function run() {
+  console.log(c.cyan('\nContextOS Validator — scanning skills...\n'));
+
+  if (!fs.existsSync(CORE_SKILLS)) {
+    console.error(c.red('[ERROR] .agents/core/skills/ not found. Run from your project root.'));
+    process.exit(1);
+  }
+
+  const sourceSkills = collectSourceSkills();
+  const total        = Object.keys(sourceSkills).length;
+  console.log(c.dim(`  Source: ${CORE_SKILLS}`));
+  console.log(c.dim(`  Skills found: ${total}\n`));
+
+  checkFrontmatter(sourceSkills);
+  checkSkillYaml(sourceSkills);
+  checkStale(sourceSkills);
+  checkSync(sourceSkills);
+  checkDependencies(sourceSkills);
+  checkContentQuality(sourceSkills);
+
+  const passed = printReport();
+  process.exit(passed ? 0 : 1);
+}
+
+module.exports = { run };
+
+// Allow direct execution: node .agents/validate.js
+if (require.main === module) {
+  run();
+}

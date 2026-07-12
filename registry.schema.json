@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ContextOS Skill Registry Schema",
+  "description": "Schema for registry.json and individual skill package.json manifests",
+  "type": "object",
+  "required": ["version", "skills"],
+  "properties": {
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "skills": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/SkillEntry" }
+    }
+  },
+  "definitions": {
+    "SkillEntry": {
+      "type": "object",
+      "required": ["id", "name", "description", "author"],
+      "properties": {
+        "id":          { "type": "string", "pattern": "^[a-z0-9-]+/[a-z0-9-]+$", "description": "Unique skill ID in author/name format" },
+        "name":        { "type": "string", "description": "Skill directory name (slug)" },
+        "description": { "type": "string", "description": "One-line description" },
+        "author":      { "type": "string", "description": "GitHub username or org" },
+        "tags":        { "type": "array", "items": { "type": "string" } },
+        "npm":         { "type": ["string", "null"], "description": "npm package name if published" },
+        "github":      { "type": ["string", "null"], "description": "GitHub repo in owner/repo format" },
+        "path":        { "type": ["string", "null"], "description": "Path within the GitHub repo to the skill directory" },
+        "builtin":     { "type": "boolean", "description": "true = ships with koko-contextos-agents core" }
+      }
+    }
+  }
+}

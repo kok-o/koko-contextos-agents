@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kok-o/koko-contextos-agents/main/registry.schema.json",
+  "version": "1",
+  "description": "ContextOS Community Skill Registry. Submit a PR to add your skill.",
+  "skills": [
+    {
+      "id": "koko-o/ponytail-mindset",
+      "name": "ponytail-mindset",
+      "description": "Minimalist coding mindset — 7-rung YAGNI ladder. Reduces code output ~54%.",
+      "author": "koko-o",
+      "tags": ["minimalism", "efficiency", "yagni"],
+      "npm": null,
+      "github": "kok-o/koko-contextos-agents",
+      "path": ".agents/core/skills/ponytail-mindset",
+      "builtin": true
+    },
+    {
+      "id": "koko-o/gstack-roles",
+      "name": "gstack-roles",
+      "description": "23 specialist AI roles. Declare your role before each task phase.",
+      "author": "koko-o",
+      "tags": ["roles", "workflow", "planning"],
+      "npm": null,
+      "github": "kok-o/koko-contextos-agents",
+      "path": ".agents/core/skills/gstack-roles",
+      "builtin": true
+    },
+    {
+      "id": "koko-o/impeccable-design",
+      "name": "impeccable-design",
+      "description": "50 deterministic design QA rules. Prevents AI design slop.",
+      "author": "koko-o",
+      "tags": ["ui", "design", "frontend", "anti-patterns"],
+      "npm": null,
+      "github": "kok-o/koko-contextos-agents",
+      "path": ".agents/core/skills/impeccable-design",
+      "builtin": true
+    }
+  ],
+  "contributing": "https://github.com/kok-o/koko-contextos-agents/blob/main/CONTRIBUTING.md#publishing-a-skill-as-a-plugin",
+  "schema": "https://raw.githubusercontent.com/kok-o/koko-contextos-agents/main/registry.schema.json"
+}

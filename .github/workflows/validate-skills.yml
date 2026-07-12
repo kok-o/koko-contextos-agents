@@ -1,0 +1,210 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# validate-skills.yml
+# Runs on every PR and push to main.
+# Checks:
+#   1. Node.js test suite (unit + integration)
+#   2. ctx.js validate  — frontmatter, stale, deps, sync
+#   3. YAML frontmatter lint  — all SKILL.md files
+#   4. Markdown quality lint  — markdownlint-cli (zero deps install)
+#   5. registry.json schema   — validates against registry.schema.json
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Validate Skills
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────────
+  test:
+    name: Tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["18", "20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run test suite
+        run: npm test
+
+  # ───────────────────────────────────────────────────────────────────────────
+  validate-skills:
+    name: ctx.js validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Compile skills (export all)
+        run: node .agents/ctx.js export all
+
+      - name: Run skill validator
+        run: |
+          node .agents/ctx.js validate
+        env:
+          NO_COLOR: "1"
+
+  # ───────────────────────────────────────────────────────────────────────────
+  lint-frontmatter:
+    name: YAML Frontmatter Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Lint SKILL.md frontmatter
+        # Pure Node.js — no extra deps needed
+        run: |
+          node - << 'EOF'
+          const fs   = require('fs');
+          const path = require('path');
+
+          const SKILLS_DIR = path.join('.agents', 'core', 'skills');
+          const KNOWN_EMPTY = ['profiles'];
+
+          let errors = 0;
+
+          for (const name of fs.readdirSync(SKILLS_DIR)) {
+            if (KNOWN_EMPTY.includes(name)) continue;
+            const skillMd = path.join(SKILLS_DIR, name, 'SKILL.md');
+            if (!fs.existsSync(skillMd)) continue;
+
+            const content = fs.readFileSync(skillMd, 'utf8');
+            if (!content.startsWith('---')) continue;   // no frontmatter — ok
+
+            const closeIdx = content.indexOf('---', 3);
+            if (closeIdx === -1) {
+              console.error(`::error file=${skillMd}::Unclosed YAML frontmatter (missing closing ---)`);
+              errors++;
+              continue;
+            }
+
+            const fm = content.slice(3, closeIdx);
+            if (!fm.match(/^name:\s*.+/m)) {
+              console.error(`::error file=${skillMd}::Frontmatter missing required 'name:' field`);
+              errors++;
+            }
+            if (!fm.match(/^description:/m)) {
+              console.error(`::error file=${skillMd}::Frontmatter missing required 'description:' field`);
+              errors++;
+            }
+          }
+
+          if (errors > 0) {
+            console.error(`\n${errors} frontmatter error(s) found.`);
+            process.exit(1);
+          } else {
+            console.log('All SKILL.md frontmatter is valid.');
+          }
+          EOF
+
+  # ───────────────────────────────────────────────────────────────────────────
+  lint-markdown:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install markdownlint-cli
+        run: npm install --no-save markdownlint-cli
+
+      - name: Lint Markdown files
+        run: |
+          npx markdownlint \
+            --config .markdownlint.json \
+            "README.md" \
+            "CONTRIBUTING.md" \
+            ".agents/core/skills/**/*.md" \
+            --ignore ".agents/generated/**" \
+            --ignore "CONVENTIONS.md" \
+            --ignore ".github/copilot-instructions.md" \
+            --ignore node_modules
+
+  # ───────────────────────────────────────────────────────────────────────────
+  validate-registry:
+    name: Registry Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate registry.json against schema
+        run: |
+          node - << 'EOF'
+          const fs = require('fs');
+
+          const registry = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+          const schema   = JSON.parse(fs.readFileSync('registry.schema.json', 'utf8'));
+
+          // Minimal validation without ajv (no deps)
+          let errors = 0;
+
+          if (!registry.version) {
+            console.error('::error file=registry.json::Missing required field: version');
+            errors++;
+          }
+          if (!Array.isArray(registry.skills)) {
+            console.error('::error file=registry.json::Missing required field: skills (must be array)');
+            errors++;
+          } else {
+            for (const skill of registry.skills) {
+              const required = ['id', 'name', 'description', 'author'];
+              for (const field of required) {
+                if (!skill[field]) {
+                  console.error(`::error file=registry.json::Skill entry missing required field '${field}': ${JSON.stringify(skill)}`);
+                  errors++;
+                }
+              }
+              // id format: author/name
+              if (skill.id && !/^[a-z0-9-]+\/[a-z0-9-]+$/.test(skill.id)) {
+                console.error(`::error file=registry.json::Skill id '${skill.id}' must match pattern author/name (lowercase, hyphens only)`);
+                errors++;
+              }
+            }
+          }
+
+          if (errors > 0) {
+            console.error(`\n${errors} registry.json error(s) found.`);
+            process.exit(1);
+          } else {
+            console.log(`registry.json is valid — ${registry.skills.length} skill(s) registered.`);
+          }
+          EOF
