@@ -6,8 +6,15 @@ description: >
   all safety, validation, error handling, and security guards intact.
 ---
 
-# Ponytail Mindset — The Lazy Senior Developer
+# ponytail-mindset
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 
 > _He says nothing. He writes one line. It works._
@@ -250,3 +257,16 @@ Do NOT apply the ladder to:
 | New library for native feature | Use rung 4 (platform native) |
 | Copy-pasting existing logic | Find and reuse (rung 2) |
 | Wrapper around wrapper around util | Read what's installed (rung 5) |
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.

@@ -5,8 +5,15 @@ description: >
   to adopt the correct role before each task phase, like a virtual engineering team.
 ---
 
-# gstack-roles — Virtual Engineering Team
+# gstack-roles
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 Inspired by [Garry Tan's gstack](https://github.com/garrytan/gstack) — shipping 810× more logical code than a solo dev in 2013.
 
 ## Core Principle
@@ -123,3 +130,16 @@ For the narrow wedge:
 - No real-time needed for MVP
 - Schema: notifications(id, user_id, type, payload, sent_at)
 ```
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.

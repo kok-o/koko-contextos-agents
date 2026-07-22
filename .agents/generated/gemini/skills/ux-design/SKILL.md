@@ -5,6 +5,13 @@ description: >
 ---
 
 
+<!-- Source: EXAMPLES.md -->
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
 <!-- Source: SKILL.md -->
 
 ---
@@ -13,7 +20,15 @@ description: >
   ContextOS skill for UX Design
 ---
 
+# UX Design
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 <!-- Source: ux.md -->
 
 # UX Design — Best Practices
@@ -97,6 +112,26 @@ Every screen has 5 states. Design ALL of them:
 9. Help users recognize and recover from errors
 10. Help and documentation
 
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+<!-- Source: TROUBLESHOOTING.md -->
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.
 
 
 <!-- Source: ux.md -->

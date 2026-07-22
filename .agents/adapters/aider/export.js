@@ -32,7 +32,18 @@ function buildSkillSection(skillDir) {
 
   if (!fs.existsSync(skillMdPath)) return null;
 
-  const raw  = fs.readFileSync(skillMdPath, 'utf8');
+  let raw = fs.readFileSync(skillMdPath, 'utf8');
+  
+  const examplesPath = path.join(skillDir, 'EXAMPLES.md');
+  if (fs.existsSync(examplesPath)) {
+    raw += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+  }
+  
+  const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
+  if (fs.existsSync(troubleshootingPath)) {
+    raw += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+  }
+  
   const body = stripFrontmatter(raw);
 
   return `\n## Skill: ${title}\n\n${body}`;

@@ -4,7 +4,15 @@ description: >
   ContextOS skill for UI Design
 ---
 
+# UI Design
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 <!-- Source: ui.md -->
 
 # UI Design — Best Practices
@@ -96,3 +104,16 @@ description: >
 - Shadows become less visible — use subtle borders or elevation changes
 - Test all states in both modes
 
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.

@@ -1,3 +1,12 @@
+# Web Accessibility
+
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 <!-- Source: accessibility.md -->
 
 # Web Accessibility — WCAG 2.1 Compliance
@@ -64,3 +73,26 @@
 - Screen reader: test with NVDA (Windows), VoiceOver (Mac)
 - Zoom: test at 200% and 400% zoom
 
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.

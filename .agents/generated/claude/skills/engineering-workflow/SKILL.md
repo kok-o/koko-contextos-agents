@@ -1,5 +1,12 @@
-# Engineering Workflow — Senior Developer Lifecycle
+# engineering-workflow
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 Inspired by [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani (Google Chrome).
 
 ## Core Principle
@@ -274,3 +281,26 @@ Only ship when all gates are green.
 | "I'll add tests later" | Later never comes | TDD: tests first |
 | Refactoring adjacent code mid-task | Expands blast radius silently | Separate task/PR for refactors |
 | Snapshot tests as primary UI test | Brittle, tests implementation not behavior | Use RTL + Playwright instead |
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.

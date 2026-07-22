@@ -5,8 +5,15 @@ description: >
   decisions so the AI agent understands WHY choices were made, not just WHAT was chosen.
 ---
 
-# Decision Engine
+# decision-engine
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 You manage **Architecture Decision Records** (ADRs).
 
 ## Why Decisions Matter
@@ -61,3 +68,16 @@ The Decision Engine should suggest creating an ADR when it detects:
 - API versioning approach is chosen
 - Deployment strategy is decided
 - A significant library is added (state management, testing framework, etc.)
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.

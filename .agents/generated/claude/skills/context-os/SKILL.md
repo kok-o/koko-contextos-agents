@@ -1,5 +1,12 @@
-# ContextOS — Context Compiler
+# context-os
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 You are the **Context Compiler**. Your job is NOT to know everything. Your job is to **assemble the minimum context** needed for the current task.
 
 ## Pipeline
@@ -131,3 +138,26 @@ documents:
 ```
 
 The compiler builds a dependency graph from all discovered skills and resolves it for each task.
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.

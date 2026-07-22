@@ -1,5 +1,12 @@
-# Impeccable Design — Visual Quality Enforcement
+# impeccable-design
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — deterministic detector rules for AI-generated frontend design.
 
 ## Core Principle
@@ -162,3 +169,26 @@ These details separate premium from mediocre:
 4. **Focus ring styling** — `focus-visible:ring-2 focus-visible:ring-primary` matching brand
 5. **Smooth color transitions** — `transition-colors duration-150` on all interactive elements
 6. **Optical alignment** — icon + text optically centered, not mathematically (`items-center gap-1.5`)
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.

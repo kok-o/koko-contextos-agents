@@ -18,14 +18,26 @@ function generateGeminiSkill(skillDir) {
   
   if (!fs.existsSync(yamlPath)) {
     if (fs.existsSync(existingSkillMdPath)) {
-      // It's already in the correct format, copy it directly
       fs.mkdirSync(outputDir, { recursive: true });
-      fs.copyFileSync(existingSkillMdPath, path.join(outputDir, 'SKILL.md'));
       
-      // Copy any other files in the directory as well, except SKILL.md
+      let finalContent = fs.readFileSync(existingSkillMdPath, 'utf8');
+      
+      const examplesPath = path.join(skillDir, 'EXAMPLES.md');
+      if (fs.existsSync(examplesPath)) {
+        finalContent += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+      }
+      
+      const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
+      if (fs.existsSync(troubleshootingPath)) {
+        finalContent += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+      }
+      
+      fs.writeFileSync(path.join(outputDir, 'SKILL.md'), finalContent);
+      
+      // Copy remaining files (like VALIDATION.json, scripts/)
       const files = fs.readdirSync(skillDir);
       for (const file of files) {
-        if (file !== 'SKILL.md') {
+        if (file !== 'SKILL.md' && file !== 'EXAMPLES.md' && file !== 'TROUBLESHOOTING.md') {
           const srcPath = path.join(skillDir, file);
           const destPath = path.join(outputDir, file);
           if (fs.statSync(srcPath).isFile()) {
@@ -33,7 +45,7 @@ function generateGeminiSkill(skillDir) {
           }
         }
       }
-      console.log(`Copied existing SKILL.md for ${skillName}`);
+      console.log(`Bundled and copied SKILL.md for ${skillName}`);
       return;
     }
     console.log(`Skipping ${skillName} (no skill.yaml or SKILL.md)`);

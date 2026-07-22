@@ -5,6 +5,13 @@ description: >
 ---
 
 
+<!-- Source: EXAMPLES.md -->
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
 <!-- Source: react.md -->
 
 # React — Best Practices
@@ -110,7 +117,15 @@ description: >
   ContextOS skill for React
 ---
 
+# React
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 <!-- Source: react.md -->
 
 # React — Best Practices
@@ -207,4 +222,24 @@ types/
   user.ts
 ```
 
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+<!-- Source: TROUBLESHOOTING.md -->
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.
 

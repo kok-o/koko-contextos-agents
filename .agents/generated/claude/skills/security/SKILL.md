@@ -1,3 +1,12 @@
+# Application Security
+
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 <!-- Source: security.md -->
 
 # Application Security — Best Practices
@@ -107,3 +116,26 @@ Redirect → Provider (Google, GitHub) → Callback → Create/link user → JWT
 - [ ] Dependency audit (`npm audit`, `pip audit`)
 - [ ] Logging for security events
 
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.

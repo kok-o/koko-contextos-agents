@@ -21,6 +21,16 @@ function generateClaudeSkill(skillDir) {
   }
 
   let content = fs.readFileSync(existingSkillMdPath, 'utf8');
+  
+  const examplesPath = path.join(skillDir, 'EXAMPLES.md');
+  if (fs.existsSync(examplesPath)) {
+    content += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+  }
+  
+  const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
+  if (fs.existsSync(troubleshootingPath)) {
+    content += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+  }
 
   // Strip YAML frontmatter if present (Claude doesn't need it)
   content = content.replace(/^---[\s\S]*?---\n/, '');

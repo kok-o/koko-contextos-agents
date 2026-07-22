@@ -5,6 +5,13 @@ description: >
 ---
 
 
+<!-- Source: EXAMPLES.md -->
+
+# Code Examples
+
+Add detailed code examples and implementations here.
+
+
 <!-- Source: SKILL.md -->
 
 ---
@@ -13,7 +20,15 @@ description: >
   ContextOS skill for TypeScript
 ---
 
+# TypeScript
 
+## Overview
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+Context for when this skill is applicable.
+
+## Rules & Patterns
 <!-- Source: typescript.md -->
 
 # TypeScript — Best Practices
@@ -88,6 +103,26 @@ interface Repository<T extends { id: string }> {
 - ❌ Enums — prefer union types or `as const` objects
 - ❌ Complex generics without JSDoc — document intent
 
+
+
+## Code Examples
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+How this skill interacts with other skills.
+
+
+<!-- Source: TROUBLESHOOTING.md -->
+
+# Troubleshooting & Common Mistakes
+
+Add common errors, anti-patterns, and debugging steps here.
 
 
 <!-- Source: typescript.md -->

@@ -357,6 +357,64 @@ function checkContentQuality(sourceSkills) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 7 — COSTAR Structure
+// ═════════════════════════════════════════════════════════════════════════════
+function checkCostarHeaders(sourceSkills) {
+  let pass = 0;
+  const requiredHeaders = [
+    '## Overview',
+    '## When to Use',
+    '## Rules & Patterns',
+    '## Code Examples',
+    '## Validation Checklist',
+    '## Common Mistakes',
+    '## Integration Notes'
+  ];
+
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    if (!skill.hasSkillMd) continue;
+
+    const content = fs.readFileSync(skill.skillMdPath, 'utf8');
+    let missing = [];
+    for (const header of requiredHeaders) {
+      if (!content.includes(header)) missing.push(header);
+    }
+    
+    if (missing.length > 0) {
+      warn(`[costar] ${name}/SKILL.md is missing required headers: ${missing.join(', ')}`);
+    } else {
+      pass++;
+    }
+  }
+  
+  info(`[costar] ${pass} SKILL.md files follow the COSTAR template`);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  CHECK 8 — VALIDATION.json
+// ═════════════════════════════════════════════════════════════════════════════
+function checkValidationJson(sourceSkills) {
+  let pass = 0;
+
+  for (const [name, skill] of Object.entries(sourceSkills)) {
+    const valPath = path.join(skill.dir, 'VALIDATION.json');
+    if (!fs.existsSync(valPath)) {
+      warn(`[validation] ${name}/VALIDATION.json is missing`);
+      continue;
+    }
+
+    try {
+      JSON.parse(fs.readFileSync(valPath, 'utf8'));
+      pass++;
+    } catch (e) {
+      error(`[validation] ${name}/VALIDATION.json is invalid JSON: ${e.message}`);
+    }
+  }
+
+  info(`[validation] ${pass} VALIDATION.json files are valid`);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
 //  REPORT
 // ═════════════════════════════════════════════════════════════════════════════
 function printReport() {
@@ -427,6 +485,8 @@ function run() {
   checkSync(sourceSkills);
   checkDependencies(sourceSkills);
   checkContentQuality(sourceSkills);
+  checkCostarHeaders(sourceSkills);
+  checkValidationJson(sourceSkills);
 
   const passed = printReport();
   process.exit(passed ? 0 : 1);
