@@ -7,15 +7,17 @@ description: >
 # Microservices
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: microservices.md -->
 
-# Microservices — Architecture Guide
+## Microservices — Architecture Guide
 
 ## When to Use Microservices
 
@@ -136,15 +138,18 @@ When integrating with legacy or external systems, create an adapter that transla
 - ❌ Premature microservices — start with a modular monolith
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
