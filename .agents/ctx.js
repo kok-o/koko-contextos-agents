@@ -18,7 +18,9 @@ function printHelp() {
   console.log('  export copilot   Compile skills → .github/copilot-instructions.md');
   console.log('  export aider     Compile skills → .aider.conf.yml + CONVENTIONS.md');
   console.log('  export all       Compile skills for all supported agents');
+  console.log('  audit            Alias for validate (check skills)');
   console.log('  validate         Validate skill sources, frontmatter, deps & sync');
+  console.log('  install-skill <ref>  Alias for skill add (install a plugin)');
   console.log('  skill add   <ref>    Install a plugin skill (GitHub or npm)');
   console.log('  skill remove <name>  Uninstall a plugin skill');
   console.log('  skill list           List installed skills (builtin + plugins)');
@@ -96,10 +98,26 @@ if (command === 'export') {
     process.exit(1);
   }
 
-// ── validate ──────────────────────────────────────────────────────────────────
-} else if (command === 'validate') {
+// ── validate / audit ──────────────────────────────────────────────────────────
+} else if (command === 'validate' || command === 'audit') {
   const validator = require('./validate.js');
   validator.run();
+
+// ── install-skill ─────────────────────────────────────────────────────────────
+} else if (command === 'install-skill') {
+  const ref = args[1];
+  const dryRun = args.includes('--dry-run');
+  const plugins = require('./plugins.js');
+  
+  if (!ref) {
+    console.error('[ERROR] Usage: ctx.js install-skill <ref>');
+    process.exit(1);
+  }
+  
+  plugins.add(ref, { dryRun }).catch(err => {
+    console.error(`[ERROR] ${err.message}`);
+    process.exit(1);
+  });
 
 // ── skill ─────────────────────────────────────────────────────────────────────
 } else if (command === 'skill') {
