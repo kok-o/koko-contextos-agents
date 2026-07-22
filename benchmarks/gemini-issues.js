@@ -259,17 +259,23 @@ async function discoverTasks(count, query, token) {
   if (!token && count > 5) {
     throw new Error('Set GITHUB_TOKEN to discover 20 tasks without GitHub API rate-limit failures.');
   }
-  const search = await githubJson(`/search/issues?q=${encodeURIComponent(query)}&per_page=100`, token);
   const tasks = [];
-  for (const issue of search.items || []) {
-    if (tasks.length === count) break;
-    if (issue.pull_request) continue;
-    try {
-      const task = await resolveIssueTask(issue, token);
-      if (task) tasks.push(task);
-    } catch (error) {
-      console.warn(`[skip] ${issue.html_url}: ${error.message}`);
+  let page = 1;
+  while (tasks.length < count && page <= 10) {
+    const search = await githubJson(`/search/issues?q=${encodeURIComponent(query)}&per_page=100&page=${page}`, token);
+    const items = search.items || [];
+    if (items.length === 0) break;
+    for (const issue of items) {
+      if (tasks.length === count) break;
+      if (issue.pull_request) continue;
+      try {
+        const task = await resolveIssueTask(issue, token);
+        if (task) tasks.push(task);
+      } catch (error) {
+        console.warn(`[skip] ${issue.html_url}: ${error.message}`);
+      }
     }
+    page++;
   }
   if (tasks.length < count) {
     throw new Error(`Only resolved ${tasks.length}/${count} reproducible issues. Broaden --query and try again.`);
