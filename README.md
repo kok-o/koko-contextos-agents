@@ -90,6 +90,21 @@ node .agents/ctx.js export claude    # Compile for Claude Code
 node .agents/ctx.js export all       # Compile for all agents
 ```
 
+### Plugin Skills & Validation
+
+You can expand your `.agents` folder with community plugins or validate your own custom skills using the top-level commands:
+
+```bash
+# Launch the interactive skill installer to browse and install community skills
+npx koko-contextos-agents install-skill
+
+# Or install a specific skill from a GitHub repository automatically
+npx koko-contextos-agents install-skill --from-repo kok-o/awesome-skill
+
+# Validate your local skills (checks frontmatter, dependencies, and payload sizes)
+npx koko-contextos-agents audit
+```
+
 **Supported agents:**
 
 | Agent | Command | Output |
