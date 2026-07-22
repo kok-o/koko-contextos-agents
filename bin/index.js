@@ -40,6 +40,10 @@ Options:
   --skip-compile      Skip running ctx.js export after installation
   --add-skill <ref>   Install a community plugin skill after setup
 
+Commands:
+  audit               Validate local skills (alias for validate)
+  install-skill       Interactive skill installer (or pass <ref> / --from-repo)
+
 Plugin ref formats:
   username/repo                    GitHub repo with a SKILL.md at the root
   username/repo@commit             GitHub repo pinned to a commit
@@ -69,6 +73,102 @@ Plugin commands (after installation):
 `);
   process.exit(0);
 }
+
+// ── Top-level Commands ────────────────────────────────────────────────────────
+const mainCommand = args[0] && !args[0].startsWith('-') ? args[0] : null;
+
+if (mainCommand === 'audit') {
+  const ctxPath = path.join(process.cwd(), '.agents', 'ctx.js');
+  if (!fs.existsSync(ctxPath)) {
+    console.error('[ERROR] .agents/ctx.js not found. Are you in a ContextOS project?');
+    process.exit(1);
+  }
+  const { execFileSync } = require('child_process');
+  try {
+    execFileSync(process.execPath, [ctxPath, 'validate'], { stdio: 'inherit' });
+  } catch (e) {
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
+if (mainCommand === 'install-skill') {
+  const ctxPath = path.join(process.cwd(), '.agents', 'ctx.js');
+  if (!fs.existsSync(ctxPath)) {
+    console.error('[ERROR] .agents/ctx.js not found. Are you in a ContextOS project?');
+    process.exit(1);
+  }
+  
+  const fromRepo = (() => {
+    const i = args.indexOf('--from-repo');
+    return i !== -1 ? args[i + 1] : null;
+  })();
+  
+  const ref = fromRepo || (args[1] && !args[1].startsWith('-') ? args[1] : null);
+  
+  if (ref) {
+    const { execFileSync } = require('child_process');
+    try {
+      execFileSync(process.execPath, [ctxPath, 'skill', 'add', ref], { stdio: 'inherit' });
+    } catch (e) {
+      process.exit(1);
+    }
+    process.exit(0);
+  } else {
+    // Interactive menu
+    (async () => {
+      try {
+        const inquirer = require('inquirer');
+        const https = require('https');
+        
+        console.log('Fetching community skills from registry...');
+        
+        const fetchRegistry = () => new Promise((resolve, reject) => {
+          https.get('https://raw.githubusercontent.com/kok-o/koko-contextos-agents/main/registry.json', (res) => {
+            let data = '';
+            res.on('data', chunk => data += chunk);
+            res.on('end', () => resolve(JSON.parse(data)));
+          }).on('error', reject);
+        });
+        
+        const registry = await fetchRegistry();
+        const choices = registry.skills.map(s => ({
+          name: `${s.name} - ${s.description}`,
+          value: s.github ? `${s.github}${s.path ? '/' + s.path : ''}` : s.npm
+        }));
+        
+        const answers = await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'selectedSkills',
+            message: 'Select skills to install:',
+            choices
+          }
+        ]);
+        
+        if (!answers.selectedSkills || answers.selectedSkills.length === 0) {
+          console.log('No skills selected.');
+          process.exit(0);
+        }
+        
+        const { execFileSync } = require('child_process');
+        for (const skillRef of answers.selectedSkills) {
+          try {
+            execFileSync(process.execPath, [ctxPath, 'skill', 'add', skillRef], { stdio: 'inherit' });
+          } catch (e) {
+            console.error(`Failed to install ${skillRef}`);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to run interactive installer:', error.message);
+        if (error.code === 'MODULE_NOT_FOUND' && error.message.includes('inquirer')) {
+          console.error('It seems inquirer is not installed. Did you run npm install?');
+        }
+        process.exit(1);
+      }
+    })();
+  }
+} else {
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
 const sourcePath = path.join(__dirname, '..', '.agents');
@@ -224,3 +324,5 @@ try {
   console.error('[ERROR] Installation failed:', error.message);
   process.exit(1);
 }
+
+} // end of main install else block
