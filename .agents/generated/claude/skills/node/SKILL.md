@@ -127,6 +127,7 @@ How this skill interacts with other skills.
 ## Example 1: Graceful Process Shutdown
 
 ### ❌ Anti-pattern (Abruptly killing process and dropping in-flight requests)
+
 ```javascript
 // BAD: drops active database transactions and in-flight HTTP connections
 process.on('SIGTERM', () => {
@@ -135,6 +136,7 @@ process.on('SIGTERM', () => {
 ```
 
 ### ✅ ContextOS Standard (Graceful connection draining)
+
 ```typescript
 // GOOD: drains active requests, closes database connections, and exits safely
 import http from 'http';
@@ -174,6 +176,7 @@ export function setupGracefulShutdown(server: http.Server) {
 ## Example 2: Stream-based File Processing
 
 ### ❌ Anti-pattern (Loading entire 500MB file into buffer)
+
 ```typescript
 // BAD: easily causes Out Of Memory (OOM) crashes under concurrency
 app.get('/download/:file', async (req, res) => {
@@ -183,6 +186,7 @@ app.get('/download/:file', async (req, res) => {
 ```
 
 ### ✅ ContextOS Standard (Piping read stream with pipeline)
+
 ```typescript
 // GOOD: constant memory usage (O(1) RAM) regardless of file size
 import fs from 'fs';

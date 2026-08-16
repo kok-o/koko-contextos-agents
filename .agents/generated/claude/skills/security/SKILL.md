@@ -146,6 +146,7 @@ How this skill interacts with other skills.
 ## Example 1: Timing-Safe Secret Verification
 
 ### ❌ Anti-pattern (Vulnerable to side-channel timing attack)
+
 ```typescript
 // BAD: string comparison returns early on the first mismatched byte
 export function verifyApiKey(providedKey: string, storedKey: string): boolean {
@@ -154,6 +155,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 ```
 
 ### ✅ ContextOS Standard (Constant-time buffer comparison)
+
 ```typescript
 // GOOD: crypto.timingSafeEqual executes in constant time
 import crypto from 'crypto';
@@ -175,6 +177,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 ## Example 2: Preventing IDOR (Insecure Direct Object Reference)
 
 ### ❌ Anti-pattern (Trusting client ID without ownership check)
+
 ```typescript
 // BAD: any authenticated user can delete any other user's document!
 app.delete('/api/documents/:id', requireAuth, async (req, res) => {
@@ -184,6 +187,7 @@ app.delete('/api/documents/:id', requireAuth, async (req, res) => {
 ```
 
 ### ✅ ContextOS Standard (Multi-tenant scoped authorization check)
+
 ```typescript
 // GOOD: document deletion is strictly scoped to authenticated user or org
 app.delete('/api/documents/:id', requireAuth, async (req, res) => {

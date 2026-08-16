@@ -56,6 +56,7 @@ Interacts with `system-design`, `ddd`, and `security` (multi-tenant scoping).
 ## Example 1: Solving the N+1 Query Problem
 
 ### ❌ Anti-pattern (N+1 database queries in a loop)
+
 ```typescript
 // BAD: 1 query for users + N queries for posts!
 const users = await prisma.user.findMany();
@@ -67,6 +68,7 @@ for (const user of users) {
 ```
 
 ### ✅ ContextOS Standard (Batch query or relational include)
+
 ```typescript
 // GOOD: 1 single optimized batch query
 const usersWithPosts = await prisma.user.findMany({
@@ -89,6 +91,7 @@ const usersWithPosts = await prisma.user.findMany({
 ## Example 2: Safe Atomic Transactions with Locking
 
 ### ❌ Anti-pattern (Unprotected read-modify-write race condition)
+
 ```typescript
 // BAD: race condition between reading balance and updating
 const account = await prisma.account.findUnique({ where: { id } });
@@ -101,6 +104,7 @@ if (account.balance >= amount) {
 ```
 
 ### ✅ ContextOS Standard (Atomic conditional update in transaction)
+
 ```typescript
 // GOOD: atomic database transaction with invariant check
 export async function deductBalance(accountId: string, amount: number) {
@@ -129,13 +133,16 @@ export async function deductBalance(accountId: string, amount: number) {
 ## Common Issues & Fixes
 
 ### 1. Connection Pool Exhaustion in Serverless / Edge
+
 - **Cause**: Creating a new PrismaClient / DB connection instance on every serverless function invocation.
 - **Fix**: Declare PrismaClient as a global singleton across warm lambdas, and enable PgBouncer or Prisma Accelerate.
 
 ### 2. Slow Queries on Large Tables
+
 - **Cause**: Missing composite index on filtered and ordered columns.
 - **Fix**: Run `EXPLAIN ANALYZE <query>` and add targeted indexes matching the WHERE and ORDER BY columns.
 
 ### 3. Database Deadlocks during Concurrent Transactions
+
 - **Cause**: Different transactions updating resources in different orders.
 - **Fix**: Always acquire locks and update entities in a deterministic alphabetical or ID-ordered sequence.

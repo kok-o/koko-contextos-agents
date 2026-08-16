@@ -113,6 +113,7 @@ How this skill interacts with other skills.
 ## Example 1: Type-Safe Parsing with Zod (No `any`)
 
 ### ❌ Anti-pattern (Blind type assertion with `as`)
+
 ```typescript
 // BAD: using 'as User' bypasses runtime validation completely
 async function fetchUser(id: string): Promise<User> {
@@ -123,6 +124,7 @@ async function fetchUser(id: string): Promise<User> {
 ```
 
 ### ✅ ContextOS Standard (Runtime schema validation with Zod)
+
 ```typescript
 // GOOD: guaranteed runtime and compile-time type safety
 import { z } from 'zod';
@@ -150,6 +152,7 @@ export async function fetchUser(id: string): Promise<User> {
 ## Example 2: Discriminated Unions for State Handling
 
 ### ❌ Anti-pattern (Optional soup with boolean flags)
+
 ```typescript
 // BAD: impossible states can be represented (e.g. isLoading: true AND error: 'Failed')
 interface AsyncState<T> {
@@ -160,6 +163,7 @@ interface AsyncState<T> {
 ```
 
 ### ✅ ContextOS Standard (Discriminated Union)
+
 ```typescript
 // GOOD: impossible states are impossible at compile-time
 export type AsyncState<T> =

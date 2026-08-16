@@ -3,6 +3,7 @@
 ## Example 1: Multi-Stage Build & Layer Caching
 
 ### ❌ Anti-pattern (Fat single-stage image running as root)
+
 ```dockerfile
 # BAD: 1.2GB image, runs as root, breaks caching on every file edit
 FROM node:latest
@@ -15,6 +16,7 @@ CMD ["npm", "start"]
 ```
 
 ### ✅ ContextOS Standard (Slim multi-stage build with non-root user)
+
 ```dockerfile
 # GOOD: 95MB image, non-root user, optimized layer caching
 FROM node:20.12.2-alpine3.19 AS builder
@@ -39,6 +41,7 @@ CMD ["node", "dist/main.js"]
 ## Example 2: Docker Ignore File (`.dockerignore`)
 
 ### ✅ ContextOS Standard `.dockerignore`
+
 ```gitignore
 node_modules
 npm-debug.log

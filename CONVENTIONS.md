@@ -806,6 +806,7 @@ Interacts with `system-design`, `ddd`, and `security` (multi-tenant scoping).
 ## Example 1: Solving the N+1 Query Problem
 
 ### ❌ Anti-pattern (N+1 database queries in a loop)
+
 ```typescript
 // BAD: 1 query for users + N queries for posts!
 const users = await prisma.user.findMany();
@@ -817,6 +818,7 @@ for (const user of users) {
 ```
 
 ### ✅ ContextOS Standard (Batch query or relational include)
+
 ```typescript
 // GOOD: 1 single optimized batch query
 const usersWithPosts = await prisma.user.findMany({
@@ -839,6 +841,7 @@ const usersWithPosts = await prisma.user.findMany({
 ## Example 2: Safe Atomic Transactions with Locking
 
 ### ❌ Anti-pattern (Unprotected read-modify-write race condition)
+
 ```typescript
 // BAD: race condition between reading balance and updating
 const account = await prisma.account.findUnique({ where: { id } });
@@ -851,6 +854,7 @@ if (account.balance >= amount) {
 ```
 
 ### ✅ ContextOS Standard (Atomic conditional update in transaction)
+
 ```typescript
 // GOOD: atomic database transaction with invariant check
 export async function deductBalance(accountId: string, amount: number) {
@@ -877,14 +881,17 @@ export async function deductBalance(accountId: string, amount: number) {
 ## Common Issues & Fixes
 
 ### 1. Connection Pool Exhaustion in Serverless / Edge
+
 - **Cause**: Creating a new PrismaClient / DB connection instance on every serverless function invocation.
 - **Fix**: Declare PrismaClient as a global singleton across warm lambdas, and enable PgBouncer or Prisma Accelerate.
 
 ### 2. Slow Queries on Large Tables
+
 - **Cause**: Missing composite index on filtered and ordered columns.
 - **Fix**: Run `EXPLAIN ANALYZE <query>` and add targeted indexes matching the WHERE and ORDER BY columns.
 
 ### 3. Database Deadlocks during Concurrent Transactions
+
 - **Cause**: Different transactions updating resources in different orders.
 - **Fix**: Always acquire locks and update entities in a deterministic alphabetical or ID-ordered sequence.
 
@@ -1254,6 +1261,7 @@ Interacts with `security` (container hardening) and `node` / `nextjs` / `fastapi
 ## Example 1: Multi-Stage Build & Layer Caching
 
 ### ❌ Anti-pattern (Fat single-stage image running as root)
+
 ```dockerfile
 # BAD: 1.2GB image, runs as root, breaks caching on every file edit
 FROM node:latest
@@ -1266,6 +1274,7 @@ CMD ["npm", "start"]
 ```
 
 ### ✅ ContextOS Standard (Slim multi-stage build with non-root user)
+
 ```dockerfile
 # GOOD: 95MB image, non-root user, optimized layer caching
 FROM node:20.12.2-alpine3.19 AS builder
@@ -1290,6 +1299,7 @@ CMD ["node", "dist/main.js"]
 ## Example 2: Docker Ignore File (`.dockerignore`)
 
 ### ✅ ContextOS Standard `.dockerignore`
+
 ```gitignore
 node_modules
 npm-debug.log
@@ -1308,14 +1318,17 @@ coverage
 ## Common Issues & Fixes
 
 ### 1. Slow Docker builds rebuilding node_modules every time
+
 - **Cause**: Copying the entire directory (`COPY . .`) before running `npm ci`.
 - **Fix**: Copy `package.json` and `package-lock.json` separately first, run `npm ci`, and only then copy application source code.
 
 ### 2. Permission Denied Errors with Non-Root Users
+
 - **Cause**: Files copied from builder without changing ownership.
 - **Fix**: Always use `--chown=appuser:appgroup` when copying files in Dockerfile.
 
 ### 3. Missing native build dependencies on Alpine Linux
+
 - **Cause**: Packages requiring C bindings (e.g. `sharp`, `bcrypt`) fail on musl libc.
 - **Fix**: Add `RUN apk add --no-cache libc6-compat python3 make g++` in the builder stage.
 
@@ -2746,6 +2759,7 @@ How this skill interacts with other skills.
 ## Example 1: Graceful Process Shutdown
 
 ### ❌ Anti-pattern (Abruptly killing process and dropping in-flight requests)
+
 ```javascript
 // BAD: drops active database transactions and in-flight HTTP connections
 process.on('SIGTERM', () => {
@@ -2754,6 +2768,7 @@ process.on('SIGTERM', () => {
 ```
 
 ### ✅ ContextOS Standard (Graceful connection draining)
+
 ```typescript
 // GOOD: drains active requests, closes database connections, and exits safely
 import http from 'http';
@@ -2793,6 +2808,7 @@ export function setupGracefulShutdown(server: http.Server) {
 ## Example 2: Stream-based File Processing
 
 ### ❌ Anti-pattern (Loading entire 500MB file into buffer)
+
 ```typescript
 // BAD: easily causes Out Of Memory (OOM) crashes under concurrency
 app.get('/download/:file', async (req, res) => {
@@ -2802,6 +2818,7 @@ app.get('/download/:file', async (req, res) => {
 ```
 
 ### ✅ ContextOS Standard (Piping read stream with pipeline)
+
 ```typescript
 // GOOD: constant memory usage (O(1) RAM) regardless of file size
 import fs from 'fs';
@@ -3316,6 +3333,7 @@ How this skill interacts with other skills.
 ## Example 1: Derived State vs. useEffect
 
 ### ❌ Anti-pattern (Redundant state + extra render with useEffect)
+
 ```tsx
 // BAD: causes an unnecessary extra render cycle and potential state desync
 function OrderSummary({ items }: { items: CartItem[] }) {
@@ -3331,6 +3349,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 ```
 
 ### ✅ ContextOS Standard (Inline derived calculation / useMemo)
+
 ```tsx
 // GOOD: calculated instantly during render with zero extra render pass
 function OrderSummary({ items }: { items: CartItem[] }) {
@@ -3348,6 +3367,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 ## Example 2: Custom Hook Encapsulation
 
 ### ❌ Anti-pattern (Scattered listener logic inside component)
+
 ```tsx
 // BAD: window listener logic cluttering UI component
 function NavHeader() {
@@ -3362,6 +3382,7 @@ function NavHeader() {
 ```
 
 ### ✅ ContextOS Standard (Reusable Custom Hook)
+
 ```tsx
 // GOOD: extracted into a reusable, testable custom hook
 export function useScrollThreshold(threshold = 50): boolean {
@@ -3537,6 +3558,7 @@ How this skill interacts with other skills.
 ## Example 1: Timing-Safe Secret Verification
 
 ### ❌ Anti-pattern (Vulnerable to side-channel timing attack)
+
 ```typescript
 // BAD: string comparison returns early on the first mismatched byte
 export function verifyApiKey(providedKey: string, storedKey: string): boolean {
@@ -3545,6 +3567,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 ```
 
 ### ✅ ContextOS Standard (Constant-time buffer comparison)
+
 ```typescript
 // GOOD: crypto.timingSafeEqual executes in constant time
 import crypto from 'crypto';
@@ -3566,6 +3589,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 ## Example 2: Preventing IDOR (Insecure Direct Object Reference)
 
 ### ❌ Anti-pattern (Trusting client ID without ownership check)
+
 ```typescript
 // BAD: any authenticated user can delete any other user's document!
 app.delete('/api/documents/:id', requireAuth, async (req, res) => {
@@ -3575,6 +3599,7 @@ app.delete('/api/documents/:id', requireAuth, async (req, res) => {
 ```
 
 ### ✅ ContextOS Standard (Multi-tenant scoped authorization check)
+
 ```typescript
 // GOOD: document deletion is strictly scoped to authenticated user or org
 app.delete('/api/documents/:id', requireAuth, async (req, res) => {
@@ -3645,6 +3670,7 @@ Interacts with `react`, `nextjs`, and `typescript`.
 ## Example 1: Selecting State from Zustand
 
 ### ❌ Anti-pattern (Subscribing to full store causes unnecessary renders)
+
 ```typescript
 // BAD: component re-renders whenever ANY property in the store changes!
 function CartBadge() {
@@ -3654,6 +3680,7 @@ function CartBadge() {
 ```
 
 ### ✅ ContextOS Standard (Atomic granular selector)
+
 ```typescript
 // GOOD: component ONLY re-renders when itemCount changes
 function CartBadge() {
@@ -3667,6 +3694,7 @@ function CartBadge() {
 ## Example 2: Server State Invalidation
 
 ### ❌ Anti-pattern (Manually syncing server data into global state with useEffect)
+
 ```typescript
 // BAD: manual sync, race conditions, stale cache bugs
 function UserProfile({ userId }) {
@@ -3678,6 +3706,7 @@ function UserProfile({ userId }) {
 ```
 
 ### ✅ ContextOS Standard (Declarative TanStack Query caching)
+
 ```typescript
 // GOOD: automatic caching, deduplication, background revalidation
 function UserProfile({ userId }: { userId: string }) {
@@ -3698,14 +3727,17 @@ function UserProfile({ userId }: { userId: string }) {
 ## Common Issues & Fixes
 
 ### 1. Infinite re-renders when calling `useStore` with an inline object selector
+
 - **Cause**: Returning a new object reference from a selector without a custom equality check.
 - **Fix**: Use `useShallow` from `zustand/react/shallow` or select scalar values directly.
 
 ### 2. Stale data shown after mutation
+
 - **Cause**: Missing `queryClient.invalidateQueries` in `onSettled` or `onSuccess`.
 - **Fix**: Always invalidate the relevant query keys on mutation completion to trigger background refetch.
 
 ### 3. Server-Side Rendering (SSR) Hydration Mismatch in Next.js
+
 - **Cause**: Reading localStorage-persisted Zustand store directly during initial SSR render.
 - **Fix**: Use a custom `useHydratedStore` hook or render persisted components only after client mount.
 
@@ -4159,6 +4191,7 @@ Interacts directly with `engineering-workflow` (Verify phase), `react`, and `typ
 ## Example 1: React Component Testing
 
 ### ❌ Anti-pattern (Brittle query & implementation coupling)
+
 ```typescript
 // BAD: querying by CSS class or test-id and testing internal state
 test('submits form', async () => {
@@ -4171,6 +4204,7 @@ test('submits form', async () => {
 ```
 
 ### ✅ ContextOS Standard (User-centric role queries & userEvent)
+
 ```typescript
 // GOOD: user-facing roles, userEvent, async wait
 import { render, screen } from '@testing-library/react';
@@ -4199,6 +4233,7 @@ test('submits form with valid user credentials', async () => {
 ## Example 2: API Mocking with MSW (Mock Service Worker)
 
 ### ❌ Anti-pattern (Hardcoded global fetch monkey-patching)
+
 ```typescript
 // BAD: globally overwriting fetch breaks other tests and hides actual contract
 global.fetch = vi.fn().mockResolvedValue({
@@ -4207,6 +4242,7 @@ global.fetch = vi.fn().mockResolvedValue({
 ```
 
 ### ✅ ContextOS Standard (Network boundary mocking)
+
 ```typescript
 // GOOD: declarative MSW network handler
 import { http, HttpResponse } from 'msw';
@@ -4227,14 +4263,17 @@ export const server = setupServer(
 ## Common Issues & Fixes
 
 ### 1. `act(...)` warning in React Testing Library
+
 - **Cause**: An asynchronous state update triggered after the test completed.
 - **Fix**: Ensure all async operations are awaited using `await waitFor(() => ...)` or `await screen.findByRole(...)`.
 
 ### 2. Tests pass in isolation but fail in concurrent test runs
+
 - **Cause**: Shared in-memory state or un-reset singleton.
 - **Fix**: Reset all mocks and in-memory databases in `beforeEach(() => vi.clearAllMocks())` and `afterEach(() => cleanup())`.
 
 ### 3. Playwright timeout waiting for selector
+
 - **Cause**: Element is animating or blocked behind a modal/overlay.
 - **Fix**: Use web-first assertions like `await expect(page.getByRole('button')).toBeVisible()` which automatically retry until timeout.
 
@@ -4353,6 +4392,7 @@ How this skill interacts with other skills.
 ## Example 1: Type-Safe Parsing with Zod (No `any`)
 
 ### ❌ Anti-pattern (Blind type assertion with `as`)
+
 ```typescript
 // BAD: using 'as User' bypasses runtime validation completely
 async function fetchUser(id: string): Promise<User> {
@@ -4363,6 +4403,7 @@ async function fetchUser(id: string): Promise<User> {
 ```
 
 ### ✅ ContextOS Standard (Runtime schema validation with Zod)
+
 ```typescript
 // GOOD: guaranteed runtime and compile-time type safety
 import { z } from 'zod';
@@ -4390,6 +4431,7 @@ export async function fetchUser(id: string): Promise<User> {
 ## Example 2: Discriminated Unions for State Handling
 
 ### ❌ Anti-pattern (Optional soup with boolean flags)
+
 ```typescript
 // BAD: impossible states can be represented (e.g. isLoading: true AND error: 'Failed')
 interface AsyncState<T> {
@@ -4400,6 +4442,7 @@ interface AsyncState<T> {
 ```
 
 ### ✅ ContextOS Standard (Discriminated Union)
+
 ```typescript
 // GOOD: impossible states are impossible at compile-time
 export type AsyncState<T> =
@@ -4821,6 +4864,7 @@ How this skill interacts with other skills.
 ## Example 1: Accessible Icon Button with Visible Focus States
 
 ### ❌ Anti-pattern (Missing accessible name and arbitrary color values)
+
 ```tsx
 // BAD: inaccessible to screen readers, missing focus ring, arbitrary hex
 <button className="bg-[#5a4fcf] p-[7px] rounded-[5px]" onClick={onClose}>
@@ -4829,6 +4873,7 @@ How this skill interacts with other skills.
 ```
 
 ### ✅ ContextOS Standard (Semantic token scales & ARIA label)
+
 ```tsx
 // GOOD: full keyboard accessibility, semantic tokens, focus-visible ring
 <button
@@ -4846,6 +4891,7 @@ How this skill interacts with other skills.
 ## Example 2: Stat Card Hierarchy
 
 ### ❌ Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
+
 ```tsx
 // BAD: cliche AI gradient, poor typographic hierarchy
 <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-4 rounded-xl text-white">
@@ -4855,6 +4901,7 @@ How this skill interacts with other skills.
 ```
 
 ### ✅ ContextOS Standard (Refined editorial typography & subtle depth)
+
 ```tsx
 // GOOD: high contrast, monospace numerical accent, subtle border
 <div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md">

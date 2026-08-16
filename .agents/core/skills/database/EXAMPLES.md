@@ -3,6 +3,7 @@
 ## Example 1: Solving the N+1 Query Problem
 
 ### ❌ Anti-pattern (N+1 database queries in a loop)
+
 ```typescript
 // BAD: 1 query for users + N queries for posts!
 const users = await prisma.user.findMany();
@@ -14,6 +15,7 @@ for (const user of users) {
 ```
 
 ### ✅ ContextOS Standard (Batch query or relational include)
+
 ```typescript
 // GOOD: 1 single optimized batch query
 const usersWithPosts = await prisma.user.findMany({
@@ -36,6 +38,7 @@ const usersWithPosts = await prisma.user.findMany({
 ## Example 2: Safe Atomic Transactions with Locking
 
 ### ❌ Anti-pattern (Unprotected read-modify-write race condition)
+
 ```typescript
 // BAD: race condition between reading balance and updating
 const account = await prisma.account.findUnique({ where: { id } });
@@ -48,6 +51,7 @@ if (account.balance >= amount) {
 ```
 
 ### ✅ ContextOS Standard (Atomic conditional update in transaction)
+
 ```typescript
 // GOOD: atomic database transaction with invariant check
 export async function deductBalance(accountId: string, amount: number) {

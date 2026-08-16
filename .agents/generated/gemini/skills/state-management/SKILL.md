@@ -55,6 +55,7 @@ Interacts with `react`, `nextjs`, and `typescript`.
 ## Example 1: Selecting State from Zustand
 
 ### ❌ Anti-pattern (Subscribing to full store causes unnecessary renders)
+
 ```typescript
 // BAD: component re-renders whenever ANY property in the store changes!
 function CartBadge() {
@@ -64,6 +65,7 @@ function CartBadge() {
 ```
 
 ### ✅ ContextOS Standard (Atomic granular selector)
+
 ```typescript
 // GOOD: component ONLY re-renders when itemCount changes
 function CartBadge() {
@@ -77,6 +79,7 @@ function CartBadge() {
 ## Example 2: Server State Invalidation
 
 ### ❌ Anti-pattern (Manually syncing server data into global state with useEffect)
+
 ```typescript
 // BAD: manual sync, race conditions, stale cache bugs
 function UserProfile({ userId }) {
@@ -88,6 +91,7 @@ function UserProfile({ userId }) {
 ```
 
 ### ✅ ContextOS Standard (Declarative TanStack Query caching)
+
 ```typescript
 // GOOD: automatic caching, deduplication, background revalidation
 function UserProfile({ userId }: { userId: string }) {
@@ -110,13 +114,16 @@ function UserProfile({ userId }: { userId: string }) {
 ## Common Issues & Fixes
 
 ### 1. Infinite re-renders when calling `useStore` with an inline object selector
+
 - **Cause**: Returning a new object reference from a selector without a custom equality check.
 - **Fix**: Use `useShallow` from `zustand/react/shallow` or select scalar values directly.
 
 ### 2. Stale data shown after mutation
+
 - **Cause**: Missing `queryClient.invalidateQueries` in `onSettled` or `onSuccess`.
 - **Fix**: Always invalidate the relevant query keys on mutation completion to trigger background refetch.
 
 ### 3. Server-Side Rendering (SSR) Hydration Mismatch in Next.js
+
 - **Cause**: Reading localStorage-persisted Zustand store directly during initial SSR render.
 - **Fix**: Use a custom `useHydratedStore` hook or render persisted components only after client mount.

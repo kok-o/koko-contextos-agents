@@ -290,6 +290,7 @@ How this skill interacts with other skills.
 ## Example 1: Accessible Icon Button with Visible Focus States
 
 ### ❌ Anti-pattern (Missing accessible name and arbitrary color values)
+
 ```tsx
 // BAD: inaccessible to screen readers, missing focus ring, arbitrary hex
 <button className="bg-[#5a4fcf] p-[7px] rounded-[5px]" onClick={onClose}>
@@ -298,6 +299,7 @@ How this skill interacts with other skills.
 ```
 
 ### ✅ ContextOS Standard (Semantic token scales & ARIA label)
+
 ```tsx
 // GOOD: full keyboard accessibility, semantic tokens, focus-visible ring
 <button
@@ -315,6 +317,7 @@ How this skill interacts with other skills.
 ## Example 2: Stat Card Hierarchy
 
 ### ❌ Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
+
 ```tsx
 // BAD: cliche AI gradient, poor typographic hierarchy
 <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-4 rounded-xl text-white">
@@ -324,6 +327,7 @@ How this skill interacts with other skills.
 ```
 
 ### ✅ ContextOS Standard (Refined editorial typography & subtle depth)
+
 ```tsx
 // GOOD: high contrast, monospace numerical accent, subtle border
 <div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md">
