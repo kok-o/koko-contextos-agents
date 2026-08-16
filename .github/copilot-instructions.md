@@ -342,12 +342,15 @@ Reference the relevant skill when working on a task.
 # agent-adapters
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 ContextOS is agent-agnostic. This skill generates the right config format for any AI agent.
 
 ## Supported Agents
@@ -419,38 +422,35 @@ conventions:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### context-manager
 
 # context-manager
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 You are the **Context Manager**. Your job is to prevent context overload.
 
 ## How It Works
@@ -543,38 +543,35 @@ Invalidate cache when:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### context-os
 
 # context-os
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 You are the **Context Compiler**. Your job is NOT to know everything. Your job is to **assemble the minimum context** needed for the current task.
 
 ## Pipeline
@@ -709,41 +706,37 @@ The compiler builds a dependency graph from all discovered skills and resolves i
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Domain-Driven Design
 
 # Domain-Driven Design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: ddd.md -->
 
-# Domain-Driven Design — Patterns & Practices
+## Domain-Driven Design — Patterns & Practices
 
 ## When to Use DDD
 
@@ -923,40 +916,36 @@ src/
 - ❌ DDD everywhere — use DDD only where complexity justifies it
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### decisions
 
 # decision-engine
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 You manage **Architecture Decision Records** (ADRs).
 
 ## Why Decisions Matter
@@ -1014,26 +1003,20 @@ The Decision Engine should suggest creating an ADR when it detects:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### engineering-workflow
 
@@ -1042,12 +1025,15 @@ Add common errors, anti-patterns, and debugging steps here.
 # engineering-workflow
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Inspired by [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani (Google Chrome).
 
 ## Core Principle
@@ -1089,11 +1075,11 @@ Turn vague intent into a precise, executable specification.
 [What pain does this solve? Who has it? How often?]
 
 ### Scope (What's In / Out)
-**In scope:**
+### 
 - [Specific thing 1]
 - [Specific thing 2]
 
-**Out of scope (explicitly):**
+### 
 - [Thing we're NOT doing and why]
 
 ### Technical Approach
@@ -1193,7 +1179,7 @@ Tests are proof, not an afterthought.
 
 ### Test Strategy by Code Type
 
-**Utilities, services, API routes → TDD (Red-Green-Refactor)**
+###
 
 ```
 1. RED:      Write a failing test for the next small behavior
@@ -1202,7 +1188,7 @@ Tests are proof, not an afterthought.
 4. REPEAT
 ```
 
-**UI Components → BDD (Behavior-Driven Development)**
+###
 
 For complex React components, prioritize testing _user behavior_ over internal state:
 
@@ -1256,13 +1242,13 @@ Review before merging. Always.
 
 ### Code Review Checklist
 
-**Correctness**
+###
 
 - [ ] Does it do what the spec says?
 - [ ] Are all acceptance criteria met?
 - [ ] Edge cases handled?
 
-**Code Quality**
+###
 
 - [ ] Single Responsibility: each function does one thing
 - [ ] DRY: no logic duplicated across 3+ places
@@ -1270,14 +1256,14 @@ Review before merging. Always.
 - [ ] Error handling: all async operations have try/catch or `.catch()`
 - [ ] Business logic is NOT in API route handlers — it lives in services/use-cases
 
-**Security**
+###
 
 - [ ] No secrets hardcoded
 - [ ] User input is validated and sanitized
 - [ ] SQL uses parameterized queries (no string concatenation)
 - [ ] Auth checks before data access
 
-**Performance**
+###
 
 - [ ] No N+1 query patterns
 - [ ] Expensive operations are cached or async
@@ -1325,41 +1311,37 @@ Only ship when all gates are green.
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### FastAPI
 
 # FastAPI
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: fastapi.md -->
 
-# FastAPI — Best Practices
+## FastAPI — Best Practices
 
 ## Project Structure
 
@@ -1473,40 +1455,36 @@ async def test_create_user(client: AsyncClient):
 - ❌ No schema validation — always use Pydantic models
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### generators
 
 # document-generator
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 You generate project documentation from a user's idea. Use the templates in `templates/` as the structure for each document.
 
 ## Commands
@@ -1585,26 +1563,20 @@ When updating a parent document, check if child documents need updates too.
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### gstack-roles
 
@@ -1613,12 +1585,15 @@ Add common errors, anti-patterns, and debugging steps here.
 # gstack-roles
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Inspired by [Garry Tan's gstack](https://github.com/garrytan/gstack) — shipping 810× more logical code than a solo dev in 2013.
 
 ## Core Principle
@@ -1738,26 +1713,20 @@ For the narrow wedge:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### impeccable-design
 
@@ -1766,12 +1735,15 @@ Add common errors, anti-patterns, and debugging steps here.
 # impeccable-design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — deterministic detector rules for AI-generated frontend design.
 
 ## Core Principle
@@ -1937,41 +1909,37 @@ These details separate premium from mediocre:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Microservices
 
 # Microservices
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: microservices.md -->
 
-# Microservices — Architecture Guide
+## Microservices — Architecture Guide
 
 ## When to Use Microservices
 
@@ -2092,43 +2060,38 @@ When integrating with legacy or external systems, create an adapter that transla
 - ❌ Premature microservices — start with a modular monolith
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### NestJS
 
 # NestJS
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: nestjs.md -->
 
-# NestJS — Best Practices
+## NestJS — Best Practices
 
 ## Module Architecture
 
@@ -2233,43 +2196,38 @@ export class AllExceptionsFilter implements ExceptionFilter {
 - ❌ Not using DTOs — always validate input
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Next.js
 
 # Next.js
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: nextjs.md -->
 
-# Next.js — Best Practices (App Router)
+## Next.js — Best Practices (App Router)
 
 ## Routing
 
@@ -2338,43 +2296,38 @@ app/
 - ❌ Not leveraging caching and revalidation
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Node.js
 
 # Node.js
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: node.md -->
 
-# Node.js — Best Practices
+## Node.js — Best Practices
 
 ## Architecture
 
@@ -2463,43 +2416,38 @@ src/
 ```
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Web Performance
 
 # Web Performance
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: performance.md -->
 
-# Web Performance — Best Practices
+## Web Performance — Best Practices
 
 ## Core Web Vitals
 
@@ -2553,28 +2501,21 @@ Context for when this skill is applicable.
 - ❌ Premature optimization — measure first, optimize second
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### ponytail-mindset
 
@@ -2583,12 +2524,15 @@ Add common errors, anti-patterns, and debugging steps here.
 # ponytail-mindset
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 
 > _He says nothing. He writes one line. It works._
@@ -2722,10 +2666,10 @@ async function deleteAccount(userId) {
 
 ```bash
 npm install flatpickr
-# Creates: DatePickerWrapper.jsx (45 lines)
-# Creates: useDatePicker.js (30 lines)  
-# Creates: DatePickerStyles.css (60 lines)
-# Total: 135 lines + 1 dependency
+## Creates: DatePickerWrapper.jsx (45 lines)
+## Creates: useDatePicker.js (30 lines)  
+## Creates: DatePickerStyles.css (60 lines)
+## Total: 135 lines + 1 dependency
 ```
 
 ✅ **Ponytail approach** (use rung 4 — native platform):
@@ -2834,41 +2778,37 @@ Do NOT apply the ladder to:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### React
 
 # React
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: react.md -->
 
-# React — Best Practices
+## React — Best Practices
 
 ## Component Architecture
 
@@ -2963,43 +2903,38 @@ types/
 ```
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Application Security
 
 # Application Security
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: security.md -->
 
-# Application Security — Best Practices
+## Application Security — Best Practices
 
 ## OWASP Top 10
 
@@ -3107,28 +3042,21 @@ Redirect → Provider (Google, GitHub) → Callback → Create/link user → JWT
 - [ ] Logging for security events
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### system-design
 
@@ -3137,12 +3065,15 @@ Add common errors, anti-patterns, and debugging steps here.
 # system-design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer) — the most starred system design resource on GitHub.
 
 ## Core Principle
@@ -3489,41 +3420,37 @@ When proposing any backend architecture, include:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### TypeScript
 
 # TypeScript
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: typescript.md -->
 
-# TypeScript — Best Practices
+## TypeScript — Best Practices
 
 ## Strict Mode
 
@@ -3596,43 +3523,38 @@ interface Repository<T extends { id: string }> {
 - ❌ Complex generics without JSDoc — document intent
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### UI Design
 
 # UI Design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: ui.md -->
 
-# UI Design — Best Practices
+## UI Design — Best Practices
 
 ## Design System Foundations
 
@@ -3722,28 +3644,21 @@ Context for when this skill is applicable.
 - Test all states in both modes
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### ui-ux-pro
 
@@ -3752,12 +3667,15 @@ Add common errors, anti-patterns, and debugging steps here.
 # ui-ux-pro
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill).
 
 ## Core Principle
@@ -4013,41 +3931,37 @@ This skill is used at two stages in the pipeline:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### UX Design
 
 # UX Design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: ux.md -->
 
-# UX Design — Best Practices
+## UX Design — Best Practices
 
 ## Information Architecture
 
@@ -4129,43 +4043,38 @@ Every screen has 5 states. Design ALL of them:
 10. Help and documentation
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 ### Web Accessibility
 
 # Web Accessibility
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: accessibility.md -->
 
-# Web Accessibility — WCAG 2.1 Compliance
+## Web Accessibility — WCAG 2.1 Compliance
 
 ## Principles (POUR)
 
@@ -4230,25 +4139,18 @@ Context for when this skill is applicable.
 - Zoom: test at 200% and 400% zoom
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.

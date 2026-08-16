@@ -17,9 +17,12 @@ const GENERATED_CLAUDE = path.join(__dirname, '..', '.agents', 'generated', 'cla
 // New adapters output to project root (cwd when running tests = repo root)
 const ROOT = path.join(__dirname, '..');
 const CURSOR_FILE  = path.join(ROOT, '.cursorrules');
+const CURSOR_RULES_DIR = path.join(ROOT, '.cursor', 'rules');
 const COPILOT_FILE = path.join(ROOT, '.github', 'copilot-instructions.md');
 const AIDER_CONF   = path.join(ROOT, '.aider.conf.yml');
 const CONVENTIONS  = path.join(ROOT, 'CONVENTIONS.md');
+const ZED_RULES    = path.join(ROOT, '.zed', 'rules.md');
+const ZED_PROMPTS  = path.join(ROOT, '.zed', 'prompts');
 const PLUGIN_DIR   = path.join(ROOT, '.agents', 'plugins', 'export-test-plugin');
 
 describe('ctx.js — context compiler', () => {
@@ -142,6 +145,23 @@ describe('ctx.js — context compiler', () => {
       const matches = content.match(/^## Skill:/gm) || [];
       assert.ok(matches.length >= 5, `Expected ≥5 skill sections, got ${matches.length}`);
     });
+
+    test('creates .cursor/rules/ directory with .mdc files', () => {
+      assert.ok(fs.existsSync(CURSOR_RULES_DIR), '.cursor/rules/ directory should exist');
+      const mdcFiles = fs.readdirSync(CURSOR_RULES_DIR).filter(f => f.endsWith('.mdc'));
+      assert.ok(mdcFiles.length >= 5, `Expected ≥5 .mdc files, got ${mdcFiles.length}`);
+      assert.ok(mdcFiles.includes('00-project-rules.mdc'), '00-project-rules.mdc should exist');
+    });
+
+    test('.cursor/rules/*.mdc files have valid YAML frontmatter with globs and alwaysApply', () => {
+      const mdcFiles = fs.readdirSync(CURSOR_RULES_DIR).filter(f => f.endsWith('.mdc'));
+      for (const file of mdcFiles) {
+        const content = fs.readFileSync(path.join(CURSOR_RULES_DIR, file), 'utf8');
+        assert.ok(content.startsWith('---'), `${file} should start with YAML frontmatter`);
+        assert.ok(content.includes('description:'), `${file} should have description field`);
+        assert.ok(content.includes('alwaysApply:'), `${file} should have alwaysApply field`);
+      }
+    });
   });
 
   describe('export copilot', () => {
@@ -200,14 +220,43 @@ describe('ctx.js — context compiler', () => {
     });
   });
 
+  describe('export zed', () => {
+    before(() => {
+      execSync(`node "${CTX_PATH}" export zed`, { cwd: ROOT });
+    });
+
+    test('creates .zed/rules.md at project root', () => {
+      assert.ok(fs.existsSync(ZED_RULES), '.zed/rules.md should exist');
+    });
+
+    test('.zed/rules.md has ContextOS header', () => {
+      const content = fs.readFileSync(ZED_RULES, 'utf8');
+      assert.ok(content.includes('ContextOS'), 'Should include ContextOS header');
+      assert.ok(content.includes('Zed Assistant'), 'Should mention Zed Assistant');
+    });
+
+    test('.zed/rules.md contains skills library section', () => {
+      const content = fs.readFileSync(ZED_RULES, 'utf8');
+      assert.ok(content.includes('## Skills Library'), 'Should include Skills Library section');
+    });
+
+    test('.zed/prompts/ directory contains prompt files', () => {
+      assert.ok(fs.existsSync(ZED_PROMPTS), '.zed/prompts should exist');
+      const files = fs.readdirSync(ZED_PROMPTS);
+      assert.ok(files.length >= 5, `Expected at least 5 prompt files, got ${files.length}`);
+      assert.ok(files.includes('contextos.md'), 'contextos.md prompt should exist');
+    });
+  });
+
   describe('export all', () => {
-    test('export all runs all five adapters successfully', () => {
+    test('export all runs all adapters successfully', () => {
       const output = execSync(`node "${CTX_PATH}" export all`, { cwd: ROOT }).toString();
       assert.ok(output.includes('gemini') || output.includes('Gemini'), 'Should mention Gemini');
       assert.ok(output.includes('claude') || output.includes('Claude'), 'Should mention Claude');
       assert.ok(output.includes('cursor') || output.includes('Cursor'), 'Should mention Cursor');
       assert.ok(output.includes('copilot') || output.includes('Copilot'), 'Should mention Copilot');
       assert.ok(output.includes('aider') || output.includes('Aider'), 'Should mention Aider');
+      assert.ok(output.includes('zed') || output.includes('Zed'), 'Should mention Zed');
       assert.ok(output.includes('All exports complete'), 'Should confirm all exports complete');
     });
   });
@@ -230,6 +279,7 @@ describe('ctx.js — context compiler', () => {
       assert.ok(fs.readFileSync(CURSOR_FILE, 'utf8').includes('unique-marker-export-test'));
       assert.ok(fs.readFileSync(COPILOT_FILE, 'utf8').includes('unique-marker-export-test'));
       assert.ok(fs.readFileSync(CONVENTIONS, 'utf8').includes('unique-marker-export-test'));
+      assert.ok(fs.readFileSync(ZED_RULES, 'utf8').includes('unique-marker-export-test'));
     });
 
     test('clears removed plugins from generated skill directories', () => {

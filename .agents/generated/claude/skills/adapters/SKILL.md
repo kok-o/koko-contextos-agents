@@ -1,12 +1,15 @@
 # agent-adapters
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 ContextOS is agent-agnostic. This skill generates the right config format for any AI agent.
 
 ## Supported Agents
@@ -78,23 +81,17 @@ conventions:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.

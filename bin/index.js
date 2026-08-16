@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { version } = require('../package.json');
+const profiles = require('../.agents/profiles.js');
 
 // ── CLI argument parsing ──────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -12,6 +13,11 @@ const flags = {
   dryRun:      args.includes('--dry-run'),
   force:       args.includes('--force'),
   skipCompile: args.includes('--skip-compile'),
+  auto:        args.includes('--auto'),
+  profile:     (() => {
+    const i = args.indexOf('--profile');
+    return i !== -1 ? args[i + 1] : null;
+  })(),
   addSkill:    (() => {
     const i = args.indexOf('--add-skill');
     return i !== -1 ? args[i + 1] : null;
@@ -37,12 +43,23 @@ Options:
   --version, -v       Show version number
   --dry-run           Preview what will be copied without making changes
   --force             Overwrite an existing .agents/ folder
+  --profile <name>    Install a specific profile (mvp, startup, enterprise, frontend, backend)
+  --auto              Auto-detect tech stack and apply recommended profile
   --skip-compile      Skip running ctx.js export after installation
   --add-skill <ref>   Install a community plugin skill after setup
 
 Commands:
   audit               Validate local skills (alias for validate)
+  detect              Analyze project and display detected tech stack
   install-skill       Interactive skill installer (or pass <ref> / --from-repo)
+
+Profiles:
+  mvp                 Fastest shipping, minimalist monolith, excludes microservices & DDD
+  startup             Balanced agile stack (modular monolith, security, testing)
+  enterprise          Maximum rigor (DDD, microservices, security audit, ADRs, 80%+ tests)
+  frontend            Frontend-focused (React, Next.js, UI/UX Pro, Accessibility, Design)
+  backend             Backend-focused (Node, FastAPI, NestJS, DDD, Microservices, DB)
+  hackathon           Rapid hackathon prototyping
 
 Plugin ref formats:
   username/repo                    GitHub repo with a SKILL.md at the root
@@ -53,23 +70,24 @@ Plugin ref formats:
 
 Examples:
   npx koko-contextos-agents                          Install .agents/ into current project
+  npx koko-contextos-agents --profile mvp            Install with MVP profile
+  npx koko-contextos-agents --auto                   Auto-detect tech stack and configure
   npx koko-contextos-agents --dry-run                Preview files that would be copied
-  npx koko-contextos-agents --force                  Force overwrite existing .agents/
   npx koko-contextos-agents --add-skill alice/my-skill
 
 Export skills to your AI tool:
   node .agents/ctx.js export gemini    → .agents/generated/gemini/   (Gemini / Antigravity)
   node .agents/ctx.js export claude    → .agents/generated/claude/   (Claude Code)
-  node .agents/ctx.js export cursor    → .cursorrules                 (Cursor IDE)
+  node .agents/ctx.js export cursor    → .cursorrules & .cursor/rules (Cursor IDE)
   node .agents/ctx.js export copilot   → .github/copilot-instructions.md
   node .agents/ctx.js export aider     → .aider.conf.yml + CONVENTIONS.md
+  node .agents/ctx.js export zed       → .zed/rules.md & .zed/prompts/ (Zed IDE)
   node .agents/ctx.js export all       → all of the above
 
-Plugin commands (after installation):
-  node .agents/ctx.js skill add   <ref>    Install a plugin skill
-  node .agents/ctx.js skill remove <name>  Remove a plugin skill
-  node .agents/ctx.js skill list           List all skills
-  node .agents/ctx.js skill search [query] Search community registry
+Profile commands (after installation):
+  node .agents/ctx.js profile list           List available profiles
+  node .agents/ctx.js profile apply <name>   Switch project profile
+  node .agents/ctx.js detect                 Detect project tech stack
 `);
   process.exit(0);
 }
@@ -89,6 +107,15 @@ if (mainCommand === 'audit') {
   } catch (e) {
     process.exit(1);
   }
+  process.exit(0);
+}
+
+if (mainCommand === 'detect') {
+  const stack = profiles.detectStack(process.cwd());
+  console.log('\nContextOS — Tech Stack Detection\n');
+  console.log(`  Detected Technologies : ${stack.detected.length ? stack.detected.join(', ') : 'Generic JavaScript'}`);
+  console.log(`  Recommended Profile   : ${stack.recommendedProfile}`);
+  console.log(`  Recommended Skills    : ${stack.recommendedSkills.join(', ')}\n`);
   process.exit(0);
 }
 
@@ -184,9 +211,7 @@ function uniqueSiblingPath(basePath, suffix) {
 }
 
 /**
- * Copy into a staging directory then replace the target with rollback. A
- * partially copied .agents directory would otherwise leave an installation
- * unusable if the process is interrupted or the disk is full.
+ * Copy into a staging directory then replace the target with rollback.
  */
 function installAtomically(source, target) {
   const stagingPath = uniqueSiblingPath(target, 'staging');
@@ -204,8 +229,6 @@ function installAtomically(source, target) {
       try {
         fs.rmSync(backupPath, { recursive: true, force: true });
       } catch {
-        // The new installation is already valid. Preserve the backup rather
-        // than reporting a failed install or risking the replacement.
         console.warn(`[WARN] Installed successfully; backup retained at ${backupPath}`);
       }
     }
@@ -217,6 +240,9 @@ function installAtomically(source, target) {
     throw error;
   }
 }
+
+// ── Stack detection ───────────────────────────────────────────────────────────
+const stackDetection = profiles.detectStack(process.cwd());
 
 // ── Dry run ───────────────────────────────────────────────────────────────────
 if (flags.dryRun) {
@@ -238,6 +264,9 @@ if (flags.dryRun) {
   } else {
     console.log(`[OK] Would create .agents/ in: ${process.cwd()}`);
   }
+  console.log(`[INFO] Detected stack: ${stackDetection.detected.length ? stackDetection.detected.join(', ') : 'Generic JavaScript'}`);
+  const targetProfile = flags.profile || (flags.auto ? stackDetection.recommendedProfile : 'none');
+  console.log(`[INFO] Selected profile: ${targetProfile}`);
   console.log(`[INFO] ${total} files would be copied from the package.`);
   console.log('\nRun without --dry-run to apply changes.');
   process.exit(0);
@@ -266,6 +295,21 @@ try {
   installAtomically(sourcePath, targetPath);
 
   console.log('[OK] .agents/ successfully installed in your project!');
+  if (stackDetection.detected.length > 0) {
+    console.log(`[OK] Detected project stack: ${stackDetection.detected.join(', ')}`);
+  }
+
+  // ── Apply profile if requested or auto ──────────────────────────────────────
+  const selectedProfile = flags.profile || (flags.auto ? stackDetection.recommendedProfile : null);
+  if (selectedProfile) {
+    try {
+      const applied = profiles.applyProfile(selectedProfile, process.cwd());
+      console.log(`[OK] Applied profile '${applied.name}' (excluded: ${(applied.exclude_skills || []).join(', ') || 'none'})`);
+    } catch (e) {
+      console.warn(`[WARN] Could not apply profile '${selectedProfile}': ${e.message}`);
+    }
+  }
+
   console.log('[OK] Your AI assistant now has skills and rules configured.\n');
 
   // ── Auto-compile skills ───────────────────────────────────────────────────
@@ -292,15 +336,16 @@ try {
   console.log('  1. Open your project in your AI assistant');
   console.log('  2. The assistant will automatically load .agents/AGENTS.md');
   console.log('  3. Skills are pre-compiled in .agents/generated/gemini/skills/');
-  console.log('  4. Export to other tools:');
-  console.log('       node .agents/ctx.js export cursor   → .cursorrules');
+  console.log('  4. Switch profiles anytime:');
+  console.log('       node .agents/ctx.js profile list');
+  console.log('       node .agents/ctx.js profile apply mvp');
+  console.log('  5. Export to other AI tools:');
+  console.log('       node .agents/ctx.js export cursor   → .cursorrules & .cursor/rules');
   console.log('       node .agents/ctx.js export copilot  → .github/copilot-instructions.md');
   console.log('       node .agents/ctx.js export aider    → .aider.conf.yml + CONVENTIONS.md');
-  console.log('  5. Add community skills (plugins):');
+  console.log('  6. Add community skills (plugins):');
   console.log('       node .agents/ctx.js skill add   username/my-skill');
-  console.log('       node .agents/ctx.js skill search');
-  console.log('       node .agents/ctx.js skill list');
-  console.log('  6. See README for full ctx.js CLI reference\n');
+  console.log('       node .agents/ctx.js skill list\n');
 
   // ── --add-skill flag ────────────────────────────────────────────────────────
   if (flags.addSkill) {

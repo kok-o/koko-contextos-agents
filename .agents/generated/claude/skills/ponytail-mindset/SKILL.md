@@ -1,12 +1,15 @@
 # ponytail-mindset
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail).
 
 > _He says nothing. He writes one line. It works._
@@ -140,10 +143,10 @@ async function deleteAccount(userId) {
 
 ```bash
 npm install flatpickr
-# Creates: DatePickerWrapper.jsx (45 lines)
-# Creates: useDatePicker.js (30 lines)  
-# Creates: DatePickerStyles.css (60 lines)
-# Total: 135 lines + 1 dependency
+## Creates: DatePickerWrapper.jsx (45 lines)
+## Creates: useDatePicker.js (30 lines)  
+## Creates: DatePickerStyles.css (60 lines)
+## Total: 135 lines + 1 dependency
 ```
 
 ✅ **Ponytail approach** (use rung 4 — native platform):
@@ -252,23 +255,17 @@ Do NOT apply the ladder to:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.

@@ -12,19 +12,25 @@ function printHelp() {
   console.log('Usage: node ctx.js <command> [args...]');
   console.log('');
   console.log('Commands:');
-  console.log('  export gemini    Compile skills for Gemini / Antigravity');
-  console.log('  export claude    Compile skills for Claude Code');
-  console.log('  export cursor    Compile skills → .cursorrules');
-  console.log('  export copilot   Compile skills → .github/copilot-instructions.md');
-  console.log('  export aider     Compile skills → .aider.conf.yml + CONVENTIONS.md');
-  console.log('  export all       Compile skills for all supported agents');
-  console.log('  audit            Alias for validate (check skills)');
-  console.log('  validate         Validate skill sources, frontmatter, deps & sync');
-  console.log('  install-skill <ref>  Alias for skill add (install a plugin)');
-  console.log('  skill add   <ref>    Install a plugin skill (GitHub or npm)');
-  console.log('  skill remove <name>  Uninstall a plugin skill');
-  console.log('  skill list           List installed skills (builtin + plugins)');
-  console.log('  skill search [query] Search the community skill registry');
+  console.log('  export gemini [--profile <p>]   Compile skills for Gemini / Antigravity');
+  console.log('  export claude [--profile <p>]   Compile skills for Claude Code');
+  console.log('  export cursor [--profile <p>]   Compile skills → .cursorrules & .cursor/rules/*.mdc');
+  console.log('  export copilot [--profile <p>]  Compile skills → .github/copilot-instructions.md');
+  console.log('  export aider [--profile <p>]    Compile skills → .aider.conf.yml + CONVENTIONS.md');
+  console.log('  export zed [--profile <p>]      Compile skills → .zed/rules.md & .zed/prompts/*.md');
+  console.log('  export all [--profile <p>]      Compile skills for all supported agents');
+  console.log('  profile list                    List available project profiles');
+  console.log('  profile show <name>             Show profile configuration');
+  console.log('  profile apply <name>            Apply a profile (e.g. mvp, startup, enterprise, frontend)');
+  console.log('  profile remove                  Remove active profile filter');
+  console.log('  detect                          Auto-detect project tech stack');
+  console.log('  audit                           Alias for validate (check skills)');
+  console.log('  validate                        Validate skill sources, frontmatter, deps & sync');
+  console.log('  install-skill <ref>             Alias for skill add (install a plugin)');
+  console.log('  skill add   <ref>               Install a plugin skill (GitHub or npm)');
+  console.log('  skill remove <name>             Uninstall a plugin skill');
+  console.log('  skill list                      List installed skills (builtin + plugins)');
+  console.log('  skill search [query]            Search the community skill registry');
   console.log('');
   console.log('Plugin ref formats:');
   console.log('  username/repo                    GitHub repo root SKILL.md');
@@ -34,10 +40,11 @@ function printHelp() {
   console.log('  @scope/npm-package               scoped npm package');
   console.log('');
   console.log('Examples:');
+  console.log('  node .agents/ctx.js profile list');
+  console.log('  node .agents/ctx.js profile apply mvp');
+  console.log('  node .agents/ctx.js detect');
+  console.log('  node .agents/ctx.js export all --profile frontend');
   console.log('  node .agents/ctx.js skill add alice/my-cool-skill');
-  console.log('  node .agents/ctx.js skill add alice/monorepo/skills/docker');
-  console.log('  node .agents/ctx.js skill search react');
-  console.log('  node .agents/ctx.js skill list');
 }
 
 const command = args[0];
@@ -45,6 +52,19 @@ const target  = args[1];
 
 // ── export ────────────────────────────────────────────────────────────────────
 if (command === 'export') {
+  const profileFlagIdx = args.indexOf('--profile');
+  if (profileFlagIdx !== -1 && args[profileFlagIdx + 1]) {
+    const profiles = require('./profiles.js');
+    const profileName = args[profileFlagIdx + 1];
+    try {
+      profiles.applyProfile(profileName);
+      console.log(`[PROFILE] Applied profile '${profileName}' for this export.\n`);
+    } catch (err) {
+      console.error(`[ERROR] ${err.message}`);
+      process.exit(1);
+    }
+  }
+
   const runGemini = () => {
     const adapter = require('./adapters/gemini/export.js');
     adapter.run();
@@ -70,6 +90,11 @@ if (command === 'export') {
     adapter.run();
   };
 
+  const runZed = () => {
+    const adapter = require('./adapters/zed/export.js');
+    adapter.run();
+  };
+
   if (target === 'gemini') {
     runGemini();
   } else if (target === 'claude') {
@@ -80,6 +105,8 @@ if (command === 'export') {
     runCopilot();
   } else if (target === 'aider') {
     runAider();
+  } else if (target === 'zed') {
+    runZed();
   } else if (target === 'all') {
     console.log('Exporting skills for all agents...\n');
     runGemini();
@@ -91,12 +118,93 @@ if (command === 'export') {
     runCopilot();
     console.log('');
     runAider();
+    console.log('');
+    runZed();
     console.log('\nAll exports complete.');
   } else {
     console.error(`Adapter for '${target}' not implemented yet.`);
-    console.error('Supported agents: gemini, claude, cursor, copilot, aider, all');
+    console.error('Supported agents: gemini, claude, cursor, copilot, aider, zed, all');
     process.exit(1);
   }
+
+// ── profile ───────────────────────────────────────────────────────────────────
+} else if (command === 'profile') {
+  const subcommand = args[1] || 'list';
+  const profileName = args[2];
+  const profiles = require('./profiles.js');
+
+  if (subcommand === 'list') {
+    const list = profiles.listProfiles();
+    const active = profiles.getActiveProfile();
+    console.log('\nAvailable ContextOS Profiles:\n');
+    for (const p of list) {
+      const isActive = active && active.profile === p.id;
+      const marker = isActive ? '● [ACTIVE]' : '○';
+      console.log(`  ${marker} ${p.id.padEnd(12)} - ${p.name}: ${p.description}`);
+      if (p.exclude_skills && p.exclude_skills.length > 0) {
+        console.log(`      Excludes: ${p.exclude_skills.join(', ')}`);
+      }
+    }
+    console.log('\nApply a profile: node .agents/ctx.js profile apply <name>');
+    if (active) {
+      console.log(`Current active profile: ${active.profile} (${active.name})`);
+    }
+    console.log('');
+  } else if (subcommand === 'show') {
+    const name = profileName || (profiles.getActiveProfile() || {}).profile;
+    if (!name) {
+      console.error('[ERROR] Usage: node ctx.js profile show <name>');
+      process.exit(1);
+    }
+    const profile = profiles.getProfile(name);
+    if (!profile) {
+      console.error(`[ERROR] Profile '${name}' not found.`);
+      process.exit(1);
+    }
+    console.log(`\nProfile: ${profile.name} (${profile.id})`);
+    console.log(`Description: ${profile.description}`);
+    console.log(`Preferred Skills: ${(profile.prefer_skills || []).join(', ') || 'none'}`);
+    console.log(`Excluded Skills: ${(profile.exclude_skills || []).join(', ') || 'none'}\n`);
+  } else if (subcommand === 'apply') {
+    if (!profileName) {
+      console.error('[ERROR] Usage: node ctx.js profile apply <name>');
+      process.exit(1);
+    }
+    try {
+      const applied = profiles.applyProfile(profileName);
+      console.log(`\n✓ Profile '${applied.name}' successfully applied!`);
+      console.log(`  Excluded skills: ${(applied.exclude_skills || []).join(', ') || 'none'}`);
+      console.log('  Run: node .agents/ctx.js export all  (to rebuild exports with this profile)\n');
+    } catch (err) {
+      console.error(`[ERROR] ${err.message}`);
+      process.exit(1);
+    }
+  } else if (subcommand === 'remove' || subcommand === 'reset') {
+    const removed = profiles.removeActiveProfile();
+    if (removed) {
+      console.log('\n✓ Active profile filter removed. All skills will be included.\n');
+    } else {
+      console.log('\nNo active profile was set.\n');
+    }
+  } else {
+    console.error(`Unknown profile subcommand: ${subcommand}`);
+    console.error('Valid subcommands: list, show, apply, remove');
+    process.exit(1);
+  }
+
+// ── detect ────────────────────────────────────────────────────────────────────
+} else if (command === 'detect') {
+  const profiles = require('./profiles.js');
+  const detection = profiles.detectStack(process.cwd());
+  console.log('\nContextOS — Tech Stack Detection\n');
+  if (detection.detected.length === 0) {
+    console.log('  Detected stack: Generic / Vanilla JavaScript');
+  } else {
+    console.log(`  Detected stack: ${detection.detected.join(', ')}`);
+  }
+  console.log(`  Recommended Profile: ${detection.recommendedProfile}`);
+  console.log(`  Recommended Skills: ${detection.recommendedSkills.join(', ')}`);
+  console.log(`\nApply recommended profile:\n  node .agents/ctx.js profile apply ${detection.recommendedProfile}\n`);
 
 // ── validate / audit ──────────────────────────────────────────────────────────
 } else if (command === 'validate' || command === 'audit') {
@@ -137,7 +245,7 @@ if (command === 'export') {
       process.exit(1);
     });
   } else if (subcommand === 'remove') {
-    plugins.remove(ref); // ref is the skill name here
+    plugins.remove(ref);
   } else if (subcommand === 'list') {
     plugins.list();
   } else if (subcommand === 'search') {

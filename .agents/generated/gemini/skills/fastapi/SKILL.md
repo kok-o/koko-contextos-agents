@@ -3,17 +3,6 @@ name: FastAPI
 description: >
   ContextOS skill for FastAPI
 ---
-
-
-<!-- Source: EXAMPLES.md -->
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-<!-- Source: fastapi.md -->
-
 # FastAPI — Best Practices
 
 ## Project Structure
@@ -139,15 +128,17 @@ description: >
 # FastAPI
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: fastapi.md -->
 
-# FastAPI — Best Practices
+## FastAPI — Best Practices
 
 ## Project Structure
 
@@ -261,23 +252,18 @@ async def test_create_user(client: AsyncClient):
 - ❌ No schema validation — always use Pydantic models
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-<!-- Source: TROUBLESHOOTING.md -->
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
-

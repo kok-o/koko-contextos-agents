@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { collectSkillDirectories, resetDirectory } = require('../shared.js');
+const { collectSkillDirectories, resetDirectory, readMeaningfulMarkdown } = require('../shared.js');
 
 const GENERATED_SKILLS_PATH = path.join(__dirname, '..', '..', 'generated', 'claude', 'skills');
 
@@ -22,18 +22,18 @@ function generateClaudeSkill(skillDir) {
 
   let content = fs.readFileSync(existingSkillMdPath, 'utf8');
   
-  const examplesPath = path.join(skillDir, 'EXAMPLES.md');
-  if (fs.existsSync(examplesPath)) {
-    content += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+  const examples = readMeaningfulMarkdown(path.join(skillDir, 'EXAMPLES.md'));
+  if (examples) {
+    content += '\n\n' + examples;
   }
   
-  const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
-  if (fs.existsSync(troubleshootingPath)) {
-    content += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+  const troubleshooting = readMeaningfulMarkdown(path.join(skillDir, 'TROUBLESHOOTING.md'));
+  if (troubleshooting) {
+    content += '\n\n' + troubleshooting;
   }
 
   // Strip YAML frontmatter if present (Claude doesn't need it)
-  content = content.replace(/^---[\s\S]*?---\n/, '');
+  content = content.replace(/^---[\s\S]*?---\r?\n/, '');
 
   // Write the cleaned Markdown
   fs.mkdirSync(outputDir, { recursive: true });

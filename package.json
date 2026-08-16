@@ -14,6 +14,7 @@
     ".agents/ctx.js",
     ".agents/validate.js",
     ".agents/plugins.js",
+    ".agents/profiles.js",
     ".agents/adapters",
     ".agents/core",
     ".agents/generated",
@@ -25,7 +26,7 @@
     "validate": "node .agents/ctx.js validate",
     "benchmark": "node benchmarks/gemini-issues.js",
     "lint:md": "markdownlint README.md CONTRIBUTING.md '.agents/core/skills/**/*.md' --ignore '.agents/generated/**' --config .markdownlint.json",
-    "test": "node --test --test-concurrency=1 tests/install.test.js tests/export.test.js tests/skills.test.js tests/validate.test.js tests/plugins.test.js tests/benchmark.test.js",
+    "test": "node --test --test-concurrency=1 tests/install.test.js tests/export.test.js tests/skills.test.js tests/validate.test.js tests/plugins.test.js tests/benchmark.test.js tests/profile.test.js",
     "prepublishOnly": "npm run validate && npm run build"
   },
   "keywords": [

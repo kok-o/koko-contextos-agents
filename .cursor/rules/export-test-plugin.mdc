@@ -1,0 +1,12 @@
+---
+description: "ContextOS rules for export-test-plugin"
+globs: ""
+alwaysApply: false
+---
+
+# Skill: export-test-plugin
+
+# Export test plugin
+
+Plugin instructions unique-marker-export-test.
+

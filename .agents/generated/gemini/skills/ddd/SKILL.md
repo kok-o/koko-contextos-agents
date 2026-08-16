@@ -3,10 +3,6 @@ name: Domain-Driven Design
 description: >
   ContextOS skill for Domain-Driven Design
 ---
-
-
-<!-- Source: ddd.md -->
-
 # Domain-Driven Design — Patterns & Practices
 
 ## When to Use DDD
@@ -185,13 +181,6 @@ src/
 - ❌ Big aggregate — aggregates should be small, focused on invariants
 - ❌ Cross-aggregate transactions — use eventual consistency
 - ❌ DDD everywhere — use DDD only where complexity justifies it
-
-
-<!-- Source: EXAMPLES.md -->
-
-# Code Examples
-
-Add detailed code examples and implementations here.
 
 
 <!-- Source: SKILL.md -->
@@ -205,15 +194,17 @@ description: >
 # Domain-Driven Design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: ddd.md -->
 
-# Domain-Driven Design — Patterns & Practices
+## Domain-Driven Design — Patterns & Practices
 
 ## When to Use DDD
 
@@ -393,23 +384,18 @@ src/
 - ❌ DDD everywhere — use DDD only where complexity justifies it
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-<!-- Source: TROUBLESHOOTING.md -->
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
-

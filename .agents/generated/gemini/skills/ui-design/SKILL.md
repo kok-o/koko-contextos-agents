@@ -3,35 +3,20 @@ name: UI Design
 description: >
   ContextOS skill for UI Design
 ---
-
-
-<!-- Source: EXAMPLES.md -->
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-<!-- Source: SKILL.md -->
-
----
-name: UI Design
-description: >
-  ContextOS skill for UI Design
----
-
 # UI Design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
 <!-- Source: ui.md -->
 
-# UI Design — Best Practices
+## UI Design — Best Practices
 
 ## Design System Foundations
 
@@ -121,25 +106,21 @@ Context for when this skill is applicable.
 - Test all states in both modes
 
 
-
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-<!-- Source: TROUBLESHOOTING.md -->
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 
 
 <!-- Source: ui.md -->
@@ -232,4 +213,3 @@ Add common errors, anti-patterns, and debugging steps here.
 - Reduce white contrast — use #E0E0E0, not #FFFFFF
 - Shadows become less visible — use subtle borders or elevation changes
 - Test all states in both modes
-

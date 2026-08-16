@@ -3,35 +3,18 @@ name: system-design
 description: >
   >
 ---
-
-
-<!-- Source: EXAMPLES.md -->
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-<!-- Source: SKILL.md -->
-
----
-name: system-design
-description: >
-  Scalable architecture skill based on the System Design Primer.
-  Before designing any backend, reason about load balancers, caching,
-  DB partitioning, CAP theorem, and microservices trade-offs.
-  Adapted for Serverless/Edge, Next.js App Router, BFF, and DDD patterns.
----
-
 # system-design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer) — the most starred system design resource on GitHub.
 
 ## Core Principle
@@ -378,15 +361,19 @@ When proposing any backend architecture, include:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
 
 
@@ -504,11 +491,3 @@ Before choosing an architecture:
 5. What's the budget?
 
 **Default answer**: Start with a monolith, PostgreSQL, Redis cache. Extract services only when you have data showing you need to.
-
-
-<!-- Source: TROUBLESHOOTING.md -->
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
-

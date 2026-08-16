@@ -1,0 +1,46 @@
+# Profile: Frontend
+# Dedicated frontend stack focus
+
+id: frontend
+name: Frontend
+description: "Specialized for modern frontend applications (React, Next.js, UI/UX, Design Systems, Accessibility)."
+
+generate_docs:
+  - PRD
+  - UI
+  - TASKS
+
+skip_docs:
+  - DATABASE
+  - MICROSERVICES
+
+prefer_skills:
+  - react
+  - nextjs
+  - typescript
+  - ui-ux-pro
+  - impeccable-design
+  - ui-design
+  - ux-design
+  - web-accessibility
+  - ponytail-mindset
+  - engineering-workflow
+  - gstack-roles
+
+exclude_skills:
+  - fastapi
+  - nestjs
+  - microservices
+  - ddd
+
+enforce:
+  adr: false
+  testing: true
+  accessibility_audit: true
+  code_review: true
+
+defaults:
+  architecture: frontend-spa-or-ssr
+  framework: nextjs
+  styling: tailwind-or-css
+  state: react-state

@@ -3,34 +3,18 @@ name: impeccable-design
 description: >
   >
 ---
-
-
-<!-- Source: EXAMPLES.md -->
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-<!-- Source: SKILL.md -->
-
----
-name: impeccable-design
-description: >
-  Visual design quality enforcement. 50 deterministic anti-pattern rules preventing
-  AI design slop. Bans generic fonts, pure colors, nested cards, dated animations.
-  Adapted for Tailwind CSS v4, shadcn/ui, and Framer Motion stacks.
----
-
 # impeccable-design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [pbakaus/impeccable](https://github.com/pbakaus/impeccable) — deterministic detector rules for AI-generated frontend design.
 
 ## Core Principle
@@ -196,21 +180,18 @@ These details separate premium from mediocre:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-<!-- Source: TROUBLESHOOTING.md -->
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.
 

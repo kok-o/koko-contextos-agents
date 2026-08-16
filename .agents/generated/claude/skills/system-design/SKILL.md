@@ -1,12 +1,15 @@
 # system-design
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Based on [donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer) — the most starred system design resource on GitHub.
 
 ## Core Principle
@@ -353,23 +356,17 @@ When proposing any backend architecture, include:
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.

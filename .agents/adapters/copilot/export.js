@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { AGENTS_MD_PATH, collectSkillDirectories, extractYamlField, stripFrontmatter } = require('../shared.js');
+const { AGENTS_MD_PATH, collectSkillDirectories, extractYamlField, stripFrontmatter, readMeaningfulMarkdown } = require('../shared.js');
 
 // GitHub Copilot reads from .github/copilot-instructions.md
 const OUTPUT_FILE = path.join(process.cwd(), '.github', 'copilot-instructions.md');
@@ -32,14 +32,14 @@ function buildSkillSection(skillDir) {
 
   let raw = fs.readFileSync(skillMdPath, 'utf8');
   
-  const examplesPath = path.join(skillDir, 'EXAMPLES.md');
-  if (fs.existsSync(examplesPath)) {
-    raw += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+  const examples = readMeaningfulMarkdown(path.join(skillDir, 'EXAMPLES.md'));
+  if (examples) {
+    raw += '\n\n' + examples;
   }
   
-  const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
-  if (fs.existsSync(troubleshootingPath)) {
-    raw += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+  const troubleshooting = readMeaningfulMarkdown(path.join(skillDir, 'TROUBLESHOOTING.md'));
+  if (troubleshooting) {
+    raw += '\n\n' + troubleshooting;
   }
   
   const body = stripFrontmatter(raw);

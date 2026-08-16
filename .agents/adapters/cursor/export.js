@@ -1,19 +1,46 @@
 const fs = require('fs');
 const path = require('path');
-const { AGENTS_MD_PATH, collectSkillDirectories, extractYamlField, stripFrontmatter } = require('../shared.js');
+const { AGENTS_MD_PATH, collectSkillDirectories, extractYamlField, stripFrontmatter, readMeaningfulMarkdown } = require('../shared.js');
 
-// Output goes to the project root (cwd), not inside .agents/
+// Output paths
 const OUTPUT_FILE = path.join(process.cwd(), '.cursorrules');
+const CURSOR_RULES_DIR = path.join(process.cwd(), '.cursor', 'rules');
 
 /**
  * Cursor adapter — export.js
  *
- * Cursor reads `.cursorrules` from the project root as a flat Markdown file.
- * We compile every skill's SKILL.md (stripping YAML frontmatter) into one
- * concatenated document, preceded by the top-level AGENTS.md rules.
+ * Generates:
+ *   1. Modern modular Cursor rules in `.cursor/rules/<skill>.mdc` with glob filters
+ *   2. Flat `.cursorrules` at project root for backwards compatibility
  *
  * Format spec: https://docs.cursor.com/context/rules-for-ai
  */
+
+function getSkillGlobsAndFlags(skillName) {
+  const ALWAYS_APPLY_SKILLS = ['engineering-workflow', 'gstack-roles', 'ponytail-mindset'];
+  if (ALWAYS_APPLY_SKILLS.includes(skillName)) {
+    return { globs: '', alwaysApply: true };
+  }
+
+  const FRONTEND_SKILLS = [
+    'react', 'nextjs', 'typescript', 'ui-ux-pro', 'impeccable-design',
+    'ui-design', 'ux-design', 'web-accessibility',
+  ];
+  if (FRONTEND_SKILLS.includes(skillName)) {
+    return { globs: '**/*.{ts,tsx,js,jsx,css,scss,html}', alwaysApply: false };
+  }
+
+  const BACKEND_SKILLS = ['system-design', 'node', 'nestjs', 'microservices', 'ddd'];
+  if (BACKEND_SKILLS.includes(skillName)) {
+    return { globs: '**/*.{ts,js,json,prisma,sql}', alwaysApply: false };
+  }
+
+  if (skillName === 'fastapi') {
+    return { globs: '**/*.{py,requirements.txt,Pipfile,pyproject.toml}', alwaysApply: false };
+  }
+
+  return { globs: '', alwaysApply: false };
+}
 
 function buildSkillSection(skillDir) {
   const skillName  = path.basename(skillDir);
@@ -27,24 +54,65 @@ function buildSkillSection(skillDir) {
   }
 
   if (!fs.existsSync(skillMdPath)) {
-    return null; // no content to include
+    return null;
   }
 
   let raw = fs.readFileSync(skillMdPath, 'utf8');
   
-  const examplesPath = path.join(skillDir, 'EXAMPLES.md');
-  if (fs.existsSync(examplesPath)) {
-    raw += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+  const examples = readMeaningfulMarkdown(path.join(skillDir, 'EXAMPLES.md'));
+  if (examples) {
+    raw += '\n\n' + examples;
   }
   
-  const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
-  if (fs.existsSync(troubleshootingPath)) {
-    raw += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+  const troubleshooting = readMeaningfulMarkdown(path.join(skillDir, 'TROUBLESHOOTING.md'));
+  if (troubleshooting) {
+    raw += '\n\n' + troubleshooting;
   }
   
   const body = stripFrontmatter(raw);
 
   return `\n## Skill: ${title}\n\n${body}`;
+}
+
+function generateCursorMdc(skillDir) {
+  const skillName = path.basename(skillDir);
+  const skillMdPath = path.join(skillDir, 'SKILL.md');
+  const yamlPath = path.join(skillDir, 'skill.yaml');
+
+  if (!fs.existsSync(skillMdPath)) return null;
+
+  let title = skillName;
+  let description = `ContextOS rules for ${skillName}`;
+  if (fs.existsSync(yamlPath)) {
+    const yaml = fs.readFileSync(yamlPath, 'utf8');
+    title = extractYamlField(yaml, 'name') || skillName;
+    const desc = extractYamlField(yaml, 'description');
+    if (desc) description = desc;
+  }
+
+  let raw = fs.readFileSync(skillMdPath, 'utf8');
+  const examples = readMeaningfulMarkdown(path.join(skillDir, 'EXAMPLES.md'));
+  if (examples) raw += '\n\n' + examples;
+
+  const troubleshooting = readMeaningfulMarkdown(path.join(skillDir, 'TROUBLESHOOTING.md'));
+  if (troubleshooting) raw += '\n\n' + troubleshooting;
+
+  const body = stripFrontmatter(raw);
+  const { globs, alwaysApply } = getSkillGlobsAndFlags(skillName);
+
+  const cleanDescription = description.replace(/\r?\n+/g, ' ').replace(/"/g, "'").trim();
+  const mdcContent = `---
+description: "${cleanDescription}"
+globs: ${globs ? `"${globs}"` : '""'}
+alwaysApply: ${alwaysApply}
+---
+
+# Skill: ${title}
+
+${body}
+`;
+
+  return { skillName, mdcContent };
 }
 
 function run() {
@@ -59,26 +127,50 @@ function run() {
     `# Source: .agents/core/skills/  ·  Do not edit manually.\n`
   );
 
-  // ── Top-level AGENTS.md ──────────────────────────────────────────────────────
-  if (fs.existsSync(AGENTS_MD_PATH)) {
-    const agentsMd = fs.readFileSync(AGENTS_MD_PATH, 'utf8');
-    sections.push(`\n---\n\n## Project Rules (AGENTS.md)\n\n${agentsMd}`);
-  }
-
   // ── All skills ───────────────────────────────────────────────────────────────
   sections.push('\n---\n\n# Skills\n');
   const skills = collectSkillDirectories();
   let count = 0;
+  let mdcCount = 0;
+
+  // Prepare .cursor/rules directory
+  fs.mkdirSync(CURSOR_RULES_DIR, { recursive: true });
+
+  // Write 00-agents-rules.mdc
+  if (fs.existsSync(AGENTS_MD_PATH)) {
+    const agentsMd = fs.readFileSync(AGENTS_MD_PATH, 'utf8');
+    sections.push(`\n---\n\n## Project Rules (AGENTS.md)\n\n${agentsMd}`);
+    const projectMdc = `---
+description: "ContextOS core project rules and role orchestration"
+globs: ""
+alwaysApply: true
+---
+
+# ContextOS — Project Operating System Rules
+
+${agentsMd}
+`;
+    fs.writeFileSync(path.join(CURSOR_RULES_DIR, '00-project-rules.mdc'), projectMdc);
+    mdcCount++;
+  }
+
   for (const skill of skills) {
     const section = buildSkillSection(skill);
     if (section) {
       sections.push(section);
       count++;
     }
+
+    const mdc = generateCursorMdc(skill);
+    if (mdc) {
+      fs.writeFileSync(path.join(CURSOR_RULES_DIR, `${mdc.skillName}.mdc`), mdc.mdcContent);
+      mdcCount++;
+    }
   }
 
   fs.writeFileSync(OUTPUT_FILE, sections.join('\n'));
   console.log(`Generated .cursorrules (${count} skills) → ${OUTPUT_FILE}`);
+  console.log(`Generated .cursor/rules/*.mdc (${mdcCount} rules) → ${CURSOR_RULES_DIR}`);
 }
 
 module.exports = { run };

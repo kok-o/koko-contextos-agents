@@ -1,12 +1,15 @@
 # engineering-workflow
 
 ## Overview
+
 A brief summary of what the skill does and its core philosophy.
 
 ## When to Use
+
 Context for when this skill is applicable.
 
 ## Rules & Patterns
+
 Inspired by [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) by Addy Osmani (Google Chrome).
 
 ## Core Principle
@@ -48,11 +51,11 @@ Turn vague intent into a precise, executable specification.
 [What pain does this solve? Who has it? How often?]
 
 ### Scope (What's In / Out)
-**In scope:**
+### 
 - [Specific thing 1]
 - [Specific thing 2]
 
-**Out of scope (explicitly):**
+### 
 - [Thing we're NOT doing and why]
 
 ### Technical Approach
@@ -152,7 +155,7 @@ Tests are proof, not an afterthought.
 
 ### Test Strategy by Code Type
 
-**Utilities, services, API routes → TDD (Red-Green-Refactor)**
+###
 
 ```
 1. RED:      Write a failing test for the next small behavior
@@ -161,7 +164,7 @@ Tests are proof, not an afterthought.
 4. REPEAT
 ```
 
-**UI Components → BDD (Behavior-Driven Development)**
+###
 
 For complex React components, prioritize testing _user behavior_ over internal state:
 
@@ -215,13 +218,13 @@ Review before merging. Always.
 
 ### Code Review Checklist
 
-**Correctness**
+###
 
 - [ ] Does it do what the spec says?
 - [ ] Are all acceptance criteria met?
 - [ ] Edge cases handled?
 
-**Code Quality**
+###
 
 - [ ] Single Responsibility: each function does one thing
 - [ ] DRY: no logic duplicated across 3+ places
@@ -229,14 +232,14 @@ Review before merging. Always.
 - [ ] Error handling: all async operations have try/catch or `.catch()`
 - [ ] Business logic is NOT in API route handlers — it lives in services/use-cases
 
-**Security**
+###
 
 - [ ] No secrets hardcoded
 - [ ] User input is validated and sanitized
 - [ ] SQL uses parameterized queries (no string concatenation)
 - [ ] Auth checks before data access
 
-**Performance**
+###
 
 - [ ] No N+1 query patterns
 - [ ] Expensive operations are cached or async
@@ -284,23 +287,17 @@ Only ship when all gates are green.
 
 
 ## Code Examples
+
 See `EXAMPLES.md` for detailed code examples.
 
 ## Validation Checklist
+
 What to verify during the review phase before completing the task.
 
 ## Common Mistakes
+
 Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 ## Integration Notes
+
 How this skill interacts with other skills.
-
-
-# Code Examples
-
-Add detailed code examples and implementations here.
-
-
-# Troubleshooting & Common Mistakes
-
-Add common errors, anti-patterns, and debugging steps here.

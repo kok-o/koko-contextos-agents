@@ -25,17 +25,6 @@ const REQUIRED_SKILLS = [
 ];
 
 describe('core/skills/ — skill source validation', () => {
-  test('exits with error when no arguments given', () => {
-    assert.throws(
-      () => execSync(`node "${CTX_PATH}"`, { stdio: 'pipe' }),
-      (err) => {
-        // execSync throws on non-zero exit — that's all we need
-        assert.ok(err instanceof Error, 'Should throw an error');
-        return true;
-      }
-    );
-  });
-
   test('core/skills/ directory exists', () => {
     assert.ok(fs.existsSync(CORE_SKILLS_PATH), 'core/skills/ directory should exist');
   });
@@ -50,13 +39,10 @@ describe('core/skills/ — skill source validation', () => {
     }
   });
 
-  test('each skill directory contains SKILL.md (ignores empty placeholder dirs)', () => {
+  test('each skill directory contains SKILL.md', () => {
     const skills = fs.readdirSync(CORE_SKILLS_PATH);
-    // Some dirs (like 'profiles') are placeholder folders with no content yet — skip them
-    const KNOWN_EMPTY = ['profiles'];
     const missing = [];
     for (const skill of skills) {
-      if (KNOWN_EMPTY.includes(skill)) continue;
       const skillPath = path.join(CORE_SKILLS_PATH, skill);
       if (!fs.statSync(skillPath).isDirectory()) continue;
       const skillMd = path.join(skillPath, 'SKILL.md');

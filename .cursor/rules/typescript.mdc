@@ -1,0 +1,110 @@
+---
+description: "ContextOS rules for typescript"
+globs: "**/*.{ts,tsx,js,jsx,css,scss,html}"
+alwaysApply: false
+---
+
+# Skill: TypeScript
+
+# TypeScript
+
+## Overview
+
+A brief summary of what the skill does and its core philosophy.
+
+## When to Use
+
+Context for when this skill is applicable.
+
+## Rules & Patterns
+<!-- Source: typescript.md -->
+
+## TypeScript — Best Practices
+
+## Strict Mode
+
+Always use strict TypeScript configuration:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  }
+}
+```
+
+## Types
+
+- **Prefer `interface`** for object shapes, `type` for unions/intersections
+- **No `any`** — use `unknown` if type is truly unknown, then narrow
+- **Explicit return types** for exported functions
+- **Const assertions** — `as const` for literal types
+
+```typescript
+// Good
+interface User {
+  id: string;
+  name: string;
+  role: 'admin' | 'user';
+}
+
+// Unions
+type Result<T> = { ok: true; data: T } | { ok: false; error: string };
+```
+
+## Utility Types
+
+- `Partial<T>` — all properties optional
+- `Required<T>` — all properties required
+- `Pick<T, K>` — select specific properties
+- `Omit<T, K>` — remove specific properties
+- `Record<K, V>` — key-value map
+
+## Type Guards
+
+```typescript
+function isUser(value: unknown): value is User {
+  return typeof value === 'object' && value !== null && 'id' in value;
+}
+```
+
+## Generic Patterns
+
+```typescript
+// Repository pattern
+interface Repository<T extends { id: string }> {
+  findById(id: string): Promise<T | null>;
+  create(data: Omit<T, 'id'>): Promise<T>;
+  update(id: string, data: Partial<T>): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+```
+
+## Anti-Patterns
+
+- ❌ `any` — use `unknown` + type guards
+- ❌ Type assertions (`as`) — prefer type guards
+- ❌ Non-null assertions (`!`) — handle null explicitly
+- ❌ Enums — prefer union types or `as const` objects
+- ❌ Complex generics without JSDoc — document intent
+
+
+## Code Examples
+
+See `EXAMPLES.md` for detailed code examples.
+
+## Validation Checklist
+
+What to verify during the review phase before completing the task.
+
+## Common Mistakes
+
+Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+
+How this skill interacts with other skills.
+

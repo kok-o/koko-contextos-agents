@@ -1,0 +1,346 @@
+{
+  "timestamp": "2026-08-16T13:16:07.142Z",
+  "model": "gemini-3.1-flash-lite",
+  "summary": {
+    "tasksCount": 5,
+    "baselineAvgScore": 86,
+    "skillAvgScore": 85.4,
+    "scoreDelta": -0.6,
+    "baselinePassRate": 80,
+    "skillPassRate": 80,
+    "passRateDelta": 0,
+    "totalBaselineTokens": 5282,
+    "totalSkillTokens": 4614
+  },
+  "results": [
+    {
+      "task": "auth-security-validation",
+      "title": "Secure Authentication & Rate Limiting Handler",
+      "skills": [
+        "security",
+        "node",
+        "ponytail-mindset"
+      ],
+      "baseline": {
+        "score": 95,
+        "passed": 5,
+        "total": 5,
+        "latencyMs": 8348,
+        "usage": {
+          "promptTokenCount": 70,
+          "candidatesTokenCount": 1034,
+          "totalTokenCount": 1104,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 70
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "The implementation demonstrates a high level of security maturity, effectively addressing timing attacks, brute-force, and information leakage.",
+        "strengths": [
+          "Excellent mitigation of user enumeration via dummy bcrypt comparison",
+          "Robust brute-force protection using express-rate-limit",
+          "Strict input validation using Joi schema enforcement",
+          "Safe error handling that avoids leaking stack traces or internal state"
+        ],
+        "weaknesses": [
+          "The architecture is slightly coupled; moving the authentication logic to a dedicated service layer would further improve testability and separation of concerns"
+        ]
+      },
+      "withSkills": {
+        "score": 90,
+        "passed": 5,
+        "total": 5,
+        "latencyMs": 6395,
+        "usage": {
+          "promptTokenCount": 1266,
+          "candidatesTokenCount": 800,
+          "totalTokenCount": 2066,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 1266
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "The implementation follows industry best practices for authentication and security, though it relies on external library internalizations for timing safety rather than explicit implementation.",
+        "strengths": [
+          "Effective use of Zod for strict input validation",
+          "Proper implementation of generic error messages to prevent user enumeration",
+          "Correct integration of rate limiting to mitigate brute-force attacks",
+          "Use of Helmet for security header hardening"
+        ],
+        "weaknesses": [
+          "The global error handler logs the full stack trace to the console, which could lead to sensitive information leakage if logs are exposed or improperly managed"
+        ]
+      },
+      "delta": -5
+    },
+    {
+      "task": "accessible-ui-component",
+      "title": "Accessible React Modal with Focus Trap & ARIA",
+      "skills": [
+        "ui-ux-pro",
+        "react",
+        "web-accessibility"
+      ],
+      "baseline": {
+        "score": 90,
+        "passed": 5,
+        "total": 5,
+        "latencyMs": 6281,
+        "usage": {
+          "promptTokenCount": 80,
+          "candidatesTokenCount": 1119,
+          "totalTokenCount": 1199,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 80
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "A robust and well-implemented accessible modal that correctly handles focus management, ARIA semantics, and portal rendering.",
+        "strengths": [
+          "Correct implementation of focus restoration using document.activeElement",
+          "Proper use of ARIA attributes (role='dialog', aria-modal='true', aria-labelledby)",
+          "Effective use of React Portals to avoid CSS stacking context issues",
+          "Clean cleanup logic for event listeners"
+        ],
+        "weaknesses": [
+          "The focus trap logic does not account for elements that might be dynamically added or removed within the modal content while it is open",
+          "The focus trap selector is manual and may miss edge cases like disabled elements or specific custom components"
+        ]
+      },
+      "withSkills": {
+        "score": 92,
+        "passed": 5,
+        "total": 5,
+        "latencyMs": 5220,
+        "usage": {
+          "promptTokenCount": 1296,
+          "candidatesTokenCount": 1149,
+          "totalTokenCount": 2445,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 1296
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "An excellent, production-ready implementation that correctly handles complex accessibility requirements like focus trapping and restoration without external dependencies.",
+        "strengths": [
+          "Robust focus trap implementation using standard DOM APIs",
+          "Correct use of React Portals for proper DOM layering",
+          "Effective focus restoration logic using refs",
+          "Full ARIA compliance with proper labeling"
+        ],
+        "weaknesses": [
+          "The initial focus logic (modalRef.current?.querySelector('button')?.focus()) is brittle and assumes the first button is the desired focus target; it should ideally focus the modal container itself or a specific element."
+        ]
+      },
+      "delta": 2
+    },
+    {
+      "task": "bounded-lru-cache",
+      "title": "High-Performance In-Memory LRU Cache with TTL",
+      "skills": [
+        "performance",
+        "typescript",
+        "ponytail-mindset"
+      ],
+      "baseline": {
+        "score": 85,
+        "passed": 4,
+        "total": 5,
+        "latencyMs": 5274,
+        "usage": {
+          "promptTokenCount": 81,
+          "candidatesTokenCount": 1098,
+          "totalTokenCount": 1179,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 81
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "The implementation is a highly efficient, idiomatic LRU cache, though it lacks a mechanism for proactive TTL cleanup, which can lead to memory bloat for expired but unaccessed keys.",
+        "strengths": [
+          "Excellent use of Map + Doubly Linked List for true O(1) operations",
+          "Clean, readable, and type-safe generic implementation",
+          "Proper handling of pointer updates in the doubly linked list to prevent memory leaks"
+        ],
+        "weaknesses": [
+          "Lazy expiration only: expired items remain in memory indefinitely if not accessed, potentially violating memory safety in high-churn scenarios"
+        ]
+      },
+      "withSkills": {
+        "score": 85,
+        "passed": 4,
+        "total": 5,
+        "latencyMs": 4342,
+        "usage": {
+          "promptTokenCount": 1338,
+          "candidatesTokenCount": 836,
+          "totalTokenCount": 2174,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 1338
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "The implementation provides a highly efficient O(1) LRU cache with correct lazy TTL handling, though it lacks a background cleanup mechanism for expired nodes that are never accessed again.",
+        "strengths": [
+          "Excellent O(1) time complexity for all primary operations",
+          "Efficient use of Map and doubly-linked list for memory management",
+          "Correct implementation of lazy TTL expiration",
+          "Clean, dependency-free TypeScript implementation"
+        ],
+        "weaknesses": [
+          "Memory leak potential: Expired nodes that are never accessed again remain in the cache indefinitely until the cache reaches maxSize"
+        ]
+      },
+      "delta": 0
+    },
+    {
+      "task": "domain-boundary-refactor",
+      "title": "DDD Aggregate Root & Domain Invariants",
+      "skills": [
+        "ddd",
+        "system-design",
+        "decisions"
+      ],
+      "baseline": {
+        "score": 75,
+        "passed": 4,
+        "total": 5,
+        "latencyMs": 13456,
+        "usage": {
+          "promptTokenCount": 79,
+          "candidatesTokenCount": 970,
+          "totalTokenCount": 1049,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 79
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "The implementation demonstrates strong DDD fundamentals but fails to fully utilize Value Objects for domain primitives, relying on primitive obsession.",
+        "strengths": [
+          "Excellent encapsulation of business invariants within the Aggregate Root",
+          "Clear separation of concerns between Domain, Application, and Infrastructure layers",
+          "Effective use of Domain Events for decoupling side effects"
+        ],
+        "weaknesses": [
+          "Failure to implement Value Objects (e.g., using 'decimal' for price and 'int' for quantity instead of Money and Quantity objects)",
+          "OrderId is represented as a raw Guid rather than a strongly-typed Value Object"
+        ]
+      },
+      "withSkills": {
+        "score": 65,
+        "passed": 3,
+        "total": 5,
+        "latencyMs": 5482,
+        "usage": {
+          "promptTokenCount": 1232,
+          "candidatesTokenCount": 888,
+          "totalTokenCount": 2120,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 1232
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "The implementation demonstrates a solid grasp of Aggregate Root patterns and DIP, but fails to implement Value Objects and lacks a robust mechanism for domain event handling.",
+        "strengths": [
+          "Strong encapsulation of business invariants within the Aggregate Root",
+          "Clear separation of concerns between domain logic and application orchestration",
+          "Proper use of Dependency Inversion Principle via repository interfaces"
+        ],
+        "weaknesses": [
+          "Failure to implement Value Objects (e.g., using primitives like 'number' for price/quantity instead of Money/Quantity objects)",
+          "Incomplete domain event implementation (events are pushed to an array but never cleared or dispatched by the aggregate)",
+          "Lack of type safety for domain events (using 'any[]' for event storage)"
+        ]
+      },
+      "delta": -10
+    },
+    {
+      "task": "async-queue-concurrency",
+      "title": "Concurrency-Limited Async Task Queue",
+      "skills": [
+        "engineering-workflow",
+        "ponytail-mindset"
+      ],
+      "baseline": {
+        "score": 85,
+        "passed": 4,
+        "total": 5,
+        "latencyMs": 4125,
+        "usage": {
+          "promptTokenCount": 67,
+          "candidatesTokenCount": 1061,
+          "totalTokenCount": 1128,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 67
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "A clean, functional implementation that effectively manages concurrency, though the drain() method implementation is state-fragile and lacks reusability.",
+        "strengths": [
+          "Strict adherence to concurrency limits via counter and recursive scheduling",
+          "Robust fault isolation using .finally() to ensure queue progression",
+          "Zero external dependencies and minimalist code structure",
+          "Correct use of Promise wrapping for individual task tracking"
+        ],
+        "weaknesses": [
+          "The drain() method is not idempotent; once resolved, the internal state (drainPromise) is not reset, preventing subsequent calls to drain() from functioning correctly."
+        ]
+      },
+      "withSkills": {
+        "score": 95,
+        "passed": 5,
+        "total": 5,
+        "latencyMs": 4668,
+        "usage": {
+          "promptTokenCount": 944,
+          "candidatesTokenCount": 941,
+          "totalTokenCount": 1885,
+          "promptTokensDetails": [
+            {
+              "modality": "TEXT",
+              "tokenCount": 944
+            }
+          ],
+          "serviceTier": "standard"
+        },
+        "summary": "A highly efficient, minimalist implementation that correctly handles concurrency and lifecycle management without external dependencies.",
+        "strengths": [
+          "Robust use of finally block to prevent deadlocks",
+          "Clean, readable, and dependency-free implementation",
+          "Correct implementation of the drain promise lifecycle"
+        ],
+        "weaknesses": [
+          "The drain() method is not idempotent if called multiple times before the queue is empty, potentially overwriting the resolve reference"
+        ]
+      },
+      "delta": 10
+    }
+  ]
+}

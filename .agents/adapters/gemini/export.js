@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { collectSkillDirectories, resetDirectory } = require('../shared.js');
+const { collectSkillDirectories, resetDirectory, readMeaningfulMarkdown } = require('../shared.js');
 
 const GENERATED_SKILLS_PATH = path.join(__dirname, '..', '..', 'generated', 'gemini', 'skills');
 
@@ -22,14 +22,14 @@ function generateGeminiSkill(skillDir) {
       
       let finalContent = fs.readFileSync(existingSkillMdPath, 'utf8');
       
-      const examplesPath = path.join(skillDir, 'EXAMPLES.md');
-      if (fs.existsSync(examplesPath)) {
-        finalContent += '\n\n' + fs.readFileSync(examplesPath, 'utf8');
+      const examples = readMeaningfulMarkdown(path.join(skillDir, 'EXAMPLES.md'));
+      if (examples) {
+        finalContent += '\n\n' + examples;
       }
       
-      const troubleshootingPath = path.join(skillDir, 'TROUBLESHOOTING.md');
-      if (fs.existsSync(troubleshootingPath)) {
-        finalContent += '\n\n' + fs.readFileSync(troubleshootingPath, 'utf8');
+      const troubleshooting = readMeaningfulMarkdown(path.join(skillDir, 'TROUBLESHOOTING.md'));
+      if (troubleshooting) {
+        finalContent += '\n\n' + troubleshooting;
       }
       
       fs.writeFileSync(path.join(outputDir, 'SKILL.md'), finalContent);
@@ -62,14 +62,27 @@ function generateGeminiSkill(skillDir) {
   }
   description = description || `ContextOS skill for ${name}`;
 
-  // Find all .md files in the skill directory to merge
+  // Find all .md files in the skill directory to merge, filtering placeholder stubs
   const files = fs.readdirSync(skillDir);
   const mdFiles = files.filter(f => f.endsWith('.md'));
   
   let mergedContent = '';
+  // Primary skill content first (SKILL.md or <skillName>.md)
+  const primaryMd = mdFiles.find(f => f === 'SKILL.md' || f === `${skillName}.md`) || mdFiles[0];
+  if (primaryMd) {
+    let primaryText = fs.readFileSync(path.join(skillDir, primaryMd), 'utf8');
+    // Strip existing frontmatter from source so we don't double-nest
+    primaryText = primaryText.replace(/^---[\s\S]*?---\r?\n/, '');
+    mergedContent += primaryText;
+  }
+
+  // Then append other meaningful md files if present
   for (const mdFile of mdFiles) {
-    mergedContent += `\n\n<!-- Source: ${mdFile} -->\n\n`;
-    mergedContent += fs.readFileSync(path.join(skillDir, mdFile), 'utf8');
+    if (mdFile === primaryMd) continue;
+    const extraContent = readMeaningfulMarkdown(path.join(skillDir, mdFile));
+    if (extraContent) {
+      mergedContent += `\n\n<!-- Source: ${mdFile} -->\n\n` + extraContent;
+    }
   }
 
   // Construct Gemini SKILL.md format
@@ -78,7 +91,7 @@ name: ${name}
 description: >
   ${description}
 ---
-${mergedContent}
+${mergedContent.trimStart()}
 `;
 
   fs.mkdirSync(outputDir, { recursive: true });
