@@ -1,0 +1,11 @@
+{
+  "skill": "docker",
+  "version": "1.0.0",
+  "checks": [
+    "Multi-stage Dockerfile architecture",
+    "Non-root USER directive present",
+    "Layer caching optimization (lockfiles copied first)",
+    "Specific image version tags (no :latest)",
+    ".dockerignore excludes node_modules and secrets"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "skill": "testing",
+  "version": "1.0.0",
+  "checks": [
+    "Test pyramid ratio enforced (70% unit/integration)",
+    "AAA (Arrange-Act-Assert) pattern implemented",
+    "No internal state inspection or brittle selectors",
+    "MSW used for network boundaries",
+    "Zero shared state between test executions"
+  ]
+}

@@ -10,10 +10,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: typescript.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## TypeScript — Best Practices
+1. **NEVER use `any`**: Use `unknown` with type guards, discriminated unions, or Zod schemas.
+2. **NEVER use type assertions (`as Type` or `as unknown as Type`) to bypass safety**: Fix the underlying type signature or use runtime narrowing (`instanceof`, `typeof`, `in`).
+3. **NEVER use non-null assertions (`foo!.bar`)**: Handle `null` and `undefined` with optional chaining (`?.`) or explicit error guards.
+4. **NEVER export mutable global arrays or object constants**: Always mark constant objects and arrays with `as const` and `readonly`.
+5. **NEVER omit explicit return types on exported functions**: Exported public APIs must declare explicit return types to protect consumers.
+
+## Rules & Patterns
 
 ## Strict Mode
 
@@ -102,3 +107,64 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# TypeScript Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Type-Safe Parsing with Zod (No `any`)
+
+### ❌ Anti-pattern (Blind type assertion with `as`)
+```typescript
+// BAD: using 'as User' bypasses runtime validation completely
+async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  const data = await res.json();
+  return data as User; // Runtime crash if payload changes!
+}
+```
+
+### ✅ ContextOS Standard (Runtime schema validation with Zod)
+```typescript
+// GOOD: guaranteed runtime and compile-time type safety
+import { z } from 'zod';
+
+export const UserSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(['admin', 'member', 'guest']),
+  createdAt: z.string().datetime(),
+});
+
+export type User = z.infer<typeof UserSchema>;
+
+export async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error(`Fetch failed with status ${res.status}`);
+  const raw: unknown = await res.json();
+  return UserSchema.parse(raw);
+}
+```
+
+---
+
+## Example 2: Discriminated Unions for State Handling
+
+### ❌ Anti-pattern (Optional soup with boolean flags)
+```typescript
+// BAD: impossible states can be represented (e.g. isLoading: true AND error: 'Failed')
+interface AsyncState<T> {
+  data?: T;
+  isLoading: boolean;
+  error?: string;
+}
+```
+
+### ✅ ContextOS Standard (Discriminated Union)
+```typescript
+// GOOD: impossible states are impossible at compile-time
+export type AsyncState<T> =
+  | { readonly status: 'idle' }
+  | { readonly status: 'loading' }
+  | { readonly status: 'success'; readonly data: T }
+  | { readonly status: 'error'; readonly error: Error };
+```

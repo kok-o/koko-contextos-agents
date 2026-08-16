@@ -51,6 +51,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **react** | `react/SKILL.md` | React component work |
 | **nextjs** | `nextjs/SKILL.md` | Next.js App Router, Server Actions, routing |
 | **typescript** | `typescript/SKILL.md` | Type-safe code, generics, config |
+| **state-management** | `state-management/SKILL.md` | Zustand, TanStack Query, client/server state |
 | **ui-design** | `ui-design/SKILL.md` | Component library design, tokens |
 | **ux-design** | `ux-design/SKILL.md` | User flow design, interaction patterns |
 | **web-accessibility** | `web-accessibility/SKILL.md` | ARIA, WCAG compliance |
@@ -65,6 +66,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **nestjs** | `nestjs/SKILL.md` | NestJS framework |
 | **microservices** | `microservices/SKILL.md` | Service decomposition |
 | **ddd** | `ddd/SKILL.md` | Domain modeling, bounded contexts |
+| **database** | `database/SKILL.md` | PostgreSQL, Prisma, Drizzle, migrations, indexing |
 
 ### ⚙️ Cross-Cutting Skills
 
@@ -72,6 +74,8 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 |-------|------|--------------|
 | **security** | `security/SKILL.md` | Any feature with auth, data access, user input |
 | **performance** | `performance/SKILL.md` | Optimization tasks, Core Web Vitals |
+| **testing** | `testing/SKILL.md` | Vitest, RTL, Playwright, TDD/BDD testing |
+| **docker** | `docker/SKILL.md` | Dockerfiles, multi-stage, container security, compose |
 | **decisions** | `decisions/SKILL.md` | Making architectural choices |
 | **adapters** | `adapters/SKILL.md` | Building system integrations |
 | **generators** | `generators/SKILL.md` | Code generation patterns |
@@ -94,8 +98,24 @@ load: [ui-ux-pro, impeccable-design, ui-design]
 role: Senior Designer
 
 trigger: "API" OR "endpoint" OR "route" OR "database" OR "backend"
-load: [system-design, security, ponytail-mindset]
+load: [system-design, database, security, ponytail-mindset]
 role: Architect (plan) → Senior Developer (build)
+
+trigger: "database" OR "prisma" OR "drizzle" OR "migration" OR "schema"
+load: [database, system-design, decisions]
+role: Database Architect (plan) → Senior Developer (build)
+
+trigger: "docker" OR "container" OR "dockerfile" OR "deploy" OR "compose"
+load: [docker, security, ponytail-mindset]
+role: DevOps Engineer
+
+trigger: "state" OR "store" OR "zustand" OR "query" OR "cache"
+load: [state-management, react, typescript, ponytail-mindset]
+role: Senior Frontend Developer
+
+trigger: "test" OR "unit test" OR "playwright" OR "vitest" OR "tdd"
+load: [testing, typescript, engineering-workflow]
+role: QA Lead → Senior Developer
 
 trigger: "architecture" OR "design the system" OR "how should we structure"
 load: [system-design, ddd, microservices, decisions]
@@ -123,6 +143,10 @@ role: Release Engineer
 ```yaml
 files: "*.tsx" OR "*.jsx" present → load react, typescript
 files: "next.config.*" present → load nextjs (supersedes node)
+files: "*.prisma" OR "drizzle.config.*" present → load database
+files: "Dockerfile*" OR "docker-compose.*" present → load docker
+files: "*store*" OR "use*Query*" present → load state-management
+files: "*.test.*" OR "*.spec.*" OR "vitest.config.*" present → load testing
 files: "*.py" OR "requirements.txt" present → load fastapi
 files: "nest-cli.json" present → load nestjs
 files: "tailwind.config.*" present → apply Tailwind rules from ui-ux-pro
@@ -721,6 +745,142 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+### database
+
+> Database architecture, schema design, Prisma, Drizzle ORM, indexing strategies, migrations, and N+1 query resolution.
+
+# Database
+
+## Overview
+
+Relational database design, query optimization, migration safety, and ORM usage across PostgreSQL, Prisma, and Drizzle.
+
+## When to Use
+
+Activate for tasks involving database schema design, migrations, indexing, relational models, ORM queries, transactions, or query performance tuning.
+
+## Rules & Patterns
+
+### 🚫 Negative Constraints (What NOT to Do)
+
+1. **NEVER do `SELECT *` in production**: Always select explicit columns required by the caller to minimize memory bandwidth and lock footprint.
+2. **NEVER run destructive migrations without backward compatibility**: Always follow expand-and-contract (Phase 1: add new column as nullable; Phase 2: backfill; Phase 3: make non-nullable & remove old column).
+3. **NEVER execute queries in loops (The N+1 Anti-Pattern)**: Always use batch loading (`inArray`, `DataLoader`, or relational `include` / `JOIN`).
+4. **NEVER leave foreign keys without indexes**: In PostgreSQL/MySQL, child foreign key columns must always have an index to prevent table-level locking on cascade deletes.
+5. **NEVER perform multi-entity writes without a database transaction**: Any operation touching multiple records must use `prisma.$transaction` or `db.transaction`.
+
+### Indexing & Performance Rules
+
+- **B-Tree Indexes**: For high-cardinality filters (`status`, `user_id`, `created_at`).
+- **Composite Indexes**: When querying multiple columns together (`WHERE organization_id = ? AND status = ?`), order columns in index by equality first, range second.
+- **Partial Indexes**: For sparse boolean flags (`WHERE is_processed = false`).
+
+## Code Examples
+
+See `EXAMPLES.md` for complete anti-patterns and production code examples.
+
+## Validation Checklist
+
+- [ ] All database queries select explicit required columns
+- [ ] Foreign keys have matching indexes
+- [ ] Multi-table writes wrapped in ACID transactions
+- [ ] No N+1 queries in loops
+
+## Common Mistakes
+
+- Missing pagination limits (`take / limit`) on list endpoints. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+
+Interacts with `system-design`, `ddd`, and `security` (multi-tenant scoping).
+
+
+# Database Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Solving the N+1 Query Problem
+
+### ❌ Anti-pattern (N+1 database queries in a loop)
+```typescript
+// BAD: 1 query for users + N queries for posts!
+const users = await prisma.user.findMany();
+const usersWithPosts = [];
+for (const user of users) {
+  const posts = await prisma.post.findMany({ where: { userId: user.id } }); // N queries!
+  usersWithPosts.push({ ...user, posts });
+}
+```
+
+### ✅ ContextOS Standard (Batch query or relational include)
+```typescript
+// GOOD: 1 single optimized batch query
+const usersWithPosts = await prisma.user.findMany({
+  where: { isActive: true },
+  select: {
+    id: true,
+    name: true,
+    email: true,
+    posts: {
+      where: { published: true },
+      select: { id: true, title: true, createdAt: true },
+      take: 5
+    }
+  }
+});
+```
+
+---
+
+## Example 2: Safe Atomic Transactions with Locking
+
+### ❌ Anti-pattern (Unprotected read-modify-write race condition)
+```typescript
+// BAD: race condition between reading balance and updating
+const account = await prisma.account.findUnique({ where: { id } });
+if (account.balance >= amount) {
+  await prisma.account.update({
+    where: { id },
+    data: { balance: account.balance - amount }
+  });
+}
+```
+
+### ✅ ContextOS Standard (Atomic conditional update in transaction)
+```typescript
+// GOOD: atomic database transaction with invariant check
+export async function deductBalance(accountId: string, amount: number) {
+  return await prisma.$transaction(async (tx) => {
+    const updated = await tx.account.updateMany({
+      where: {
+        id: accountId,
+        balance: { gte: amount }
+      },
+      data: {
+        balance: { decrement: amount }
+      }
+    });
+
+    if (updated.count === 0) {
+      throw new InsufficientFundsError(accountId);
+    }
+  });
+}
+```
+
+# Database Troubleshooting Guide
+
+## Common Issues & Fixes
+
+### 1. Connection Pool Exhaustion in Serverless / Edge
+- **Cause**: Creating a new PrismaClient / DB connection instance on every serverless function invocation.
+- **Fix**: Declare PrismaClient as a global singleton across warm lambdas, and enable PgBouncer or Prisma Accelerate.
+
+### 2. Slow Queries on Large Tables
+- **Cause**: Missing composite index on filtered and ordered columns.
+- **Fix**: Run `EXPLAIN ANALYZE <query>` and add targeted indexes matching the WHERE and ORDER BY columns.
+
+### 3. Database Deadlocks during Concurrent Transactions
+- **Cause**: Different transactions updating resources in different orders.
+- **Fix**: Always acquire locks and update entities in a deterministic alphabetical or ID-ordered sequence.
 ### Domain-Driven Design
 
 # Domain-Driven Design
@@ -1018,6 +1178,139 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+### docker
+
+> Docker containerization, multi-stage builds, non-root security, layer caching optimization, and docker-compose standards.
+
+# Docker
+
+## Overview
+
+Containerization, Dockerfile architecture, security best practices, and container orchestration for production workloads.
+
+## When to Use
+
+Activate when creating or optimizing Dockerfiles, docker-compose configurations, container security audits, or CI/CD container builds.
+
+## Rules & Patterns
+
+### 🚫 Negative Constraints (What NOT to Do)
+
+1. **NEVER run containers as `root` in production**: Always create and switch to an unprivileged non-root user (e.g. `USER node` or `USER nonroot`).
+2. **NEVER use the `latest` tag**: Always pin base images to specific immutable version digests or explicit minor tags (e.g. `node:20.12.2-alpine3.19`).
+3. **NEVER copy source code before `package.json`**: Always copy lockfiles and install dependencies first to leverage Docker's layer caching.
+4. **NEVER bake secrets, API keys, or `.env` files into image layers**: Pass secrets via build-time secret mounts (`--mount=type=secret`) or runtime environment variables.
+5. **NEVER include build tools or devDependencies in the final runner image**: Always use multi-stage builds to discard compilers and package managers from production images.
+
+### Multi-Stage Standard Pattern
+
+```dockerfile
+FROM node:20.12.2-alpine3.19 AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build && npm prune --production
+
+FROM node:20.12.2-alpine3.19 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+RUN addgroup -S -g 1001 appgroup && adduser -S -u 1001 appuser -G appgroup
+COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
+USER appuser
+CMD ["node", "dist/index.js"]
+```
+
+## Code Examples
+
+See `EXAMPLES.md` for production Dockerfiles and dockerignore patterns.
+
+## Validation Checklist
+
+- [ ] Multi-stage build separates build tools from runtime
+- [ ] Non-root `USER` directive active in final stage
+- [ ] Base images pinned to exact versions
+- [ ] `.dockerignore` file prevents leaking node_modules or secrets
+
+## Common Mistakes
+
+- Copying entire workspace before `npm ci`, breaking Docker cache. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+
+Interacts with `security` (container hardening) and `node` / `nextjs` / `fastapi`.
+
+
+# Docker Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Multi-Stage Build & Layer Caching
+
+### ❌ Anti-pattern (Fat single-stage image running as root)
+```dockerfile
+# BAD: 1.2GB image, runs as root, breaks caching on every file edit
+FROM node:latest
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### ✅ ContextOS Standard (Slim multi-stage build with non-root user)
+```dockerfile
+# GOOD: 95MB image, non-root user, optimized layer caching
+FROM node:20.12.2-alpine3.19 AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build && npm prune --production
+
+FROM node:20.12.2-alpine3.19 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+RUN addgroup -S -g 1001 appgroup && adduser -S -u 1001 appuser -G appgroup
+COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
+USER appuser
+CMD ["node", "dist/main.js"]
+```
+
+---
+
+## Example 2: Docker Ignore File (`.dockerignore`)
+
+### ✅ ContextOS Standard `.dockerignore`
+```gitignore
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.*
+dist
+coverage
+.DS_Store
+*.md
+```
+
+# Docker Troubleshooting Guide
+
+## Common Issues & Fixes
+
+### 1. Slow Docker builds rebuilding node_modules every time
+- **Cause**: Copying the entire directory (`COPY . .`) before running `npm ci`.
+- **Fix**: Copy `package.json` and `package-lock.json` separately first, run `npm ci`, and only then copy application source code.
+
+### 2. Permission Denied Errors with Non-Root Users
+- **Cause**: Files copied from builder without changing ownership.
+- **Fix**: Always use `--chown=appuser:appgroup` when copying files in Dockerfile.
+
+### 3. Missing native build dependencies on Alpine Linux
+- **Cause**: Packages requiring C bindings (e.g. `sharp`, `bcrypt`) fail on musl libc.
+- **Fix**: Add `RUN apk add --no-cache libc6-compat python3 make g++` in the builder stage.
 ### engineering-workflow
 
 > >
@@ -2324,10 +2617,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: node.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## Node.js — Best Practices
+1. **NEVER execute synchronous filesystem/crypto calls in request handlers (`fs.readFileSync`)**: Always use async promises (`fs.promises.*`) to avoid blocking the event loop.
+2. **NEVER leave uncaught promise rejections**: Every async route must use `express-async-errors` or wrap operations in try/catch calling `next(err)`.
+3. **NEVER buffer large files/payloads entirely in memory (`fs.readFile`)**: Always use Streams or Pipelines (`stream.pipeline`) for processing large files.
+4. **NEVER store in-memory session or user state on a single process instance**: Use Redis or an external state store to allow multi-instance scaling.
+5. **NEVER ignore `SIGTERM` / `SIGINT` shutdown signals**: Always implement graceful shutdown to close open DB pools and drain active HTTP connections.
+
+## Rules & Patterns
 
 ## Architecture
 
@@ -2432,6 +2730,83 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# Node.js Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Graceful Process Shutdown
+
+### ❌ Anti-pattern (Abruptly killing process and dropping in-flight requests)
+```javascript
+// BAD: drops active database transactions and in-flight HTTP connections
+process.on('SIGTERM', () => {
+  process.exit(0);
+});
+```
+
+### ✅ ContextOS Standard (Graceful connection draining)
+```typescript
+// GOOD: drains active requests, closes database connections, and exits safely
+import http from 'http';
+import { prisma } from './db';
+import { logger } from './logger';
+
+export function setupGracefulShutdown(server: http.Server) {
+  const shutdown = async (signal: string) => {
+    logger.info(`Received ${signal}. Starting graceful shutdown...`);
+    
+    server.close(async () => {
+      logger.info('HTTP server closed.');
+      try {
+        await prisma.$disconnect();
+        logger.info('Database pool closed.');
+        process.exit(0);
+      } catch (err) {
+        logger.error('Error during database disconnect:', err);
+        process.exit(1);
+      }
+    });
+
+    // Force shutdown after timeout if connections hang
+    setTimeout(() => {
+      logger.error('Forceful shutdown timeout reached.');
+      process.exit(1);
+    }, 10_000).unref();
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+}
+```
+
+---
+
+## Example 2: Stream-based File Processing
+
+### ❌ Anti-pattern (Loading entire 500MB file into buffer)
+```typescript
+// BAD: easily causes Out Of Memory (OOM) crashes under concurrency
+app.get('/download/:file', async (req, res) => {
+  const data = await fs.promises.readFile(`/uploads/${req.params.file}`);
+  res.send(data);
+});
+```
+
+### ✅ ContextOS Standard (Piping read stream with pipeline)
+```typescript
+// GOOD: constant memory usage (O(1) RAM) regardless of file size
+import fs from 'fs';
+import { pipeline } from 'stream/promises';
+
+app.get('/download/:file', async (req, res, next) => {
+  try {
+    const filePath = `/uploads/${req.params.file}`;
+    const readStream = fs.createReadStream(filePath);
+    await pipeline(readStream, res);
+  } catch (err) {
+    next(err);
+  }
+});
+```
 ### Web Performance
 
 # Web Performance
@@ -2805,10 +3180,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: react.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## React — Best Practices
+1. **NEVER use `useEffect` for derived/calculated state**: Calculate values inline during render or use `useMemo` if computationally expensive.
+2. **NEVER use array index as `key` in dynamic/mutable lists**: Always use stable, unique entity IDs (`user.id`, `item.id`).
+3. **NEVER mutate React state directly**: Always return new immutable copies (`[...prev, newItem]` or `{ ...prev, key: value }`).
+4. **NEVER declare components inside other components**: Always declare subcomponents at the top-level module scope to avoid re-mounting on every render.
+5. **NEVER omit cleanup functions in `useEffect` with event listeners or timers**: Always return a cleanup function (`return () => clearTimeout(timer)`).
+
+## Rules & Patterns
 
 ## Component Architecture
 
@@ -2919,6 +3299,82 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# React Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Derived State vs. useEffect
+
+### ❌ Anti-pattern (Redundant state + extra render with useEffect)
+```tsx
+// BAD: causes an unnecessary extra render cycle and potential state desync
+function OrderSummary({ items }: { items: CartItem[] }) {
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const calculated = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    setTotal(calculated);
+  }, [items]);
+
+  return <div>Total: ${total}</div>;
+}
+```
+
+### ✅ ContextOS Standard (Inline derived calculation / useMemo)
+```tsx
+// GOOD: calculated instantly during render with zero extra render pass
+function OrderSummary({ items }: { items: CartItem[] }) {
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
+
+  return <div>Total: ${total.toFixed(2)}</div>;
+}
+```
+
+---
+
+## Example 2: Custom Hook Encapsulation
+
+### ❌ Anti-pattern (Scattered listener logic inside component)
+```tsx
+// BAD: window listener logic cluttering UI component
+function NavHeader() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  return <header className={isScrolled ? 'scrolled' : ''}>Header</header>;
+}
+```
+
+### ✅ ContextOS Standard (Reusable Custom Hook)
+```tsx
+// GOOD: extracted into a reusable, testable custom hook
+export function useScrollThreshold(threshold = 50): boolean {
+  const [isPassed, setIsPassed] = useState(() => typeof window !== 'undefined' && window.scrollY > threshold);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsPassed(window.scrollY > threshold);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [threshold]);
+
+  return isPassed;
+}
+```
 ### Application Security
 
 # Application Security
@@ -2931,10 +3387,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: security.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## Application Security — Best Practices
+1. **NEVER use standard string comparison (`===`) for secrets/hashes**: Always use `crypto.timingSafeEqual` to prevent timing attacks.
+2. **NEVER store sensitive JWT access/refresh tokens in `localStorage`**: Store tokens in `httpOnly`, `Secure`, `SameSite=Strict` cookies.
+3. **NEVER return raw database/internal error messages or stack traces to the client**: Return standardized generic error codes (`INTERNAL_SERVER_ERROR`) and log details internally.
+4. **NEVER trust client-provided IDs for authorization without tenant/ownership checks**: Always verify `where: { id, userId: session.userId }` to prevent Insecure Direct Object References (IDOR).
+5. **NEVER disable CSRF protection, CORS allow-all (`*`), or TLS verification (`NODE_TLS_REJECT_UNAUTHORIZED=0`) in production**: Always enforce strict origin whitelists and HTTPS.
+
+## Rules & Patterns
 
 ## OWASP Top 10
 
@@ -3058,6 +3519,184 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# Application Security Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Timing-Safe Secret Verification
+
+### ❌ Anti-pattern (Vulnerable to side-channel timing attack)
+```typescript
+// BAD: string comparison returns early on the first mismatched byte
+export function verifyApiKey(providedKey: string, storedKey: string): boolean {
+  return providedKey === storedKey; // Vulnerable to timing analysis!
+}
+```
+
+### ✅ ContextOS Standard (Constant-time buffer comparison)
+```typescript
+// GOOD: crypto.timingSafeEqual executes in constant time
+import crypto from 'crypto';
+
+export function verifyApiKey(providedKey: string, storedKey: string): boolean {
+  const providedBuffer = Buffer.from(providedKey, 'utf8');
+  const storedBuffer = Buffer.from(storedKey, 'utf8');
+
+  if (providedBuffer.length !== storedBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(providedBuffer, storedBuffer);
+}
+```
+
+---
+
+## Example 2: Preventing IDOR (Insecure Direct Object Reference)
+
+### ❌ Anti-pattern (Trusting client ID without ownership check)
+```typescript
+// BAD: any authenticated user can delete any other user's document!
+app.delete('/api/documents/:id', requireAuth, async (req, res) => {
+  await prisma.document.delete({ where: { id: req.params.id } });
+  res.status(204).end();
+});
+```
+
+### ✅ ContextOS Standard (Multi-tenant scoped authorization check)
+```typescript
+// GOOD: document deletion is strictly scoped to authenticated user or org
+app.delete('/api/documents/:id', requireAuth, async (req, res) => {
+  const deleted = await prisma.document.deleteMany({
+    where: {
+      id: req.params.id,
+      organizationId: req.user.organizationId, // Tenant isolation
+    },
+  });
+
+  if (deleted.count === 0) {
+    return res.status(404).json({ error: 'Document not found or access denied' });
+  }
+
+  return res.status(204).end();
+});
+```
+### state-management
+
+> Client and server state management standards using Zustand and TanStack Query. Enforces minimal global state, optimistic updates, and clean query invalidation.
+
+# State Management
+
+## Overview
+
+Global client state and server state management in modern React and Next.js applications using Zustand and TanStack Query.
+
+## When to Use
+
+Activate when managing asynchronous server data fetching/caching, optimistic UI updates, or global UI client state (modals, filters, wizards).
+
+## Rules & Patterns
+
+### 🎯 The Rule of Two States
+
+- **SERVER STATE (Async)**: Managed exclusively by TanStack Query (`useQuery`, `useMutation`). Caching, background refetching, pagination, and invalidation.
+- **CLIENT STATE (Sync)**: Managed by Zustand. Modal visibility, active filters, wizard step, theme.
+
+### 🚫 Negative Constraints (What NOT to Do)
+
+1. **NEVER store server-fetched data in Zustand or Redux stores**: Store ONLY client-local UI state in Zustand. All API data belongs in TanStack Query.
+2. **NEVER duplicate derived state**: Compute values inline or via `useMemo` from existing state instead of storing redundant state variables.
+3. **NEVER subscribe to entire store objects in components**: Always use atomic selector functions (e.g. `useStore(state => state.isOpen)`) to prevent unnecessary component re-renders.
+4. **NEVER mutate state directly**: Always return new immutable state objects in Zustand setters.
+5. **NEVER ignore optimistic rollback on mutation failure**: When implementing optimistic UI, always capture `previousData` in `onMutate` and restore it in `onError`.
+
+## Code Examples
+
+See `EXAMPLES.md` for Zustand store patterns and optimistic TanStack mutations.
+
+## Validation Checklist
+
+- [ ] Clear separation between Server (TanStack Query) and Client (Zustand) state
+- [ ] Atomic selectors used on all Zustand hook calls
+- [ ] Optimistic updates implement rollback on error
+- [ ] Zero duplicated derived state
+
+## Common Mistakes
+
+- Subscribing to full store objects causing cascading re-renders. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+
+Interacts with `react`, `nextjs`, and `typescript`.
+
+
+# State Management Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Selecting State from Zustand
+
+### ❌ Anti-pattern (Subscribing to full store causes unnecessary renders)
+```typescript
+// BAD: component re-renders whenever ANY property in the store changes!
+function CartBadge() {
+  const store = useCartStore(); // subscribes to entire object!
+  return <span>{store.items.length}</span>;
+}
+```
+
+### ✅ ContextOS Standard (Atomic granular selector)
+```typescript
+// GOOD: component ONLY re-renders when itemCount changes
+function CartBadge() {
+  const itemCount = useCartStore((state) => state.items.length);
+  return <span>{itemCount}</span>;
+}
+```
+
+---
+
+## Example 2: Server State Invalidation
+
+### ❌ Anti-pattern (Manually syncing server data into global state with useEffect)
+```typescript
+// BAD: manual sync, race conditions, stale cache bugs
+function UserProfile({ userId }) {
+  const { setUser } = useUserStore();
+  useEffect(() => {
+    fetch(`/api/users/${userId}`).then(res => res.json()).then(setUser);
+  }, [userId]);
+}
+```
+
+### ✅ ContextOS Standard (Declarative TanStack Query caching)
+```typescript
+// GOOD: automatic caching, deduplication, background revalidation
+function UserProfile({ userId }: { userId: string }) {
+  const { data: user, isLoading, error } = useQuery({
+    queryKey: ['users', userId],
+    queryFn: () => fetchUserById(userId),
+    staleTime: 1000 * 60 * 5, // 5 minutes fresh
+  });
+
+  if (isLoading) return <SkeletonLoader />;
+  if (error) return <ErrorMessage error={error} />;
+  return <UserDetails user={user} />;
+}
+```
+
+# State Management Troubleshooting Guide
+
+## Common Issues & Fixes
+
+### 1. Infinite re-renders when calling `useStore` with an inline object selector
+- **Cause**: Returning a new object reference from a selector without a custom equality check.
+- **Fix**: Use `useShallow` from `zustand/react/shallow` or select scalar values directly.
+
+### 2. Stale data shown after mutation
+- **Cause**: Missing `queryClient.invalidateQueries` in `onSettled` or `onSuccess`.
+- **Fix**: Always invalidate the relevant query keys on mutation completion to trigger background refetch.
+
+### 3. Server-Side Rendering (SSR) Hydration Mismatch in Next.js
+- **Cause**: Reading localStorage-persisted Zustand store directly during initial SSR render.
+- **Fix**: Use a custom `useHydratedStore` hook or render persisted components only after client mount.
 ### system-design
 
 > >
@@ -3435,6 +4074,160 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+### testing
+
+> Vitest, React Testing Library, and Playwright testing standards. Enforces TDD/BDD, test pyramid, zero brittle mocks, and complete assertion coverage.
+
+# Testing
+
+## Overview
+
+Testing strategy across unit, component, integration, and end-to-end testing suites using Vitest, React Testing Library, and Playwright.
+
+## When to Use
+
+Activate for any task involving unit tests, integration tests, E2E testing, TDD/BDD workflows, or fixing regression bugs.
+
+## Rules & Patterns
+
+### 🏛️ The ContextOS Testing Pyramid
+
+```
+      /\
+     /E2E\       10% — Playwright (Critical user journeys, auth, checkout)
+    /-----\
+   / Integ \     20% — API & Component Integration (RTL + MSW / Supertest)
+  /---------\
+ /   Unit    \   70% — Pure functions, Domain Entities, Utils (Vitest)
+/-------------\
+```
+
+### 🚫 Negative Constraints (What NOT to Do)
+
+1. **NEVER mock internal implementation details**: Mock ONLY external I/O boundaries (HTTP network requests via MSW, Database via test containers or in-memory DB).
+2. **NEVER test implementation details**: In React Testing Library, query by user-facing roles (`getByRole`, `getByLabelText`), NEVER by CSS selectors or internal component state.
+3. **NEVER write assertions without an expected failure mode**: Each test must test a single logical behavior and fail if that behavior breaks.
+4. **NEVER leave flaky tests or arbitrary sleep (`await delay(1000)`)**: Always use `waitFor()` or explicit event triggers with timeouts.
+5. **NEVER share mutable state between tests**: Every test must have isolated state via `beforeEach()` setup and clean reset.
+
+### AAA Standard Pattern
+
+```typescript
+describe('Feature / Unit', () => {
+  it('should achieve expected outcome when given specific condition', async () => {
+    // 1. ARRANGE
+    const user = createTestUser({ role: 'admin' });
+    // 2. ACT
+    const result = await processOrder(user, sampleCart);
+    // 3. ASSERT
+    expect(result.status).toBe('confirmed');
+  });
+});
+```
+
+## Code Examples
+
+See `EXAMPLES.md` for detailed anti-patterns and production testing code.
+
+## Validation Checklist
+
+- [ ] Tests follow Arrange-Act-Assert (AAA) structure
+- [ ] No brittle CSS selectors or private state inspections
+- [ ] Mocks isolated strictly to network/IO boundaries (MSW)
+- [ ] Fast execution (< 5s for unit suite) with zero flaky sleeps
+
+## Common Mistakes
+
+- Over-mocking modules instead of running real pure logic. See `TROUBLESHOOTING.md`.
+
+## Integration Notes
+
+Interacts directly with `engineering-workflow` (Verify phase), `react`, and `typescript`.
+
+
+# Testing Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: React Component Testing
+
+### ❌ Anti-pattern (Brittle query & implementation coupling)
+```typescript
+// BAD: querying by CSS class or test-id and testing internal state
+test('submits form', async () => {
+  const wrapper = render(<LoginForm />);
+  const input = wrapper.container.querySelector('.email-input');
+  fireEvent.change(input, { target: { value: 'user@test.com' } });
+  fireEvent.click(wrapper.container.querySelector('#submit-btn'));
+  expect(wrapper.state().isSubmitted).toBe(true); // Brittle!
+});
+```
+
+### ✅ ContextOS Standard (User-centric role queries & userEvent)
+```typescript
+// GOOD: user-facing roles, userEvent, async wait
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LoginForm } from './LoginForm';
+
+test('submits form with valid user credentials', async () => {
+  const user = userEvent.setup();
+  const onSubmit = vi.fn();
+  render(<LoginForm onSubmit={onSubmit} />);
+
+  await user.type(screen.getByLabelText(/email address/i), 'user@test.com');
+  await user.type(screen.getByLabelText(/password/i), 'SecureP@ss123!');
+  await user.click(screen.getByRole('button', { name: /sign in/i }));
+
+  expect(onSubmit).toHaveBeenCalledWith({
+    email: 'user@test.com',
+    password: 'SecureP@ss123!'
+  });
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+});
+```
+
+---
+
+## Example 2: API Mocking with MSW (Mock Service Worker)
+
+### ❌ Anti-pattern (Hardcoded global fetch monkey-patching)
+```typescript
+// BAD: globally overwriting fetch breaks other tests and hides actual contract
+global.fetch = vi.fn().mockResolvedValue({
+  json: () => Promise.resolve({ data: 'ok' })
+});
+```
+
+### ✅ ContextOS Standard (Network boundary mocking)
+```typescript
+// GOOD: declarative MSW network handler
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+
+export const server = setupServer(
+  http.get('/api/users/:id', ({ params }) => {
+    if (params.id === '404') {
+      return new HttpResponse(null, { status: 404 });
+    }
+    return HttpResponse.json({ id: params.id, name: 'Alice Smith' });
+  })
+);
+```
+
+# Testing Troubleshooting Guide
+
+## Common Issues & Fixes
+
+### 1. `act(...)` warning in React Testing Library
+- **Cause**: An asynchronous state update triggered after the test completed.
+- **Fix**: Ensure all async operations are awaited using `await waitFor(() => ...)` or `await screen.findByRole(...)`.
+
+### 2. Tests pass in isolation but fail in concurrent test runs
+- **Cause**: Shared in-memory state or un-reset singleton.
+- **Fix**: Reset all mocks and in-memory databases in `beforeEach(() => vi.clearAllMocks())` and `afterEach(() => cleanup())`.
+
+### 3. Playwright timeout waiting for selector
+- **Cause**: Element is animating or blocked behind a modal/overlay.
+- **Fix**: Use web-first assertions like `await expect(page.getByRole('button')).toBeVisible()` which automatically retry until timeout.
 ### TypeScript
 
 # TypeScript
@@ -3447,10 +4240,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: typescript.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## TypeScript — Best Practices
+1. **NEVER use `any`**: Use `unknown` with type guards, discriminated unions, or Zod schemas.
+2. **NEVER use type assertions (`as Type` or `as unknown as Type`) to bypass safety**: Fix the underlying type signature or use runtime narrowing (`instanceof`, `typeof`, `in`).
+3. **NEVER use non-null assertions (`foo!.bar`)**: Handle `null` and `undefined` with optional chaining (`?.`) or explicit error guards.
+4. **NEVER export mutable global arrays or object constants**: Always mark constant objects and arrays with `as const` and `readonly`.
+5. **NEVER omit explicit return types on exported functions**: Exported public APIs must declare explicit return types to protect consumers.
+
+## Rules & Patterns
 
 ## Strict Mode
 
@@ -3539,6 +4337,67 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# TypeScript Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Type-Safe Parsing with Zod (No `any`)
+
+### ❌ Anti-pattern (Blind type assertion with `as`)
+```typescript
+// BAD: using 'as User' bypasses runtime validation completely
+async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  const data = await res.json();
+  return data as User; // Runtime crash if payload changes!
+}
+```
+
+### ✅ ContextOS Standard (Runtime schema validation with Zod)
+```typescript
+// GOOD: guaranteed runtime and compile-time type safety
+import { z } from 'zod';
+
+export const UserSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(['admin', 'member', 'guest']),
+  createdAt: z.string().datetime(),
+});
+
+export type User = z.infer<typeof UserSchema>;
+
+export async function fetchUser(id: string): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error(`Fetch failed with status ${res.status}`);
+  const raw: unknown = await res.json();
+  return UserSchema.parse(raw);
+}
+```
+
+---
+
+## Example 2: Discriminated Unions for State Handling
+
+### ❌ Anti-pattern (Optional soup with boolean flags)
+```typescript
+// BAD: impossible states can be represented (e.g. isLoading: true AND error: 'Failed')
+interface AsyncState<T> {
+  data?: T;
+  isLoading: boolean;
+  error?: string;
+}
+```
+
+### ✅ ContextOS Standard (Discriminated Union)
+```typescript
+// GOOD: impossible states are impossible at compile-time
+export type AsyncState<T> =
+  | { readonly status: 'idle' }
+  | { readonly status: 'loading' }
+  | { readonly status: 'success'; readonly data: T }
+  | { readonly status: 'error'; readonly error: Error };
+```
 ### UI Design
 
 # UI Design
@@ -3946,6 +4805,65 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# UI/UX Pro Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Accessible Icon Button with Visible Focus States
+
+### ❌ Anti-pattern (Missing accessible name and arbitrary color values)
+```tsx
+// BAD: inaccessible to screen readers, missing focus ring, arbitrary hex
+<button className="bg-[#5a4fcf] p-[7px] rounded-[5px]" onClick={onClose}>
+  <XIcon />
+</button>
+```
+
+### ✅ ContextOS Standard (Semantic token scales & ARIA label)
+```tsx
+// GOOD: full keyboard accessibility, semantic tokens, focus-visible ring
+<button
+  type="button"
+  aria-label="Close modal dialog"
+  onClick={onClose}
+  className="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+>
+  <X className="h-4 w-4" aria-hidden="true" />
+</button>
+```
+
+---
+
+## Example 2: Stat Card Hierarchy
+
+### ❌ Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
+```tsx
+// BAD: cliche AI gradient, poor typographic hierarchy
+<div className="bg-gradient-to-r from-purple-500 to-blue-500 p-4 rounded-xl text-white">
+  <div>Total Revenue</div>
+  <div className="text-xl">$45,231.89</div>
+</div>
+```
+
+### ✅ ContextOS Standard (Refined editorial typography & subtle depth)
+```tsx
+// GOOD: high contrast, monospace numerical accent, subtle border
+<div className="rounded-xl border border-border/50 bg-card p-6 shadow-sm transition-all hover:shadow-md">
+  <div className="flex items-center justify-between">
+    <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+      Total Revenue
+    </span>
+    <TrendingUp className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+  </div>
+  <div className="mt-3 flex items-baseline gap-2">
+    <span className="font-mono text-3xl font-semibold tracking-tight text-foreground">
+      $45,231.89
+    </span>
+    <span className="font-mono text-xs font-medium text-emerald-600 dark:text-emerald-400">
+      +14.2%
+    </span>
+  </div>
+</div>
+```
 ### UX Design
 
 # UX Design

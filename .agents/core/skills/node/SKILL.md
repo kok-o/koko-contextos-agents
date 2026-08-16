@@ -14,10 +14,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: node.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## Node.js — Best Practices
+1. **NEVER execute synchronous filesystem/crypto calls in request handlers (`fs.readFileSync`)**: Always use async promises (`fs.promises.*`) to avoid blocking the event loop.
+2. **NEVER leave uncaught promise rejections**: Every async route must use `express-async-errors` or wrap operations in try/catch calling `next(err)`.
+3. **NEVER buffer large files/payloads entirely in memory (`fs.readFile`)**: Always use Streams or Pipelines (`stream.pipeline`) for processing large files.
+4. **NEVER store in-memory session or user state on a single process instance**: Use Redis or an external state store to allow multi-instance scaling.
+5. **NEVER ignore `SIGTERM` / `SIGINT` shutdown signals**: Always implement graceful shutdown to close open DB pools and drain active HTTP connections.
+
+## Rules & Patterns
 
 ## Architecture
 

@@ -45,6 +45,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **react** | `react/SKILL.md` | React component work |
 | **nextjs** | `nextjs/SKILL.md` | Next.js App Router, Server Actions, routing |
 | **typescript** | `typescript/SKILL.md` | Type-safe code, generics, config |
+| **state-management** | `state-management/SKILL.md` | Zustand, TanStack Query, client/server state |
 | **ui-design** | `ui-design/SKILL.md` | Component library design, tokens |
 | **ux-design** | `ux-design/SKILL.md` | User flow design, interaction patterns |
 | **web-accessibility** | `web-accessibility/SKILL.md` | ARIA, WCAG compliance |
@@ -59,6 +60,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **nestjs** | `nestjs/SKILL.md` | NestJS framework |
 | **microservices** | `microservices/SKILL.md` | Service decomposition |
 | **ddd** | `ddd/SKILL.md` | Domain modeling, bounded contexts |
+| **database** | `database/SKILL.md` | PostgreSQL, Prisma, Drizzle, migrations, indexing |
 
 ### ⚙️ Cross-Cutting Skills
 
@@ -66,6 +68,8 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 |-------|------|--------------|
 | **security** | `security/SKILL.md` | Any feature with auth, data access, user input |
 | **performance** | `performance/SKILL.md` | Optimization tasks, Core Web Vitals |
+| **testing** | `testing/SKILL.md` | Vitest, RTL, Playwright, TDD/BDD testing |
+| **docker** | `docker/SKILL.md` | Dockerfiles, multi-stage, container security, compose |
 | **decisions** | `decisions/SKILL.md` | Making architectural choices |
 | **adapters** | `adapters/SKILL.md` | Building system integrations |
 | **generators** | `generators/SKILL.md` | Code generation patterns |
@@ -88,8 +92,24 @@ load: [ui-ux-pro, impeccable-design, ui-design]
 role: Senior Designer
 
 trigger: "API" OR "endpoint" OR "route" OR "database" OR "backend"
-load: [system-design, security, ponytail-mindset]
+load: [system-design, database, security, ponytail-mindset]
 role: Architect (plan) → Senior Developer (build)
+
+trigger: "database" OR "prisma" OR "drizzle" OR "migration" OR "schema"
+load: [database, system-design, decisions]
+role: Database Architect (plan) → Senior Developer (build)
+
+trigger: "docker" OR "container" OR "dockerfile" OR "deploy" OR "compose"
+load: [docker, security, ponytail-mindset]
+role: DevOps Engineer
+
+trigger: "state" OR "store" OR "zustand" OR "query" OR "cache"
+load: [state-management, react, typescript, ponytail-mindset]
+role: Senior Frontend Developer
+
+trigger: "test" OR "unit test" OR "playwright" OR "vitest" OR "tdd"
+load: [testing, typescript, engineering-workflow]
+role: QA Lead → Senior Developer
 
 trigger: "architecture" OR "design the system" OR "how should we structure"
 load: [system-design, ddd, microservices, decisions]
@@ -117,6 +137,10 @@ role: Release Engineer
 ```yaml
 files: "*.tsx" OR "*.jsx" present → load react, typescript
 files: "next.config.*" present → load nextjs (supersedes node)
+files: "*.prisma" OR "drizzle.config.*" present → load database
+files: "Dockerfile*" OR "docker-compose.*" present → load docker
+files: "*store*" OR "use*Query*" present → load state-management
+files: "*.test.*" OR "*.spec.*" OR "vitest.config.*" present → load testing
 files: "*.py" OR "requirements.txt" present → load fastapi
 files: "nest-cli.json" present → load nestjs
 files: "tailwind.config.*" present → apply Tailwind rules from ui-ux-pro

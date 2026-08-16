@@ -1,0 +1,11 @@
+{
+  "skill": "state-management",
+  "version": "1.0.0",
+  "checks": [
+    "Strict separation between Server and Client state",
+    "No server API responses cached in Zustand",
+    "Granular atomic selectors used for component subscriptions",
+    "Optimistic mutations include rollback handler",
+    "Zero duplicated derived state"
+  ]
+}

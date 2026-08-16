@@ -14,10 +14,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: react.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## React — Best Practices
+1. **NEVER use `useEffect` for derived/calculated state**: Calculate values inline during render or use `useMemo` if computationally expensive.
+2. **NEVER use array index as `key` in dynamic/mutable lists**: Always use stable, unique entity IDs (`user.id`, `item.id`).
+3. **NEVER mutate React state directly**: Always return new immutable copies (`[...prev, newItem]` or `{ ...prev, key: value }`).
+4. **NEVER declare components inside other components**: Always declare subcomponents at the top-level module scope to avoid re-mounting on every render.
+5. **NEVER omit cleanup functions in `useEffect` with event listeners or timers**: Always return a cleanup function (`return () => clearTimeout(timer)`).
+
+## Rules & Patterns
 
 ## Component Architecture
 

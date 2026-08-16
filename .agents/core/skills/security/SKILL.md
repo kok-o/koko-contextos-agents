@@ -14,10 +14,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: security.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## Application Security — Best Practices
+1. **NEVER use standard string comparison (`===`) for secrets/hashes**: Always use `crypto.timingSafeEqual` to prevent timing attacks.
+2. **NEVER store sensitive JWT access/refresh tokens in `localStorage`**: Store tokens in `httpOnly`, `Secure`, `SameSite=Strict` cookies.
+3. **NEVER return raw database/internal error messages or stack traces to the client**: Return standardized generic error codes (`INTERNAL_SERVER_ERROR`) and log details internally.
+4. **NEVER trust client-provided IDs for authorization without tenant/ownership checks**: Always verify `where: { id, userId: session.userId }` to prevent Insecure Direct Object References (IDOR).
+5. **NEVER disable CSRF protection, CORS allow-all (`*`), or TLS verification (`NODE_TLS_REJECT_UNAUTHORIZED=0`) in production**: Always enforce strict origin whitelists and HTTPS.
+
+## Rules & Patterns
 
 ## OWASP Top 10
 

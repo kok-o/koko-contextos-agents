@@ -10,10 +10,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: node.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## Node.js — Best Practices
+1. **NEVER execute synchronous filesystem/crypto calls in request handlers (`fs.readFileSync`)**: Always use async promises (`fs.promises.*`) to avoid blocking the event loop.
+2. **NEVER leave uncaught promise rejections**: Every async route must use `express-async-errors` or wrap operations in try/catch calling `next(err)`.
+3. **NEVER buffer large files/payloads entirely in memory (`fs.readFile`)**: Always use Streams or Pipelines (`stream.pipeline`) for processing large files.
+4. **NEVER store in-memory session or user state on a single process instance**: Use Redis or an external state store to allow multi-instance scaling.
+5. **NEVER ignore `SIGTERM` / `SIGINT` shutdown signals**: Always implement graceful shutdown to close open DB pools and drain active HTTP connections.
+
+## Rules & Patterns
 
 ## Architecture
 
@@ -118,3 +123,80 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# Node.js Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Graceful Process Shutdown
+
+### ❌ Anti-pattern (Abruptly killing process and dropping in-flight requests)
+```javascript
+// BAD: drops active database transactions and in-flight HTTP connections
+process.on('SIGTERM', () => {
+  process.exit(0);
+});
+```
+
+### ✅ ContextOS Standard (Graceful connection draining)
+```typescript
+// GOOD: drains active requests, closes database connections, and exits safely
+import http from 'http';
+import { prisma } from './db';
+import { logger } from './logger';
+
+export function setupGracefulShutdown(server: http.Server) {
+  const shutdown = async (signal: string) => {
+    logger.info(`Received ${signal}. Starting graceful shutdown...`);
+    
+    server.close(async () => {
+      logger.info('HTTP server closed.');
+      try {
+        await prisma.$disconnect();
+        logger.info('Database pool closed.');
+        process.exit(0);
+      } catch (err) {
+        logger.error('Error during database disconnect:', err);
+        process.exit(1);
+      }
+    });
+
+    // Force shutdown after timeout if connections hang
+    setTimeout(() => {
+      logger.error('Forceful shutdown timeout reached.');
+      process.exit(1);
+    }, 10_000).unref();
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+}
+```
+
+---
+
+## Example 2: Stream-based File Processing
+
+### ❌ Anti-pattern (Loading entire 500MB file into buffer)
+```typescript
+// BAD: easily causes Out Of Memory (OOM) crashes under concurrency
+app.get('/download/:file', async (req, res) => {
+  const data = await fs.promises.readFile(`/uploads/${req.params.file}`);
+  res.send(data);
+});
+```
+
+### ✅ ContextOS Standard (Piping read stream with pipeline)
+```typescript
+// GOOD: constant memory usage (O(1) RAM) regardless of file size
+import fs from 'fs';
+import { pipeline } from 'stream/promises';
+
+app.get('/download/:file', async (req, res, next) => {
+  try {
+    const filePath = `/uploads/${req.params.file}`;
+    const readStream = fs.createReadStream(filePath);
+    await pipeline(readStream, res);
+  } catch (err) {
+    next(err);
+  }
+});
+```

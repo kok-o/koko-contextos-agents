@@ -10,10 +10,15 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## Rules & Patterns
-<!-- Source: react.md -->
+## 🚫 Negative Constraints (What NOT to Do)
 
-## React — Best Practices
+1. **NEVER use `useEffect` for derived/calculated state**: Calculate values inline during render or use `useMemo` if computationally expensive.
+2. **NEVER use array index as `key` in dynamic/mutable lists**: Always use stable, unique entity IDs (`user.id`, `item.id`).
+3. **NEVER mutate React state directly**: Always return new immutable copies (`[...prev, newItem]` or `{ ...prev, key: value }`).
+4. **NEVER declare components inside other components**: Always declare subcomponents at the top-level module scope to avoid re-mounting on every render.
+5. **NEVER omit cleanup functions in `useEffect` with event listeners or timers**: Always return a cleanup function (`return () => clearTimeout(timer)`).
+
+## Rules & Patterns
 
 ## Component Architecture
 
@@ -124,3 +129,79 @@ Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
 
 How this skill interacts with other skills.
 
+
+# React Examples — Anti-patterns vs ContextOS Standard
+
+## Example 1: Derived State vs. useEffect
+
+### ❌ Anti-pattern (Redundant state + extra render with useEffect)
+```tsx
+// BAD: causes an unnecessary extra render cycle and potential state desync
+function OrderSummary({ items }: { items: CartItem[] }) {
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const calculated = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    setTotal(calculated);
+  }, [items]);
+
+  return <div>Total: ${total}</div>;
+}
+```
+
+### ✅ ContextOS Standard (Inline derived calculation / useMemo)
+```tsx
+// GOOD: calculated instantly during render with zero extra render pass
+function OrderSummary({ items }: { items: CartItem[] }) {
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
+
+  return <div>Total: ${total.toFixed(2)}</div>;
+}
+```
+
+---
+
+## Example 2: Custom Hook Encapsulation
+
+### ❌ Anti-pattern (Scattered listener logic inside component)
+```tsx
+// BAD: window listener logic cluttering UI component
+function NavHeader() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  return <header className={isScrolled ? 'scrolled' : ''}>Header</header>;
+}
+```
+
+### ✅ ContextOS Standard (Reusable Custom Hook)
+```tsx
+// GOOD: extracted into a reusable, testable custom hook
+export function useScrollThreshold(threshold = 50): boolean {
+  const [isPassed, setIsPassed] = useState(() => typeof window !== 'undefined' && window.scrollY > threshold);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setIsPassed(window.scrollY > threshold);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [threshold]);
+
+  return isPassed;
+}
+```

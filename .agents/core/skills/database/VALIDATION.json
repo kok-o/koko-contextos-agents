@@ -1,0 +1,11 @@
+{
+  "skill": "database",
+  "version": "1.0.0",
+  "checks": [
+    "No SELECT * in application queries",
+    "All foreign keys indexed",
+    "Multi-table writes enclosed in database transactions",
+    "No N+1 queries in loops",
+    "Safe expand-and-contract migration strategy"
+  ]
+}
