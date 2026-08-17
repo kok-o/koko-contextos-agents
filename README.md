@@ -228,6 +228,7 @@ node benchmarks/run-live-benchmark.js --base-url "https://agentrouter.org/v1" --
 ### Evaluation Methodology
 
 Submissions are evaluated using a two-tier verification pipeline:
+
 1. **Deterministic Static Analysis (60% weight):** Automated AST and regex invariant validation checking for cryptographic safety (`timingSafeEqual`), brute-force rate-limiting, zero stack-trace leakage in HTTP 500 responses, ARIA dialog compliance, and absence of anti-patterns.
 2. **Architecture Review Judge (40% weight):** Impartial Principal Architect review evaluating domain boundaries, error taxonomy, state-machine integrity, and edge-case handling.
 
@@ -244,6 +245,7 @@ Submissions are evaluated using a two-tier verification pipeline:
 ### Artifacts and Reports
 
 Every benchmark execution generates the following artifacts:
+
 - **Interactive HTML Dashboard** (`benchmarks/results/report-latest.html`): Side-by-side split code viewer with static checklist badges.
 - **Markdown Report** (`benchmarks/results/report-latest.md`): Exportable summary for pull requests and CI/CD pipelines.
 - **JSON Data Export** (`benchmarks/results/report-*.json`): Machine-readable results and timing metrics.

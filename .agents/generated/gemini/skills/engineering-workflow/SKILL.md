@@ -254,6 +254,7 @@ Review before merging. Always.
 **UI/Design** (if applicable — activate `impeccable-design` skill checklist)
 
 - [ ] Passes impeccable-design Quick Audit (typography, colors, spacing, animations)
+
 ---
 
 ## Command Workflows
@@ -275,6 +276,7 @@ Review before merging. Always.
 ### Auto-activates → `[ROLE: Staff Engineer]` (Ponytail Mindset)
 
 Before merging, ruthlessly simplify:
+
 1. Did we introduce abstractions that are only used once? (Inline them).
 2. Can 3 lines of vanilla JavaScript replace a 50-line custom utility?
 3. Is any configuration or generic handler premature? (YAGNI).
