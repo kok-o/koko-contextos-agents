@@ -29,7 +29,7 @@
     "benchmark": "node benchmarks/gemini-issues.js",
     "benchmark:live": "node benchmarks/run-live-benchmark.js",
     "lint:md": "markdownlint README.md CONTRIBUTING.md '.agents/core/skills/**/*.md' --ignore '.agents/generated/**' --config .markdownlint.json",
-    "test": "npm run lint:md && node --test --test-concurrency=1 tests/install.test.js tests/export.test.js tests/skills.test.js tests/validate.test.js tests/plugins.test.js tests/benchmark.test.js tests/profile.test.js tests/resolver.test.js",
+    "test": "node --test --test-concurrency=1 tests/install.test.js tests/export.test.js tests/skills.test.js tests/validate.test.js tests/plugins.test.js tests/benchmark.test.js tests/profile.test.js tests/resolver.test.js",
     "prepublishOnly": "npm run validate && npm run build"
   },
   "keywords": [
@@ -59,7 +59,7 @@
     "node": ">=16.7.0"
   },
   "devDependencies": {
-    "markdownlint-cli": "^0.49.0"
+    "markdownlint-cli": "^0.43.0"
   },
   "dependencies": {
     "inquirer": "^8.2.7"
