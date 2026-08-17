@@ -191,10 +191,10 @@ src/
 
 ## Anti-Patterns
 
-- ❌ Anemic domain model — entities with only getters/setters, all logic in services
-- ❌ Big aggregate — aggregates should be small, focused on invariants
-- ❌ Cross-aggregate transactions — use eventual consistency
-- ❌ DDD everywhere — use DDD only where complexity justifies it
+- [FAIL] Anemic domain model — entities with only getters/setters, all logic in services
+- [FAIL] Big aggregate — aggregates should be small, focused on invariants
+- [FAIL] Cross-aggregate transactions — use eventual consistency
+- [FAIL] DDD everywhere — use DDD only where complexity justifies it
 
 
 ## Code Examples

@@ -15,12 +15,12 @@ Activate when managing asynchronous server data fetching/caching, optimistic UI 
 
 ## Rules & Patterns
 
-### 🎯 The Rule of Two States
+### The Rule of Two States
 
 - **SERVER STATE (Async)**: Managed exclusively by TanStack Query (`useQuery`, `useMutation`). Caching, background refetching, pagination, and invalidation.
 - **CLIENT STATE (Sync)**: Managed by Zustand. Modal visibility, active filters, wizard step, theme.
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER store server-fetched data in Zustand or Redux stores**: Store ONLY client-local UI state in Zustand. All API data belongs in TanStack Query.
 2. **NEVER duplicate derived state**: Compute values inline or via `useMemo` from existing state instead of storing redundant state variables.
@@ -54,7 +54,7 @@ Interacts with `react`, `nextjs`, and `typescript`.
 
 ## Example 1: Selecting State from Zustand
 
-### ❌ Anti-pattern (Subscribing to full store causes unnecessary renders)
+### Anti-pattern: Anti-pattern (Subscribing to full store causes unnecessary renders)
 
 ```typescript
 // BAD: component re-renders whenever ANY property in the store changes!
@@ -64,7 +64,7 @@ function CartBadge() {
 }
 ```
 
-### ✅ ContextOS Standard (Atomic granular selector)
+### Best practice: ContextOS Standard (Atomic granular selector)
 
 ```typescript
 // GOOD: component ONLY re-renders when itemCount changes
@@ -78,7 +78,7 @@ function CartBadge() {
 
 ## Example 2: Server State Invalidation
 
-### ❌ Anti-pattern (Manually syncing server data into global state with useEffect)
+### Anti-pattern: Anti-pattern (Manually syncing server data into global state with useEffect)
 
 ```typescript
 // BAD: manual sync, race conditions, stale cache bugs
@@ -90,7 +90,7 @@ function UserProfile({ userId }) {
 }
 ```
 
-### ✅ ContextOS Standard (Declarative TanStack Query caching)
+### Best practice: ContextOS Standard (Declarative TanStack Query caching)
 
 ```typescript
 // GOOD: automatic caching, deduplication, background revalidation

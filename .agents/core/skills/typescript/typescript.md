@@ -64,8 +64,8 @@ interface Repository<T extends { id: string }> {
 
 ## Anti-Patterns
 
-- ❌ `any` — use `unknown` + type guards
-- ❌ Type assertions (`as`) — prefer type guards
-- ❌ Non-null assertions (`!`) — handle null explicitly
-- ❌ Enums — prefer union types or `as const` objects
-- ❌ Complex generics without JSDoc — document intent
+- [FAIL] `any` — use `unknown` + type guards
+- [FAIL] Type assertions (`as`) — prefer type guards
+- [FAIL] Non-null assertions (`!`) — handle null explicitly
+- [FAIL] Enums — prefer union types or `as const` objects
+- [FAIL] Complex generics without JSDoc — document intent

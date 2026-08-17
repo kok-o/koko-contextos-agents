@@ -15,7 +15,7 @@ Activate for any task involving unit tests, integration tests, E2E testing, TDD/
 
 ## Rules & Patterns
 
-### 🏛️ The ContextOS Testing Pyramid
+### ️ The ContextOS Testing Pyramid
 
 ```
       /\
@@ -27,7 +27,7 @@ Activate for any task involving unit tests, integration tests, E2E testing, TDD/
 /-------------\
 ```
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER mock internal implementation details**: Mock ONLY external I/O boundaries (HTTP network requests via MSW, Database via test containers or in-memory DB).
 2. **NEVER test implementation details**: In React Testing Library, query by user-facing roles (`getByRole`, `getByLabelText`), NEVER by CSS selectors or internal component state.

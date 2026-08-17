@@ -14,7 +14,7 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
 1. **NEVER use `any`**: Use `unknown` with type guards, discriminated unions, or Zod schemas.
 2. **NEVER use type assertions (`as Type` or `as unknown as Type`) to bypass safety**: Fix the underlying type signature or use runtime narrowing (`instanceof`, `typeof`, `in`).
@@ -88,11 +88,11 @@ interface Repository<T extends { id: string }> {
 
 ## Anti-Patterns
 
-- ❌ `any` — use `unknown` + type guards
-- ❌ Type assertions (`as`) — prefer type guards
-- ❌ Non-null assertions (`!`) — handle null explicitly
-- ❌ Enums — prefer union types or `as const` objects
-- ❌ Complex generics without JSDoc — document intent
+- [FAIL] `any` — use `unknown` + type guards
+- [FAIL] Type assertions (`as`) — prefer type guards
+- [FAIL] Non-null assertions (`!`) — handle null explicitly
+- [FAIL] Enums — prefer union types or `as const` objects
+- [FAIL] Complex generics without JSDoc — document intent
 
 
 ## Code Examples

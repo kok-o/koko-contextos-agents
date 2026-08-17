@@ -69,40 +69,76 @@ node .agents/ctx.js export all
 
 - **AGENTS.md** — The core ruleset. Automatically routes skills by task type and technology detected in your codebase.
 
-### Skills (24 total)
+### Skills (28 total)
 
 | Category | Skill | What It Does |
 | ---------- | ------- | ------------- |
 | Core | `gstack-roles` | 23 specialist roles (PM, Architect, QA Lead, etc.) — AI declares its role before each task |
-| Core | `engineering-workflow` | Enforces DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP pipeline. No code before spec is approved. |
-| Core | `ponytail-mindset` | 7-rung decision ladder before writing any code. Reduces code output ~54%. |
+| Core | `engineering-workflow` | Enforces DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP pipeline and slash commands |
+| Core | `ponytail-mindset` | 7-rung decision ladder before writing any code. Reduces code output ~54% |
 | Frontend | `ui-ux-pro` | Planning guide for UI: color systems, typography, Framer Motion, shadcn/ui patterns |
 | Frontend | `impeccable-design` | 50 deterministic QA rules for design review (typography, color, layout, animation) |
-| Frontend | `react` | React component patterns |
-| Frontend | `nextjs` | Next.js App Router, Server Actions, routing |
-| Frontend | `typescript` | Type-safe code, generics, config |
+| Frontend | `react` | Modern React 19, concurrency, state colocation, `useOptimistic`, and render optimization |
+| Frontend | `nextjs` | Next.js App Router, RSC, `React.cache()`, Server Actions, and bundle optimization |
+| Frontend | `typescript` | Type-safe code, generics, config, and invariant type assertions |
 | Frontend | `ui-design` | Component library design, design tokens |
 | Frontend | `ux-design` | User flow design, interaction patterns |
-| Frontend | `web-accessibility` | ARIA, WCAG compliance |
+| Frontend | `web-accessibility` | ARIA dialogs, focus traps, WCAG 2.1 compliance, and `:focus-visible` standards |
 | Backend | `system-design` | Pre-design checklist, Serverless/Edge patterns, BFF/Server Actions, DDD isolation |
+| Backend | `database` | Schema design, PostgreSQL indexing, Prisma/Drizzle ORMs, transactions, and N+1 prevention |
 | Backend | `node` | Node.js server patterns |
 | Backend | `fastapi` | FastAPI / Python backend |
 | Backend | `nestjs` | NestJS framework |
 | Backend | `microservices` | Service decomposition, bounded contexts |
-| Backend | `ddd` | Domain-Driven Design, domain modeling |
-| Cross | `security` | Auth patterns, input validation, SQL injection prevention |
-| Cross | `performance` | Core Web Vitals, optimization strategies |
+| Backend | `ddd` | Domain-Driven Design, domain modeling, and aggregate invariants |
+| Cross | `security` | Auth patterns, timing attack prevention, input validation, SQL injection prevention |
+| Cross | `performance` | Core Web Vitals, waterfall elimination, and layout stability |
+| Cross | `testing` | Vitest, React Testing Library behavior testing, and Playwright E2E suites |
+| Cross | `docker` | Multi-stage Dockerfiles, non-root security, and container standards |
 | Cross | `decisions` | Architectural decision records format |
 | Cross | `adapters` | System integration patterns |
 | Cross | `generators` | Code generation patterns |
 | Cross | `context-manager` | Context loading optimization |
 | Cross | `context-os` | ContextOS meta-skill |
 
-## CLI — Context Compiler (`ctx.js`)
+## Slash Command Workflows
 
-The `.agents/ctx.js` file is the **Context Compiler** — a local CLI tool that reads skills from `core/skills/` and generates agent-ready rules for specific AI platforms.
+ContextOS maps development phases directly to slash commands in your AI chat:
 
-### Supported Agents
+| Command | Role Activated | What It Does |
+|:---|:---|:---|
+| `/spec` | Product Manager | Turn vague ideas into structured requirements and acceptance criteria |
+| `/plan` | Architect | Decompose the spec into atomic, testable tasks (< 2 hours each) |
+| `/build` | Senior Developer | Implement code task-by-task with TDD and minimal blast radius |
+| `/test` | QA Lead | Run unit, integration, and E2E behavioral tests covering edge cases |
+| `/simplify` | Staff Engineer | Run the Ponytail 7-rung ladder to strip over-engineering and dead abstractions |
+| `/review` | Staff Engineer + Designer | 5-axis quality gate (correctness, architecture, security, performance, design) |
+| `/ship` | Release Engineer | Verify clean CI, lint checks, docs, and rollback plan before merging |
+
+## Dynamic Skill Resolution & CLI (`ctx.js`)
+
+The `.agents/ctx.js` file is the **Context Engine** — it resolves minimal skills on the fly and compiles exports for AI assistants.
+
+### Dynamic Skill Resolution (`resolve` & `index`)
+
+To prevent context bloat, ContextOS dynamically resolves the exact 2–4 skills needed for any prompt or file:
+
+```bash
+# Resolve skills for a task description:
+node .agents/ctx.js resolve "Build an accessible modal component with React and Tailwind"
+
+# Output:
+# [DOMAIN: Frontend] [PHASE: Build] [ROLE: Senior Developer]
+# Skills loaded: ponytail-mindset, engineering-workflow, react, ui-ux-pro, web-accessibility
+
+# Resolve skills based on active files:
+node .agents/ctx.js resolve --files "app/api/auth/route.ts"
+
+# Generate/update progressive lightweight skills index:
+node .agents/ctx.js index
+```
+
+### Supported Agents & Compilation
 
 | Agent | Command | Output Format |
 |-------|---------|---------------|
@@ -112,8 +148,6 @@ The `.agents/ctx.js` file is the **Context Compiler** — a local CLI tool that 
 | **GitHub Copilot** | `export copilot` | `.github/copilot-instructions.md` |
 | **Aider** | `export aider` | `.aider.conf.yml` + `CONVENTIONS.md` |
 | **Zed IDE** | `export zed` | `.zed/rules.md` + `.zed/prompts/*.md` |
-
-### Available Commands
 
 ```bash
 node .agents/ctx.js export all       # Compile for all agents
@@ -149,9 +183,9 @@ npm test
 ```
 
 ```text
-# tests 94
-# suites 22
-# pass  94
+# tests 109
+# suites 25
+# pass  109
 # fail  0
 ```
 
@@ -163,38 +197,56 @@ npm test
 - `tests/profile.test.js` — profile resolution, stack auto-detection, and skill filtering
 - `tests/validate.test.js` — validator rules, dependency graph, and sync checks
 - `tests/plugins.test.js` — plugin lockfile, registry fetching, and security checks
+- `tests/resolver.test.js` — dynamic skill resolution, progressive index, and prompt matching
+- `tests/benchmark.test.js` — benchmark scoring engine, static AST checks, and reporters
 
 ## Benchmark: With Skills vs. Without Skills
 
-The repository includes a paired, reproducible code-quality benchmark running across **20 real, closed GitHub Issues** with linked merged pull requests:
+The repository includes a paired, reproducible code-quality benchmark suite supporting OpenAI (GPT-4o, GPT-5, o1, o3-mini), Google Gemini, Anthropic Claude, and custom gateways (AgentRouter, OpenRouter).
 
-### Benchmark Summary (Gemini 3 Flash & Issue Suites)
+The benchmark evaluates real-world code quality, security vulnerabilities, timing attacks, ARIA accessibility contracts, DDD business invariants, and error isolation between baseline LLMs and ContextOS-assisted agents.
 
-| Benchmark Metric | Without Skills (Baseline) | With ContextOS Skills | Delta / Impact |
-|:---|:---:|:---:|:---:|
-| **Security & Auth Score (Task 1)** | 80/100 | **96/100** | **+16 pts** |
-| **Concurrency & Async Queue (Task 5)** | 75/100 | **95/100** | **+20 pts** |
-| **Overall Production Quality** | 80.0% Pass | **88.2 / 100** | **Strict Invariants Enforced** |
-| **Token Bloat Reduction** | Baseline (100%) | **~46% of baseline** | **-54% tokens saved** |
-| **Turns to Resolution (20 GitHub Issues)** | 5.1 turns | **3.2 turns** | **-37% fewer turns** |
-
-### Running the Benchmark
+### Live Benchmark Execution
 
 ```bash
-# Run live paired engineering benchmark on Gemini 3 Flash:
-set GEMINI_API_KEY=...     # PowerShell: $env:GEMINI_API_KEY = "..."
-node benchmarks/run-live-benchmark.js
+# 1. Run live benchmark with OpenAI (GPT-4o, GPT-5, o3-mini):
+set OPENAI_API_KEY=sk-...    # PowerShell: $env:OPENAI_API_KEY = "sk-..."
+npm run benchmark:live -- --provider openai --model gpt-4o
 
-# Or run full GitHub issues paired benchmark:
-set GITHUB_TOKEN=...       # PowerShell: $env:GITHUB_TOKEN = "..."
-node benchmarks/gemini-issues.js --allow-commands
+# 2. Run live benchmark with Google Gemini:
+set GEMINI_API_KEY=...       # PowerShell: $env:GEMINI_API_KEY = "..."
+npm run benchmark:live -- --provider gemini --model gemini-2.5-flash
+
+# 3. Run live benchmark with Anthropic Claude:
+set ANTHROPIC_API_KEY=...    # PowerShell: $env:ANTHROPIC_API_KEY = "..."
+npm run benchmark:live -- --provider anthropic --model claude-3-7-sonnet-20250219
+
+# 4. Run with custom OpenAI-compatible router (OpenRouter, AgentRouter, Local vLLM):
+node benchmarks/run-live-benchmark.js --base-url "https://agentrouter.org/v1" --api-key "sk-..." --model "gpt-5.6-sol" --open
 ```
 
-Use `--dry-run` to discover and validate tasks without calling Gemini:
+### Evaluation Methodology
 
-```bash
-node benchmarks/gemini-issues.js --dry-run
-```
+Submissions are evaluated using a two-tier verification pipeline:
+1. **Deterministic Static Analysis (60% weight):** Automated AST and regex invariant validation checking for cryptographic safety (`timingSafeEqual`), brute-force rate-limiting, zero stack-trace leakage in HTTP 500 responses, ARIA dialog compliance, and absence of anti-patterns.
+2. **Architecture Review Judge (40% weight):** Impartial Principal Architect review evaluating domain boundaries, error taxonomy, state-machine integrity, and edge-case handling.
+
+### Live Benchmark Results (`gpt-5.6-sol`)
+
+| Category | Benchmark Scenario | Vanilla LLM | With ContextOS | Delta | Key Enforced Technical Invariants |
+|---|:---|:---:|:---:|:---:|---|
+| **Security & Backend** | Secure Auth & Rate Limiting | 67 / 100 | **77 / 100** | **+10 pts** | Timing-safe crypto comparisons (`timingSafeEqual`), bounded Redis brute-force rate-limiting, error stack redaction |
+| **UI/UX & Accessibility** | Accessible Modal & Focus Trap | 77 / 100 | **94 / 100** | **+17 pts** | Full ARIA dialog contracts, bidirectional Tab/Shift-Tab focus wrap, `createPortal` mounting, unmount focus restore |
+| **Architecture & DDD** | DDD Order Invariants & Value Objects | 69 / 100 | **73 / 100** | **+4 pts** | Immutable `Money`/`OrderId` Value Objects, domain events collection, zero ORM/HTTP transport leakage in domain |
+| **TypeScript & Reliability** | Type-Safe Resilient API Client | 67 / 100 | **69 / 100** | **+2 pts** | Generic `Promise<T>`, runtime schema assertion, secret-redacting error taxonomy, AbortController timeouts |
+| **Systems & Performance** | Async Queue & Circuit Breaker | Evaluated | **Verified** | **Invariant Pass** | Strict concurrency bounding, `CLOSED/OPEN/HALF-OPEN` states, exponential backoff with full jitter |
+
+### Artifacts and Reports
+
+Every benchmark execution generates the following artifacts:
+- **Interactive HTML Dashboard** (`benchmarks/results/report-latest.html`): Side-by-side split code viewer with static checklist badges.
+- **Markdown Report** (`benchmarks/results/report-latest.md`): Exportable summary for pull requests and CI/CD pipelines.
+- **JSON Data Export** (`benchmarks/results/report-*.json`): Machine-readable results and timing metrics.
 
 ## Contributing
 

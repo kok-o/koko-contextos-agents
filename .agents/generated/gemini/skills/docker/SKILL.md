@@ -15,7 +15,7 @@ Activate when creating or optimizing Dockerfiles, docker-compose configurations,
 
 ## Rules & Patterns
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER run containers as `root` in production**: Always create and switch to an unprivileged non-root user (e.g. `USER node` or `USER nonroot`).
 2. **NEVER use the `latest` tag**: Always pin base images to specific immutable version digests or explicit minor tags (e.g. `node:20.12.2-alpine3.19`).
@@ -69,7 +69,7 @@ Interacts with `security` (container hardening) and `node` / `nextjs` / `fastapi
 
 ## Example 1: Multi-Stage Build & Layer Caching
 
-### ❌ Anti-pattern (Fat single-stage image running as root)
+### Anti-pattern: Anti-pattern (Fat single-stage image running as root)
 
 ```dockerfile
 # BAD: 1.2GB image, runs as root, breaks caching on every file edit
@@ -82,7 +82,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-### ✅ ContextOS Standard (Slim multi-stage build with non-root user)
+### Best practice: ContextOS Standard (Slim multi-stage build with non-root user)
 
 ```dockerfile
 # GOOD: 95MB image, non-root user, optimized layer caching
@@ -107,7 +107,7 @@ CMD ["node", "dist/main.js"]
 
 ## Example 2: Docker Ignore File (`.dockerignore`)
 
-### ✅ ContextOS Standard `.dockerignore`
+### Best practice: ContextOS Standard `.dockerignore`
 
 ```gitignore
 node_modules

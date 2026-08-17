@@ -110,11 +110,11 @@ async def test_create_user(client: AsyncClient):
 
 ## Anti-Patterns
 
-- ❌ Business logic in route handlers — use services
-- ❌ Raw SQL without ORM — use SQLAlchemy
-- ❌ Sync database calls — use async drivers
-- ❌ Hardcoded settings — use Pydantic BaseSettings
-- ❌ No schema validation — always use Pydantic models
+- [FAIL] Business logic in route handlers — use services
+- [FAIL] Raw SQL without ORM — use SQLAlchemy
+- [FAIL] Sync database calls — use async drivers
+- [FAIL] Hardcoded settings — use Pydantic BaseSettings
+- [FAIL] No schema validation — always use Pydantic models
 
 
 <!-- Source: SKILL.md -->
@@ -245,11 +245,11 @@ async def test_create_user(client: AsyncClient):
 
 ## Anti-Patterns
 
-- ❌ Business logic in route handlers — use services
-- ❌ Raw SQL without ORM — use SQLAlchemy
-- ❌ Sync database calls — use async drivers
-- ❌ Hardcoded settings — use Pydantic BaseSettings
-- ❌ No schema validation — always use Pydantic models
+- [FAIL] Business logic in route handlers — use services
+- [FAIL] Raw SQL without ORM — use SQLAlchemy
+- [FAIL] Sync database calls — use async drivers
+- [FAIL] Hardcoded settings — use Pydantic BaseSettings
+- [FAIL] No schema validation — always use Pydantic models
 
 
 ## Code Examples

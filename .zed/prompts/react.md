@@ -1,140 +1,138 @@
 # ContextOS — React
 
-# React
+# React Engineering & Performance Best Practices
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces declarative, component-driven UI architecture with optimal re-render cycles, state colocation, responsive optimistic updates, and robust accessibility standards.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever creating, refactoring, or optimizing React functional components, custom hooks, context providers, or UI interaction states.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
-1. **NEVER use `useEffect` for derived/calculated state**: Calculate values inline during render or use `useMemo` if computationally expensive.
-2. **NEVER use array index as `key` in dynamic/mutable lists**: Always use stable, unique entity IDs (`user.id`, `item.id`).
-3. **NEVER mutate React state directly**: Always return new immutable copies (`[...prev, newItem]` or `{ ...prev, key: value }`).
-4. **NEVER declare components inside other components**: Always declare subcomponents at the top-level module scope to avoid re-mounting on every render.
-5. **NEVER omit cleanup functions in `useEffect` with event listeners or timers**: Always return a cleanup function (`return () => clearTimeout(timer)`).
+1. **NEVER use `useEffect` to synchronize or compute derived state**: Calculate derived state inline during render. Use `useMemo` only for computationally intensive derivations.
+2. **NEVER use array indices as `key` props on dynamic or reorderable lists**: Always use stable, unique entity identifiers (`item.id`).
+3. **NEVER mutate React state directly**: Always return new immutable references (`[...prev, newItem]` or `{ ...prev, key: value }`).
+4. **NEVER declare subcomponents inside the render body of parent components**: Declare components at module scope or in dedicated files to prevent DOM node remounting and lost focus state.
+5. **NEVER create memory leaks in `useEffect`**: Always provide clean-up functions for event listeners, `AbortController`, timers, and websocket subscriptions.
+6. **NEVER lift state higher than necessary**: Colocate state to the nearest common ancestor or leaf component to prevent wasteful re-renders of unrelated subtrees.
 
 ## Rules & Patterns
 
-## Component Architecture
+### 1. State Colocation & Re-render Optimization
 
-- **Prefer function components** with hooks over class components
-- **One component per file** — name file same as component
-- **Composition over inheritance** — use children and render props
-- **Keep components small** — if > 150 lines, split it
-
-## Hooks
-
-- **useState** for local state, **useReducer** for complex state
-- **useEffect** — always specify dependencies, clean up subscriptions
-- **Custom hooks** — extract reusable logic into `use*` functions
-- **useMemo/useCallback** — only when you have measured a performance problem
-
-## State Management
-
-- **Local state first** — don't reach for global state until you need it
-- **Lift state up** — find the closest common ancestor
-- **Context** — for cross-cutting concerns (theme, auth, locale)
-- **External store** (Zustand, Jotai) — for truly global, frequently updated state
-
-## Patterns
-
-### Container/Presenter
+- **State Colocation**: Keep state as close as possible to the components that consume it.
+- **Composition to Prevent Re-renders**: Pass expensive static subtrees as `children` to wrapper components holding state so the children do not re-render when the wrapper updates.
 
 ```tsx
-// Container — handles logic
-function UserListContainer() {
-  const users = useUsers();
-  return <UserList users={users} />;
+export function ExpandableCard({ title, children }: { title: string; children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border p-4">
+      <button 
+        type="button"
+        onClick={() => setIsOpen(v => !v)}
+        className="flex w-full justify-between font-semibold"
+        aria-expanded={isOpen}
+      >
+        <span>{title}</span>
+        <span>{isOpen ? '−' : '+'}</span>
+      </button>
+      {isOpen && <div className="mt-3 pt-3 border-t">{children}</div>}
+    </div>
+  );
 }
+```
 
-// Presenter — handles display
-function UserList({ users }: { users: User[] }) {
-  return <ul>{users.map(u => <UserItem key={u.id} user={u} />)}</ul>;
+### 2. Optimistic UI Updates & Concurrent Actions (`useOptimistic`, `useTransition`)
+
+- Provide instantaneous visual feedback for user actions without waiting for server network roundtrips.
+
+```tsx
+import { useOptimistic, useTransition } from 'react';
+
+export function TodoList({ todos, onAdd }: { todos: Todo[]; onAdd: (text: string) => Promise<void> }) {
+  const [isPending, startTransition] = useTransition();
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    todos,
+    (state, newText: string) => [...state, { id: 'temp-' + Date.now(), text: newText, isPending: true }]
+  );
+
+  const handleAction = async (formData: FormData) => {
+    const text = formData.get('todo') as string;
+    if (!text?.trim()) return;
+
+    startTransition(async () => {
+      addOptimisticTodo(text);
+      await onAdd(text);
+    });
+  };
+
+  return (
+    <form action={handleAction} className="space-y-4">
+      <input name="todo" placeholder="Add a new task..." className="border p-2 rounded" />
+      <button type="submit" disabled={isPending} className="bg-primary text-white px-4 py-2 rounded">
+        {isPending ? 'Saving...' : 'Add'}
+      </button>
+      <ul className="divide-y">
+        {optimisticTodos.map(todo => (
+          <li key={todo.id} className={todo.isPending ? 'opacity-50 italic' : ''}>
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </form>
+  );
 }
 ```
 
-### Error Boundaries
+### 3. Derived State vs. Effects Anti-Pattern
 
-- Wrap major sections in Error Boundaries
-- Provide meaningful fallback UI
-- Log errors to monitoring service
+```tsx
+// [GOOD] Computed directly during render (or memoized if expensive)
+function SearchResults({ query, items }: { query: string; items: Item[] }) {
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter(i => i.title.toLowerCase().includes(q));
+  }, [query, items]);
 
-### Loading States
-
-- Always handle: `loading`, `error`, `empty`, `data` states
-- Use Suspense where supported
-- Show skeleton screens, not spinners
-
-## Performance
-
-- **React.memo** — only for expensive renders with stable props
-- **Code splitting** — lazy load routes and heavy components
-- **Virtualization** — for lists > 100 items
-- **Image optimization** — use next/image or lazy loading
-- **Avoid** — inline object/array creation in JSX props
-
-## Anti-Patterns (Avoid)
-
-- ❌ Props drilling more than 2 levels — use Context or state management
-- ❌ useEffect for derived state — use useMemo instead
-- ❌ Index as key — use stable unique IDs
-- ❌ Mutating state directly — always create new references
-- ❌ God components — split into smaller, focused components
-- ❌ Business logic in components — extract to hooks or services
-
-## Testing
-
-- **React Testing Library** — test behavior, not implementation
-- Test user interactions, not component internals
-- Mock API calls, not React hooks
-- Use `screen.getByRole` over `getByTestId`
-
-## File Structure
-
+  return <List items={filtered} />;
+}
 ```
-components/
-  Button/
-    Button.tsx
-    Button.test.tsx
-    Button.module.css
-    index.ts
-hooks/
-  useAuth.ts
-  useDebounce.ts
-services/
-  api.ts
-types/
-  user.ts
-```
-
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed code examples and hook implementations.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] Zero `useEffect` hooks used for derived calculations.
+- [ ] Every list mapping has a unique, non-index entity ID key.
+- [ ] Subcomponents declared in parent render functions are extracted to top-level scope.
+- [ ] Effects with event listeners, timers, or abortable requests include clean-up returns.
+- [ ] Reusable components are composed cleanly via `children` or render props.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Setting state inside `useEffect` based on prop changes rather than deriving values inline.
+- Declaring nested components within component bodies.
+- Using index keys causing input focus loss or animations breaking on list mutations.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `typescript` for type safety on props, generics, and ref forwarding.
+- Pairs with `ui-ux-pro` and `web-accessibility` for UI tokens and ARIA standards.
 
 
 # React Examples — Anti-patterns vs ContextOS Standard
 
 ## Example 1: Derived State vs. useEffect
 
-### ❌ Anti-pattern (Redundant state + extra render with useEffect)
+### Anti-pattern: Anti-pattern (Redundant state + extra render with useEffect)
 
 ```tsx
 // BAD: causes an unnecessary extra render cycle and potential state desync
@@ -150,7 +148,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 }
 ```
 
-### ✅ ContextOS Standard (Inline derived calculation / useMemo)
+### Best practice: ContextOS Standard (Inline derived calculation / useMemo)
 
 ```tsx
 // GOOD: calculated instantly during render with zero extra render pass
@@ -168,7 +166,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 
 ## Example 2: Custom Hook Encapsulation
 
-### ❌ Anti-pattern (Scattered listener logic inside component)
+### Anti-pattern: Anti-pattern (Scattered listener logic inside component)
 
 ```tsx
 // BAD: window listener logic cluttering UI component
@@ -183,7 +181,7 @@ function NavHeader() {
 }
 ```
 
-### ✅ ContextOS Standard (Reusable Custom Hook)
+### Best practice: ContextOS Standard (Reusable Custom Hook)
 
 ```tsx
 // GOOD: extracted into a reusable, testable custom hook

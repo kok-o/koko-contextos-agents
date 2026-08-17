@@ -15,12 +15,12 @@ Activate when managing asynchronous server data fetching/caching, optimistic UI 
 
 ## Rules & Patterns
 
-### 🎯 The Rule of Two States
+### The Rule of Two States
 
 - **SERVER STATE (Async)**: Managed exclusively by TanStack Query (`useQuery`, `useMutation`). Caching, background refetching, pagination, and invalidation.
 - **CLIENT STATE (Sync)**: Managed by Zustand. Modal visibility, active filters, wizard step, theme.
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER store server-fetched data in Zustand or Redux stores**: Store ONLY client-local UI state in Zustand. All API data belongs in TanStack Query.
 2. **NEVER duplicate derived state**: Compute values inline or via `useMemo` from existing state instead of storing redundant state variables.

@@ -1,85 +1,72 @@
 # ContextOS — Web Performance
 
-# Web Performance
+# Web Performance & Core Web Vitals
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces high-efficiency frontend and full-stack performance standards to achieve exceptional Core Web Vitals: Largest Contentful Paint (LCP < 2.5s), Interaction to Next Paint (INP < 200ms), and Cumulative Layout Shift (CLS < 0.1).
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever analyzing, profiling, writing, or optimizing page loading speeds, network waterfalls, script bundling, animation frame rates, or data caching.
+
+## Negative Constraints (What NOT to Do)
+
+1. **NEVER introduce async waterfalls**: Do not chain sequential `await` calls when requests can be executed concurrently via `Promise.all()`.
+2. **NEVER import large full libraries when only a utility is needed**: Never `import _ from 'lodash'`; use `import debounce from 'lodash/debounce'` or native alternatives.
+3. **NEVER render images or videos without explicit aspect ratios**: Always provide `width` and `height` or `aspect-ratio` to avoid Cumulative Layout Shift (CLS).
+4. **NEVER trigger synchronous layout thrashing**: Do not alternate between reading layout properties (`offsetHeight`, `getBoundingClientRect`) and writing styles in loops.
+5. **NEVER animate non-composited properties**: Animate only GPU-composited CSS properties (`transform`, `opacity`). Never animate `width`, `height`, `top`, `left`, or `margin`.
 
 ## Rules & Patterns
-<!-- Source: performance.md -->
 
-## Web Performance — Best Practices
+### 1. Vercel Optimization Hierarchy by Impact
 
-## Core Web Vitals
+| Priority | Category | Key Optimization Target | Expected Impact |
+|:---|:---|:---|:---|
+| **1. CRITICAL** | **Eliminating Waterfalls** | Parallel data fetching (`Promise.all`), Suspense streaming | **30–60% faster LCP** |
+| **2. CRITICAL** | **Bundle Size Optimization** | Direct submodule imports, `next/dynamic`, deferring 3rd party scripts | **40–70% smaller initial JS** |
+| **3. HIGH** | **Server-Side & RSC Caching** | `React.cache()` request deduplication, edge SSR caching | **Lower TTFB & DB load** |
+| **4. MEDIUM-HIGH** | **Client Query Optimization** | SWR / TanStack Query stale-while-revalidate, deduplication | **Zero redundant network calls** |
+| **5. MEDIUM** | **Render & DOM Optimization** | Virtualization for large lists, state colocation, `:focus-visible` | **Smooth 60 FPS / INP < 100ms** |
 
-| Metric | Target | What it measures |
-| --- | --- | --- |
-| LCP (Largest Contentful Paint) | < 2.5s | Loading performance |
-| INP (Interaction to Next Paint) | < 200ms | Responsiveness |
-| CLS (Cumulative Layout Shift) | < 0.1 | Visual stability |
+### 2. Eliminating Network Waterfalls
 
-## Loading Performance
+```ts
+// [GOOD] Parallel execution
+const [user, notifications] = await Promise.all([
+  fetchUser(),
+  fetchNotifications(),
+]);
+const posts = await fetchPosts(user.id);
+```
 
-- **Code splitting** — split by route, lazy load non-critical components
-- **Tree shaking** — use ES modules, avoid side-effect imports
-- **Image optimization** — WebP/AVIF, responsive srcset, lazy loading
-- **Font loading** — `font-display: swap`, preload critical fonts
-- **Critical CSS** — inline above-the-fold styles
-- **Preconnect** — `<link rel="preconnect">` for third-party origins
+### 3. Layout Shift & Visual Stability (CLS < 0.1)
 
-## Runtime Performance
-
-- **Avoid layout thrashing** — batch DOM reads and writes
-- **Debounce/throttle** — expensive event handlers (scroll, resize, input)
-- **Web Workers** — offload heavy computation
-- **Virtualize long lists** — render only visible items
-- **Avoid synchronous operations** — use async/await, requestIdleCallback
-
-## Bundle Optimization
-
-- **Analyze bundle** — use webpack-bundle-analyzer or similar
-- **Dynamic imports** — `import()` for heavy libraries
-- **Avoid barrel exports** — they prevent tree shaking
-- **Vendor splitting** — separate vendor chunks for caching
-- **Compression** — Brotli > gzip
-
-## Caching Strategy
-
-| Asset | Cache | Strategy |
-| --- | --- | --- |
-| HTML | Short (5min) | Revalidate |
-| JS/CSS (hashed) | Long (1 year) | Immutable |
-| Images | Long (1 year) | Immutable |
-| API responses | Depends | stale-while-revalidate |
-| Fonts | Long (1 year) | Immutable |
-
-## Anti-Patterns
-
-- ❌ Importing entire libraries (`import _ from 'lodash'`)
-- ❌ Unoptimized images (PNG > 500KB)
-- ❌ Blocking scripts in `<head>` without `defer`
-- ❌ Layout shifts from dynamic content (no dimensions on images)
-- ❌ Premature optimization — measure first, optimize second
-
+- **Images & Video**: Always supply `width`, `height`, and `sizes` or CSS `aspect-ratio: 16 / 9`.
+- **Dynamic Content**: Reserve layout space for dynamically loaded widgets with min-height placeholders or skeletons.
+- **Tabular Numbers**: Use `font-feature-settings: "tnum"` / `font-variant-numeric: tabular-nums` for counters, clocks, and tables to prevent number width jitter.
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed performance patterns and benchmark snippets.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] LCP target is < 2.5s with preloaded critical fonts and LCP image `priority`.
+- [ ] No sequential `await` waterfalls in API routes or Server Components.
+- [ ] All animated elements use only `transform` and `opacity`.
+- [ ] `prefers-reduced-motion` media queries are respected.
+- [ ] Large tables / lists (> 100 items) utilize virtualization.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Chaining independent async requests instead of using `Promise.all`.
+- Animating layout-triggering properties (`height`, `width`, `top`) causing jank.
+- Missing image dimensions causing layout shift when images finish loading.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `nextjs` and `react` for App Router caching and component lifecycle tuning.
+- Pairs with `ui-ux-pro` for smooth animations and responsive design tokens.
 

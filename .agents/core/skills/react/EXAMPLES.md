@@ -2,7 +2,7 @@
 
 ## Example 1: Derived State vs. useEffect
 
-### ❌ Anti-pattern (Redundant state + extra render with useEffect)
+### Anti-pattern: Anti-pattern (Redundant state + extra render with useEffect)
 
 ```tsx
 // BAD: causes an unnecessary extra render cycle and potential state desync
@@ -18,7 +18,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 }
 ```
 
-### ✅ ContextOS Standard (Inline derived calculation / useMemo)
+### Best practice: ContextOS Standard (Inline derived calculation / useMemo)
 
 ```tsx
 // GOOD: calculated instantly during render with zero extra render pass
@@ -36,7 +36,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 
 ## Example 2: Custom Hook Encapsulation
 
-### ❌ Anti-pattern (Scattered listener logic inside component)
+### Anti-pattern: Anti-pattern (Scattered listener logic inside component)
 
 ```tsx
 // BAD: window listener logic cluttering UI component
@@ -51,7 +51,7 @@ function NavHeader() {
 }
 ```
 
-### ✅ ContextOS Standard (Reusable Custom Hook)
+### Best practice: ContextOS Standard (Reusable Custom Hook)
 
 ```tsx
 // GOOD: extracted into a reusable, testable custom hook

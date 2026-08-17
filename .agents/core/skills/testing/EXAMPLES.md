@@ -2,7 +2,7 @@
 
 ## Example 1: React Component Testing
 
-### ❌ Anti-pattern (Brittle query & implementation coupling)
+### Anti-pattern: Anti-pattern (Brittle query & implementation coupling)
 
 ```typescript
 // BAD: querying by CSS class or test-id and testing internal state
@@ -15,7 +15,7 @@ test('submits form', async () => {
 });
 ```
 
-### ✅ ContextOS Standard (User-centric role queries & userEvent)
+### Best practice: ContextOS Standard (User-centric role queries & userEvent)
 
 ```typescript
 // GOOD: user-facing roles, userEvent, async wait
@@ -44,7 +44,7 @@ test('submits form with valid user credentials', async () => {
 
 ## Example 2: API Mocking with MSW (Mock Service Worker)
 
-### ❌ Anti-pattern (Hardcoded global fetch monkey-patching)
+### Anti-pattern: Anti-pattern (Hardcoded global fetch monkey-patching)
 
 ```typescript
 // BAD: globally overwriting fetch breaks other tests and hides actual contract
@@ -53,7 +53,7 @@ global.fetch = vi.fn().mockResolvedValue({
 });
 ```
 
-### ✅ ContextOS Standard (Network boundary mocking)
+### Best practice: ContextOS Standard (Network boundary mocking)
 
 ```typescript
 // GOOD: declarative MSW network handler

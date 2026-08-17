@@ -60,12 +60,12 @@ function UserList({ users }: { users: User[] }) {
 
 ## Anti-Patterns (Avoid)
 
-- ❌ Props drilling more than 2 levels — use Context or state management
-- ❌ useEffect for derived state — use useMemo instead
-- ❌ Index as key — use stable unique IDs
-- ❌ Mutating state directly — always create new references
-- ❌ God components — split into smaller, focused components
-- ❌ Business logic in components — extract to hooks or services
+- [FAIL] Props drilling more than 2 levels — use Context or state management
+- [FAIL] useEffect for derived state — use useMemo instead
+- [FAIL] Index as key — use stable unique IDs
+- [FAIL] Mutating state directly — always create new references
+- [FAIL] God components — split into smaller, focused components
+- [FAIL] Business logic in components — extract to hooks or services
 
 ## Testing
 

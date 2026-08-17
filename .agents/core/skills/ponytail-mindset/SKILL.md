@@ -10,11 +10,11 @@ description: >
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Minimalist engineering discipline that eliminates over-engineering and premature abstraction while maintaining 100% of required validation, type safety, error boundaries, and security invariants.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate on all BUILD phases to prevent bloated implementations and enforce concise, focused solutions.
 
 ## Rules & Patterns
 
@@ -72,7 +72,7 @@ The ladder applies to features and abstractions. These 4 areas are **non-negotia
 ### 1. Input Validation
 
 ```javascript
-// ✅ Always validate — even if "internal" API
+// [GOOD] Always validate — even if "internal" API
 function createUser(data) {
   if (!data.email || !isValidEmail(data.email)) {
     throw new ValidationError('Invalid email');
@@ -80,7 +80,7 @@ function createUser(data) {
   // ...
 }
 
-// ❌ Never skip validation for "speed"
+// [BAD] Never skip validation for "speed"
 function createUser(data) {
   return db.insert('users', data); // NEVER
 }
@@ -89,7 +89,7 @@ function createUser(data) {
 ### 2. Error Handling
 
 ```javascript
-// ✅ Always handle errors explicitly
+// [GOOD] Always handle errors explicitly
 async function fetchUser(id) {
   try {
     const user = await db.findById(id);
@@ -101,7 +101,7 @@ async function fetchUser(id) {
   }
 }
 
-// ❌ Never silently swallow errors
+// [BAD] Never silently swallow errors
 async function fetchUser(id) {
   try {
     return await db.findById(id);
@@ -112,7 +112,7 @@ async function fetchUser(id) {
 ### 3. Security Guards
 
 ```javascript
-// ✅ Always check authorization before data access
+// [GOOD] Always check authorization before data access
 app.get('/users/:id/data', authMiddleware, async (req, res) => {
   if (req.user.id !== req.params.id && !req.user.isAdmin) {
     return res.status(403).json({ error: 'Forbidden' });
@@ -120,7 +120,7 @@ app.get('/users/:id/data', authMiddleware, async (req, res) => {
   // ...
 });
 
-// ❌ Never skip auth for "internal" routes
+// [BAD] Never skip auth for "internal" routes
 app.get('/users/:id/data', async (req, res) => {
   // No auth check — NEVER
 });
@@ -129,7 +129,7 @@ app.get('/users/:id/data', async (req, res) => {
 ### 4. Data Loss Prevention
 
 ```javascript
-// ✅ Always confirm before destructive operations
+// [GOOD] Always confirm before destructive operations
 async function deleteAccount(userId) {
   const user = await db.findById(userId);
   if (!user) throw new NotFoundError('User not found');
@@ -147,7 +147,7 @@ async function deleteAccount(userId) {
 
 ### The Date Picker Problem
 
-❌ **What AI usually does** (over-build):
+[FAIL] **What AI usually does** (over-build):
 
 ```bash
 npm install flatpickr
@@ -157,7 +157,7 @@ npm install flatpickr
 ## Total: 135 lines + 1 dependency
 ```
 
-✅ **Ponytail approach** (use rung 4 — native platform):
+[PASS] **Ponytail approach** (use rung 4 — native platform):
 
 ```html
 <!-- ponytail: browser has one -->
@@ -170,7 +170,7 @@ Total: 1 line. 0 dependencies.
 
 ### The Utility Function Problem
 
-❌ **Over-build**:
+[FAIL] **Over-build**:
 
 ```javascript
 // Creates entire utilities.js module
@@ -181,7 +181,7 @@ export const StringUtils = {
 };
 ```
 
-✅ **Ponytail** (rung 6 — one line, or rung 2 — already installed):
+[PASS] **Ponytail** (rung 6 — one line, or rung 2 — already installed):
 
 ```javascript
 // If lodash is already installed (rung 5):
@@ -195,7 +195,7 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 
 ### The API Client Problem
 
-❌ **Over-build**:
+[FAIL] **Over-build**:
 
 ```javascript
 // Creates: ApiClient.js (200 lines of abstraction)
@@ -203,14 +203,14 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 // Creates: ApiConfig.js (configuration layer)
 ```
 
-✅ **Ponytail** (rung 3 — stdlib for client APIs):
+[PASS] **Ponytail** (rung 3 — stdlib for client APIs):
 
 ```javascript
 // fetch is built-in. Use it directly.
 const user = await fetch(`/api/users/${id}`).then(r => r.json());
 ```
 
-✅ **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
+[PASS] **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
 
 ```typescript
 // Instead of: /api/users/[id]/route.ts + fetch wrapper

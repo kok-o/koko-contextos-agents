@@ -127,11 +127,11 @@ When integrating with legacy or external systems, create an adapter that transla
 
 ## Anti-Patterns
 
-- ❌ Distributed monolith — services that can't deploy independently
-- ❌ Shared database — defeats the purpose
-- ❌ Synchronous chains — A calls B calls C calls D
-- ❌ No versioning — breaking API changes
-- ❌ Premature microservices — start with a modular monolith
+- [FAIL] Distributed monolith — services that can't deploy independently
+- [FAIL] Shared database — defeats the purpose
+- [FAIL] Synchronous chains — A calls B calls C calls D
+- [FAIL] No versioning — breaking API changes
+- [FAIL] Premature microservices — start with a modular monolith
 
 
 ## Code Examples

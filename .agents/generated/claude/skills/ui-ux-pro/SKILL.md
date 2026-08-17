@@ -18,14 +18,14 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 
 ---
 
-## ❌ Absolute Prohibitions (Never Do These)
+## [FAIL] Absolute Prohibitions (Never Do These)
 
 ### Typography Anti-Patterns
 
 - **NEVER** use Arial, Helvetica, or system-ui defaults as primary fonts
 - **NEVER** use Inter as the ONLY font — it is the #1 "AI-generated" visual tell when used alone
-  - ✅ **CORRECT**: If using Inter for primary UI text, ALWAYS pair it with a strong monospace font like `JetBrains Mono` for numbers, code blocks, and technical accents to create a premium SaaS aesthetic (see Vercel, Linear)
-  - ❌ **WRONG**: Inter for headings, body, labels, numbers, captions — everything
+  - [PASS] **CORRECT**: If using Inter for primary UI text, ALWAYS pair it with a strong monospace font like `JetBrains Mono` for numbers, code blocks, and technical accents to create a premium SaaS aesthetic (see Vercel, Linear)
+  - [FAIL] **WRONG**: Inter for headings, body, labels, numbers, captions — everything
 - **NEVER** mix more than 2 font families
 - **ALWAYS** import proper fonts from Google Fonts or similar
 
@@ -52,7 +52,7 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 
 ---
 
-## ✅ Required Standards
+## [PASS] Required Standards
 
 ### Accessibility Checklist
 
@@ -223,7 +223,7 @@ transform: scale(0.97);
 For complex UI like modals, popovers, layout shifts, and multi-element orchestration, prefer Framer Motion over raw CSS keyframes. Keep animations quick and purposeful:
 
 ```tsx
-// ✅ Modal entrance — use highly damped spring for physical feel (like Vercel/Linear)
+// [GOOD] Modal entrance — use highly damped spring for physical feel (like Vercel/Linear)
 <motion.div
   initial={{ opacity: 0, scale: 0.96, y: 8 }}
   animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -231,14 +231,14 @@ For complex UI like modals, popovers, layout shifts, and multi-element orchestra
   transition={{ type: "spring", stiffness: 400, damping: 30 }}
 />
 
-// ✅ List item stagger
+// [GOOD] List item stagger
 <motion.li
   initial={{ opacity: 0, x: -8 }}
   animate={{ opacity: 1, x: 0 }}
   transition={{ duration: 0.2, ease: "easeOut" }}
 />
 
-// ❌ Never use low damping (bouncy feel)
+// [BAD] Never use low damping (bouncy feel)
 transition={{ type: "spring", stiffness: 200, damping: 8 }} // WRONG
 ```
 
@@ -285,7 +285,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Accessible Icon Button with Visible Focus States
 
-### ❌ Anti-pattern (Missing accessible name and arbitrary color values)
+### Anti-pattern: Anti-pattern (Missing accessible name and arbitrary color values)
 
 ```tsx
 // BAD: inaccessible to screen readers, missing focus ring, arbitrary hex
@@ -294,7 +294,7 @@ How this skill interacts with other skills.
 </button>
 ```
 
-### ✅ ContextOS Standard (Semantic token scales & ARIA label)
+### Best practice: ContextOS Standard (Semantic token scales & ARIA label)
 
 ```tsx
 // GOOD: full keyboard accessibility, semantic tokens, focus-visible ring
@@ -312,7 +312,7 @@ How this skill interacts with other skills.
 
 ## Example 2: Stat Card Hierarchy
 
-### ❌ Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
+### Anti-pattern: Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
 
 ```tsx
 // BAD: cliche AI gradient, poor typographic hierarchy
@@ -322,7 +322,7 @@ How this skill interacts with other skills.
 </div>
 ```
 
-### ✅ ContextOS Standard (Refined editorial typography & subtle depth)
+### Best practice: ContextOS Standard (Refined editorial typography & subtle depth)
 
 ```tsx
 // GOOD: high contrast, monospace numerical accent, subtle border

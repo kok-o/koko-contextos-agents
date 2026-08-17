@@ -2,7 +2,7 @@
 
 ## Example 1: Accessible Icon Button with Visible Focus States
 
-### ❌ Anti-pattern (Missing accessible name and arbitrary color values)
+### Anti-pattern: Anti-pattern (Missing accessible name and arbitrary color values)
 
 ```tsx
 // BAD: inaccessible to screen readers, missing focus ring, arbitrary hex
@@ -11,7 +11,7 @@
 </button>
 ```
 
-### ✅ ContextOS Standard (Semantic token scales & ARIA label)
+### Best practice: ContextOS Standard (Semantic token scales & ARIA label)
 
 ```tsx
 // GOOD: full keyboard accessibility, semantic tokens, focus-visible ring
@@ -29,7 +29,7 @@
 
 ## Example 2: Stat Card Hierarchy
 
-### ❌ Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
+### Anti-pattern: Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
 
 ```tsx
 // BAD: cliche AI gradient, poor typographic hierarchy
@@ -39,7 +39,7 @@
 </div>
 ```
 
-### ✅ ContextOS Standard (Refined editorial typography & subtle depth)
+### Best practice: ContextOS Standard (Refined editorial typography & subtle depth)
 
 ```tsx
 // GOOD: high contrast, monospace numerical accent, subtle border

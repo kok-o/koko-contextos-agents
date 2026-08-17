@@ -14,7 +14,7 @@ Activate for any task involving unit tests, integration tests, E2E testing, TDD/
 
 ## Rules & Patterns
 
-### 🏛️ The ContextOS Testing Pyramid
+### ️ The ContextOS Testing Pyramid
 
 ```
       /\
@@ -26,7 +26,7 @@ Activate for any task involving unit tests, integration tests, E2E testing, TDD/
 /-------------\
 ```
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER mock internal implementation details**: Mock ONLY external I/O boundaries (HTTP network requests via MSW, Database via test containers or in-memory DB).
 2. **NEVER test implementation details**: In React Testing Library, query by user-facing roles (`getByRole`, `getByLabelText`), NEVER by CSS selectors or internal component state.
@@ -73,7 +73,7 @@ Interacts directly with `engineering-workflow` (Verify phase), `react`, and `typ
 
 ## Example 1: React Component Testing
 
-### ❌ Anti-pattern (Brittle query & implementation coupling)
+### Anti-pattern: Anti-pattern (Brittle query & implementation coupling)
 
 ```typescript
 // BAD: querying by CSS class or test-id and testing internal state
@@ -86,7 +86,7 @@ test('submits form', async () => {
 });
 ```
 
-### ✅ ContextOS Standard (User-centric role queries & userEvent)
+### Best practice: ContextOS Standard (User-centric role queries & userEvent)
 
 ```typescript
 // GOOD: user-facing roles, userEvent, async wait
@@ -115,7 +115,7 @@ test('submits form with valid user credentials', async () => {
 
 ## Example 2: API Mocking with MSW (Mock Service Worker)
 
-### ❌ Anti-pattern (Hardcoded global fetch monkey-patching)
+### Anti-pattern: Anti-pattern (Hardcoded global fetch monkey-patching)
 
 ```typescript
 // BAD: globally overwriting fetch breaks other tests and hides actual contract
@@ -124,7 +124,7 @@ global.fetch = vi.fn().mockResolvedValue({
 });
 ```
 
-### ✅ ContextOS Standard (Network boundary mocking)
+### Best practice: ContextOS Standard (Network boundary mocking)
 
 ```typescript
 // GOOD: declarative MSW network handler

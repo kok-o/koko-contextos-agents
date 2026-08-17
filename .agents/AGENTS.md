@@ -6,7 +6,7 @@ You are working inside a project managed by **ContextOS**. This file is the **si
 
 ---
 
-## 🧠 Step 0 — Identify Before Acting
+## Step 0 — Identify Before Acting
 
 Before writing a single line of code or plan, stop and answer three questions:
 
@@ -24,11 +24,11 @@ Skills loaded: react, typescript, ui-ux-pro, ponytail-mindset
 
 ---
 
-## 🗺 Skill Registry
+## Skill Registry
 
 All skills live in `.agents/core/skills/`. Here is what each does and when to use it:
 
-### 🔑 Core Skills (Always Considered)
+### Core Skills (Always Considered)
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -36,7 +36,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **gstack-roles** | `gstack-roles/SKILL.md` | **Every task** — declare your specialist role before each phase |
 | **ponytail-mindset** | `ponytail-mindset/SKILL.md` | **Every BUILD phase** — run the 7-rung ladder before writing any code |
 
-### 🎨 Frontend Skills
+### Frontend Skills
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -50,7 +50,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **ux-design** | `ux-design/SKILL.md` | User flow design, interaction patterns |
 | **web-accessibility** | `web-accessibility/SKILL.md` | ARIA, WCAG compliance |
 
-### 🏗 Backend Skills
+### Backend Skills
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -62,7 +62,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **ddd** | `ddd/SKILL.md` | Domain modeling, bounded contexts |
 | **database** | `database/SKILL.md` | PostgreSQL, Prisma, Drizzle, migrations, indexing |
 
-### ⚙️ Cross-Cutting Skills
+### Cross-Cutting Skills
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -76,7 +76,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 
 ---
 
-## 🤖 Automatic Skill Activation Rules
+## Automatic Skill Activation Rules
 
 The following rules are **deterministic** — no judgment needed. If the condition is true, the skill is loaded.
 
@@ -149,7 +149,7 @@ files: "components/ui/*" present → shadcn detected, apply K9-K11 rules from im
 
 ---
 
-## 📋 Pipeline — Phase-by-Phase Rules
+## Pipeline — Phase-by-Phase Rules
 
 Every task MUST follow these phases in order. No skipping.
 
@@ -225,7 +225,7 @@ For UI tasks — run the full impeccable-design audit:
 
 ---
 
-## 🚦 Decision Routing Table
+## Decision Routing Table
 
 Use this table to instantly determine which skills to load:
 
@@ -244,7 +244,7 @@ Use this table to instantly determine which skills to load:
 
 ---
 
-## 🔗 Skill Interaction Map
+## Skill Interaction Map
 
 How the 6 core skills work together:
 
@@ -285,7 +285,7 @@ How the 6 core skills work together:
 
 ---
 
-## 🛡 Non-Negotiable Rules (Always Active)
+## Non-Negotiable Rules (Always Active)
 
 These rules apply regardless of which skills are loaded:
 
@@ -306,13 +306,13 @@ These rules apply regardless of which skills are loaded:
 - Every list/table/feed has a designed empty state
 
 ### Engineering
-- No code before spec + plan are approved (engineering-workflow Iron Rule)
+- No code before spec + plan are approved in interactive development (proceed directly to BUILD when standalone/benchmark code is requested)
 - Blast radius limited to files in current task's plan
 - One atomic commit per task
 
 ---
 
-## 📝 Decision Records
+## Decision Records
 
 When making significant architectural decisions (choosing a DB, framework, auth strategy, caching layer):
 
@@ -324,7 +324,7 @@ Load the `decisions` skill when writing decision records.
 
 ---
 
-## 📚 Quick Reference: What to Load for Common Tasks
+## Quick Reference: What to Load for Common Tasks
 
 ```bash
 # "Add a login page"

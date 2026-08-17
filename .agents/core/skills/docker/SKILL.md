@@ -15,7 +15,7 @@ Activate when creating or optimizing Dockerfiles, docker-compose configurations,
 
 ## Rules & Patterns
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER run containers as `root` in production**: Always create and switch to an unprivileged non-root user (e.g. `USER node` or `USER nonroot`).
 2. **NEVER use the `latest` tag**: Always pin base images to specific immutable version digests or explicit minor tags (e.g. `node:20.12.2-alpine3.19`).

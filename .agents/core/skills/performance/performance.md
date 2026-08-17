@@ -45,8 +45,8 @@
 
 ## Anti-Patterns
 
-- ❌ Importing entire libraries (`import _ from 'lodash'`)
-- ❌ Unoptimized images (PNG > 500KB)
-- ❌ Blocking scripts in `<head>` without `defer`
-- ❌ Layout shifts from dynamic content (no dimensions on images)
-- ❌ Premature optimization — measure first, optimize second
+- [FAIL] Importing entire libraries (`import _ from 'lodash'`)
+- [FAIL] Unoptimized images (PNG > 500KB)
+- [FAIL] Blocking scripts in `<head>` without `defer`
+- [FAIL] Layout shifts from dynamic content (no dimensions on images)
+- [FAIL] Premature optimization — measure first, optimize second

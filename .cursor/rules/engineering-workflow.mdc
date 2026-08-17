@@ -10,11 +10,11 @@ alwaysApply: true
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Systematic 6-phase engineering pipeline (DEFINE → PLAN → BUILD → VERIFY → REVIEW → SHIP) enforcing role declarations, atomic task execution, quality gates, and regression prevention.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate on all project tasks to orchestrate structured development, spec definition, architectural planning, and verification gates.
 
 ## Rules & Patterns
 
@@ -40,7 +40,8 @@ Inspired by [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills
 [ROLE: Product Manager]  [ROLE: Architect]  [ROLE: Senior Dev]  [ROLE: QA Lead]  [ROLE: Staff Eng]  [ROLE: Release Eng]
 ```
 
-**IRON RULE**: No phase can be skipped. No code before `/plan` is approved.
+**IRON RULE**: In interactive development, no phase can be skipped and no code is written before `/plan` is approved.
+**Direct Build Exception**: When the prompt/caller explicitly requests a standalone implementation, or declares `[PHASE: Build]`, execute the BUILD phase directly and deliver the complete, self-contained production code without conversational pauses.
 
 ---
 
@@ -182,7 +183,7 @@ For complex React components, prioritize testing _user behavior_ over internal s
 - Focus on: "When user clicks X, does Y appear?" not "Does `useState` hold the right value?"
 
 ```tsx
-// ✅ BDD: Test behavior
+// [GOOD] BDD: Test behavior
 test("shows error when email is invalid", async () => {
   render(<LoginForm />)
   await userEvent.type(screen.getByLabelText("Email"), "not-an-email")
@@ -190,7 +191,7 @@ test("shows error when email is invalid", async () => {
   expect(screen.getByText(/invalid email/i)).toBeInTheDocument()
 })
 
-// ❌ Brittle: Testing internal implementation
+// [BAD] Brittle: Testing internal implementation
 test("sets error state to true", () => {
   const { result } = renderHook(() => useLoginForm())
   act(() => result.current.setError(true))
@@ -256,8 +257,31 @@ Review before merging. Always.
 **UI/Design** (if applicable — activate `impeccable-design` skill checklist)
 
 - [ ] Passes impeccable-design Quick Audit (typography, colors, spacing, animations)
-- [ ] Empty states are designed for all lists/tables
-- [ ] No hardcoded z-indexes
+---
+
+## Command Workflows
+
+| Command | Auto-Role | Purpose & Action |
+|:---|:---|:---|
+| **`/spec`** | `[ROLE: Product Manager]` | Interrogate requirements, define In-Scope/Out-of-Scope, write testable acceptance criteria. |
+| **`/plan`** | `[ROLE: Architect]` | Decompose spec into atomic tasks (< 2 hrs each), define affected files and test requirements. |
+| **`/build`** | `[ROLE: Senior Developer]` | Implement task-by-task using TDD, minimal blast radius, atomic commits. |
+| **`/test`** | `[ROLE: QA Lead]` | Run unit, integration, and UI behavioral tests covering all edge cases. |
+| **`/simplify`** | `[ROLE: Staff Engineer]` | Run the 7-rung ladder to strip over-engineering, dead abstractions, and premature flexibility. |
+| **`/review`** | `[ROLE: Staff Engineer + Senior Designer]` | Execute the 5-axis quality gate (correctness, architecture, security, performance, design). |
+| **`/ship`** | `[ROLE: Release Engineer]` | Final validation: clean CI, zero lint errors, updated docs, and verified rollback plan. |
+
+---
+
+## Phase 5.5: SIMPLIFY — /simplify
+
+### Auto-activates → `[ROLE: Staff Engineer]` (Ponytail Mindset)
+
+Before merging, ruthlessly simplify:
+1. Did we introduce abstractions that are only used once? (Inline them).
+2. Can 3 lines of vanilla JavaScript replace a 50-line custom utility?
+3. Is any configuration or generic handler premature? (YAGNI).
+4. Is the code obvious to a mid-level engineer without reading a documentation manual?
 
 ---
 

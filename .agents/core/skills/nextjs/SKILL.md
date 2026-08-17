@@ -1,103 +1,120 @@
 ---
 name: Next.js
 description: >
-  ContextOS skill for Next.js
+  ContextOS skill for Next.js App Router, Server Components, Server Actions, performance optimization, and Vercel best practices.
 ---
 
-# Next.js
+# Next.js App Router Best Practices
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces high-performance architectural patterns for Next.js App Router based on Vercel Engineering guidelines: React Server Components (RSC), zero-waterfall async pipelines, request deduplication via `React.cache()`, bundle optimization, and secure Server Actions.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever building, refactoring, or reviewing Next.js pages, layouts, Route Handlers (`app/api`), Server Actions, or components in the `app/` directory.
+
+## Negative Constraints (What NOT to Do)
+
+1. **NEVER use barrel imports for UI libraries**: Avoid `import { Button, Dialog } from '@/components'`. Import directly from the exact file (`import { Button } from '@/components/ui/button'`) to prevent bundler tree-shaking failures and trace bloat.
+2. **NEVER trust client-provided data or session state in Server Actions**: Always authenticate session and authorize tenant ownership inside the Server Action handler itself before mutating data.
+3. **NEVER introduce sequential `await` waterfalls for independent data**: Always use `Promise.all()` or parallel streaming `<Suspense>` boundaries.
+4. **NEVER pass large unneeded serialized data from Server to Client Components**: Only pass the specific primitive fields required by the client component (`server-dedup-props`).
+5. **NEVER use `useEffect` for data fetching**: Fetch directly in Server Components or use TanStack Query / SWR for client-side queries.
+6. **NEVER import server-only modules in client components**: Use the `server-only` package in data access layers to catch accidental client imports at build time.
 
 ## Rules & Patterns
-<!-- Source: nextjs.md -->
 
-## Next.js — Best Practices (App Router)
+### 1. Eliminating Async Waterfalls (Critical)
 
-## Routing
+- **Parallel Fetching**: Fetch independent data concurrently at the top of the route or component.
+- **Granular Streaming**: Wrap slow, non-critical subtrees in `<Suspense fallback={<Skeleton />}>` so critical above-the-fold content streams immediately.
+- **Defer Awaits**: Check cheap synchronous conditions before awaiting remote resources.
 
-- Use **App Router** (`app/` directory) — not Pages Router
-- **Layouts** — shared UI in `layout.tsx`, nested layouts for sections
-- **Loading states** — `loading.tsx` for Suspense boundaries
-- **Error handling** — `error.tsx` for error boundaries per route
-- **Not found** — `not-found.tsx` for 404 pages
+### 2. Request Deduplication & Caching (`server-cache-react`)
 
-## Server vs Client Components
-
-- **Default to Server Components** — they're server by default
-- **Use `'use client'`** only when you need: event handlers, useState, useEffect, browser APIs
-- **Push client boundaries down** — keep as much as possible on the server
-- **Don't pass functions** from Server to Client components
-
-## Data Fetching
-
-- **Server Components** — fetch directly, no useEffect
-- **Server Actions** — for mutations (`'use server'`)
-- **Route Handlers** — `app/api/` for REST endpoints
-- **Parallel fetching** — use Promise.all for independent requests
-- **Caching** — leverage Next.js cache, revalidate strategically
+- Use `React.cache()` to deduplicate identical database or service calls across multiple components rendered in the same server request lifecycle.
 
 ```tsx
-// Server Component — direct fetch
-async function UserProfile({ id }: { id: string }) {
-  const user = await getUser(id); // No useEffect needed
-  return <div>{user.name}</div>;
+import { cache } from 'react';
+import { db } from '@/lib/db';
+
+export const getCurrentUser = cache(async (userId: string) => {
+  return await db.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true, role: true, email: true }
+  });
+});
+```
+
+### 3. Secure Server Actions (`server-auth-actions`)
+
+- Treat every Server Action as a public HTTP endpoint. Always validate session, authorization, and input schema with Zod.
+
+```tsx
+'use server';
+
+import { z } from 'zod';
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { revalidatePath } from 'next/cache';
+
+const UpdateProfileSchema = z.object({
+  name: z.string().min(2).max(50),
+});
+
+export async function updateProfile(formData: FormData) {
+  const session = await auth();
+  if (!session?.userId) throw new Error('Unauthorized');
+
+  const result = UpdateProfileSchema.safeParse({ name: formData.get('name') });
+  if (!result.success) return { error: 'Invalid input', issues: result.error.flatten() };
+
+  await db.user.update({
+    where: { id: session.userId },
+    data: { name: result.data.name },
+  });
+
+  revalidatePath('/settings');
+  return { success: true };
 }
 ```
 
-## File Structure
+### 4. Bundle Optimization & Dynamic Imports (`bundle-dynamic-imports`)
 
+- Heavy interactive client components (charts, rich-text editors, video players) must be dynamically loaded with `next/dynamic`.
+
+```tsx
+import dynamic from 'next/dynamic';
+
+const AnalyticsChart = dynamic(
+  () => import('@/components/analytics/chart').then(mod => mod.AnalyticsChart),
+  {
+    loading: () => <div className="h-64 animate-pulse bg-muted rounded-lg" />,
+    ssr: false,
+  }
+);
 ```
-app/
-├── layout.tsx              # Root layout
-├── page.tsx                # Home page
-├── globals.css
-├── (auth)/                 # Route group (no URL impact)
-│   ├── login/page.tsx
-│   └── register/page.tsx
-├── dashboard/
-│   ├── layout.tsx          # Dashboard layout
-│   ├── page.tsx            # Dashboard home
-│   └── settings/page.tsx
-├── api/
-│   └── users/route.ts      # API route
-└── components/             # Shared components
-```
-
-## Performance
-
-- **Image optimization** — always use `next/image`
-- **Font optimization** — use `next/font`
-- **Metadata** — export metadata object from pages
-- **Static generation** — prefer SSG over SSR when possible
-- **Edge runtime** — for latency-sensitive routes
-
-## Anti-Patterns
-
-- ❌ Using `useEffect` for data fetching in Server Components
-- ❌ Making everything a Client Component
-- ❌ Not using `loading.tsx` and `error.tsx`
-- ❌ Importing server-only code in Client Components
-- ❌ Not leveraging caching and revalidation
-
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed code examples and component templates.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] All database queries in RSC layers use `React.cache()` if called across multiple components.
+- [ ] No barrel imports (`from '@/components'`); all imports point to exact component modules.
+- [ ] Server Actions have explicit auth checks and Zod input validation.
+- [ ] Heavy client widgets (charts, editors) use `next/dynamic`.
+- [ ] Images use `next/image` with explicit `sizes` and `priority` on LCP elements.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Using `'use client'` at page level instead of leaf components.
+- Relying on client-side authentication checks for Server Actions without server-side validation.
+- Chaining sequential awaits for independent data models.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `react` and `ui-ux-pro` for component design and state management.
+- Pairs with `security` for session authorization and input sanitization.

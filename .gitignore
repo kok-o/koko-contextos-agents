@@ -1,4 +1,30 @@
-node_modules
+# Dependencies
+node_modules/
+package-lock.json.bak
+
+# OS Clutter
 .DS_Store
-*.log
+Thumbs.db
+*.tmp
+
+# Environment and Secrets
 .env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Benchmark Run Outputs & Reports
+benchmarks/results/report-*
+benchmarks/results/*.html
+benchmarks/results/*.json
+benchmarks/results/*.md
+!benchmarks/results/.gitkeep
+
+# Plugin cache & local installs
+.agents/plugins/
+.agents/plugins.json

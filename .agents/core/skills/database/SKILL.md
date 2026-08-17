@@ -15,7 +15,7 @@ Activate for tasks involving database schema design, migrations, indexing, relat
 
 ## Rules & Patterns
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER do `SELECT *` in production**: Always select explicit columns required by the caller to minimize memory bandwidth and lock footprint.
 2. **NEVER run destructive migrations without backward compatibility**: Always follow expand-and-contract (Phase 1: add new column as nullable; Phase 2: backfill; Phase 3: make non-nullable & remove old column).

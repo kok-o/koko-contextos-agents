@@ -10,7 +10,7 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
 1. **NEVER use `any`**: Use `unknown` with type guards, discriminated unions, or Zod schemas.
 2. **NEVER use type assertions (`as Type` or `as unknown as Type`) to bypass safety**: Fix the underlying type signature or use runtime narrowing (`instanceof`, `typeof`, `in`).
@@ -84,11 +84,11 @@ interface Repository<T extends { id: string }> {
 
 ## Anti-Patterns
 
-- ❌ `any` — use `unknown` + type guards
-- ❌ Type assertions (`as`) — prefer type guards
-- ❌ Non-null assertions (`!`) — handle null explicitly
-- ❌ Enums — prefer union types or `as const` objects
-- ❌ Complex generics without JSDoc — document intent
+- [FAIL] `any` — use `unknown` + type guards
+- [FAIL] Type assertions (`as`) — prefer type guards
+- [FAIL] Non-null assertions (`!`) — handle null explicitly
+- [FAIL] Enums — prefer union types or `as const` objects
+- [FAIL] Complex generics without JSDoc — document intent
 
 
 ## Code Examples
@@ -112,7 +112,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Type-Safe Parsing with Zod (No `any`)
 
-### ❌ Anti-pattern (Blind type assertion with `as`)
+### Anti-pattern: Anti-pattern (Blind type assertion with `as`)
 
 ```typescript
 // BAD: using 'as User' bypasses runtime validation completely
@@ -123,7 +123,7 @@ async function fetchUser(id: string): Promise<User> {
 }
 ```
 
-### ✅ ContextOS Standard (Runtime schema validation with Zod)
+### Best practice: ContextOS Standard (Runtime schema validation with Zod)
 
 ```typescript
 // GOOD: guaranteed runtime and compile-time type safety
@@ -151,7 +151,7 @@ export async function fetchUser(id: string): Promise<User> {
 
 ## Example 2: Discriminated Unions for State Handling
 
-### ❌ Anti-pattern (Optional soup with boolean flags)
+### Anti-pattern: Anti-pattern (Optional soup with boolean flags)
 
 ```typescript
 // BAD: impossible states can be represented (e.g. isLoading: true AND error: 'Failed')
@@ -162,7 +162,7 @@ interface AsyncState<T> {
 }
 ```
 
-### ✅ ContextOS Standard (Discriminated Union)
+### Best practice: ContextOS Standard (Discriminated Union)
 
 ```typescript
 // GOOD: impossible states are impossible at compile-time

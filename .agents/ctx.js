@@ -23,6 +23,8 @@ function printHelp() {
   console.log('  profile show <name>             Show profile configuration');
   console.log('  profile apply <name>            Apply a profile (e.g. mvp, startup, enterprise, frontend)');
   console.log('  profile remove                  Remove active profile filter');
+  console.log('  resolve <prompt>                Resolve minimal skills needed for a task');
+  console.log('  index                           Generate progressive skills-index.json');
   console.log('  detect                          Auto-detect project tech stack');
   console.log('  audit                           Alias for validate (check skills)');
   console.log('  validate                        Validate skill sources, frontmatter, deps & sync');
@@ -40,6 +42,7 @@ function printHelp() {
   console.log('  @scope/npm-package               scoped npm package');
   console.log('');
   console.log('Examples:');
+  console.log('  node .agents/ctx.js resolve "Build an accessible modal component"');
   console.log('  node .agents/ctx.js profile list');
   console.log('  node .agents/ctx.js profile apply mvp');
   console.log('  node .agents/ctx.js detect');
@@ -191,6 +194,31 @@ if (command === 'export') {
     console.error('Valid subcommands: list, show, apply, remove');
     process.exit(1);
   }
+
+// ── resolve ───────────────────────────────────────────────────────────────────
+} else if (command === 'resolve') {
+  const resolver = require('./resolver.js');
+  const promptArgs = args.slice(1).filter(a => !a.startsWith('-')).join(' ');
+  const filesIdx = args.indexOf('--files');
+  const files = filesIdx !== -1 && args[filesIdx + 1] ? args[filesIdx + 1].split(',') : [];
+  const phaseIdx = args.indexOf('--phase');
+  const phase = phaseIdx !== -1 && args[phaseIdx + 1] ? args[phaseIdx + 1] : 'Build';
+
+  const result = resolver.resolveSkills({ prompt: promptArgs, files, phase });
+  console.log('\n══════════════════════════════════════════');
+  console.log('  ContextOS — Dynamic Skill Resolution');
+  console.log('══════════════════════════════════════════');
+  console.log(resolver.formatDeclaration(result));
+  console.log('──────────────────────────────────────────\n');
+
+// ── index ─────────────────────────────────────────────────────────────────────
+} else if (command === 'index') {
+  const resolver = require('./resolver.js');
+  const index = resolver.buildSkillIndex(process.cwd());
+  const fs = require('fs');
+  const indexPath = path.join(process.cwd(), '.agents', 'skills-index.json');
+  fs.writeFileSync(indexPath, JSON.stringify({ version: '1.0.0', skills: index }, null, 2) + '\n');
+  console.log(`\nGenerated progressive skills index with ${index.length} skills → .agents/skills-index.json\n`);
 
 // ── detect ────────────────────────────────────────────────────────────────────
 } else if (command === 'detect') {

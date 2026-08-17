@@ -109,11 +109,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
 ## Anti-Patterns
 
-- ❌ Business logic in controllers — use services
-- ❌ Direct database access in controllers — use repositories
-- ❌ Circular dependencies — refactor module structure
-- ❌ God modules — split large modules by domain
-- ❌ Not using DTOs — always validate input
+- [FAIL] Business logic in controllers — use services
+- [FAIL] Direct database access in controllers — use repositories
+- [FAIL] Circular dependencies — refactor module structure
+- [FAIL] God modules — split large modules by domain
+- [FAIL] Not using DTOs — always validate input
 
 
 ## Code Examples

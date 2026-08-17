@@ -12,7 +12,7 @@ You are working inside a project managed by **ContextOS**. This file is the **si
 
 ---
 
-## 🧠 Step 0 — Identify Before Acting
+## Step 0 — Identify Before Acting
 
 Before writing a single line of code or plan, stop and answer three questions:
 
@@ -30,11 +30,11 @@ Skills loaded: react, typescript, ui-ux-pro, ponytail-mindset
 
 ---
 
-## 🗺 Skill Registry
+## Skill Registry
 
 All skills live in `.agents/core/skills/`. Here is what each does and when to use it:
 
-### 🔑 Core Skills (Always Considered)
+### Core Skills (Always Considered)
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -42,7 +42,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **gstack-roles** | `gstack-roles/SKILL.md` | **Every task** — declare your specialist role before each phase |
 | **ponytail-mindset** | `ponytail-mindset/SKILL.md` | **Every BUILD phase** — run the 7-rung ladder before writing any code |
 
-### 🎨 Frontend Skills
+### Frontend Skills
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -56,7 +56,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **ux-design** | `ux-design/SKILL.md` | User flow design, interaction patterns |
 | **web-accessibility** | `web-accessibility/SKILL.md` | ARIA, WCAG compliance |
 
-### 🏗 Backend Skills
+### Backend Skills
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -68,7 +68,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 | **ddd** | `ddd/SKILL.md` | Domain modeling, bounded contexts |
 | **database** | `database/SKILL.md` | PostgreSQL, Prisma, Drizzle, migrations, indexing |
 
-### ⚙️ Cross-Cutting Skills
+### Cross-Cutting Skills
 
 | Skill | File | Activate When |
 |-------|------|--------------|
@@ -82,7 +82,7 @@ All skills live in `.agents/core/skills/`. Here is what each does and when to us
 
 ---
 
-## 🤖 Automatic Skill Activation Rules
+## Automatic Skill Activation Rules
 
 The following rules are **deterministic** — no judgment needed. If the condition is true, the skill is loaded.
 
@@ -155,7 +155,7 @@ files: "components/ui/*" present → shadcn detected, apply K9-K11 rules from im
 
 ---
 
-## 📋 Pipeline — Phase-by-Phase Rules
+## Pipeline — Phase-by-Phase Rules
 
 Every task MUST follow these phases in order. No skipping.
 
@@ -231,7 +231,7 @@ For UI tasks — run the full impeccable-design audit:
 
 ---
 
-## 🚦 Decision Routing Table
+## Decision Routing Table
 
 Use this table to instantly determine which skills to load:
 
@@ -250,7 +250,7 @@ Use this table to instantly determine which skills to load:
 
 ---
 
-## 🔗 Skill Interaction Map
+## Skill Interaction Map
 
 How the 6 core skills work together:
 
@@ -291,7 +291,7 @@ How the 6 core skills work together:
 
 ---
 
-## 🛡 Non-Negotiable Rules (Always Active)
+## Non-Negotiable Rules (Always Active)
 
 These rules apply regardless of which skills are loaded:
 
@@ -312,13 +312,13 @@ These rules apply regardless of which skills are loaded:
 - Every list/table/feed has a designed empty state
 
 ### Engineering
-- No code before spec + plan are approved (engineering-workflow Iron Rule)
+- No code before spec + plan are approved in interactive development (proceed directly to BUILD when standalone/benchmark code is requested)
 - Blast radius limited to files in current task's plan
 - One atomic commit per task
 
 ---
 
-## 📝 Decision Records
+## Decision Records
 
 When making significant architectural decisions (choosing a DB, framework, auth strategy, caching layer):
 
@@ -330,7 +330,7 @@ Load the `decisions` skill when writing decision records.
 
 ---
 
-## 📚 Quick Reference: What to Load for Common Tasks
+## Quick Reference: What to Load for Common Tasks
 
 ```bash
 # "Add a login page"
@@ -760,7 +760,7 @@ Activate for tasks involving database schema design, migrations, indexing, relat
 
 ## Rules & Patterns
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER do `SELECT *` in production**: Always select explicit columns required by the caller to minimize memory bandwidth and lock footprint.
 2. **NEVER run destructive migrations without backward compatibility**: Always follow expand-and-contract (Phase 1: add new column as nullable; Phase 2: backfill; Phase 3: make non-nullable & remove old column).
@@ -798,7 +798,7 @@ Interacts with `system-design`, `ddd`, and `security` (multi-tenant scoping).
 
 ## Example 1: Solving the N+1 Query Problem
 
-### ❌ Anti-pattern (N+1 database queries in a loop)
+### Anti-pattern: Anti-pattern (N+1 database queries in a loop)
 
 ```typescript
 // BAD: 1 query for users + N queries for posts!
@@ -810,7 +810,7 @@ for (const user of users) {
 }
 ```
 
-### ✅ ContextOS Standard (Batch query or relational include)
+### Best practice: ContextOS Standard (Batch query or relational include)
 
 ```typescript
 // GOOD: 1 single optimized batch query
@@ -833,7 +833,7 @@ const usersWithPosts = await prisma.user.findMany({
 
 ## Example 2: Safe Atomic Transactions with Locking
 
-### ❌ Anti-pattern (Unprotected read-modify-write race condition)
+### Anti-pattern: Anti-pattern (Unprotected read-modify-write race condition)
 
 ```typescript
 // BAD: race condition between reading balance and updating
@@ -846,7 +846,7 @@ if (account.balance >= amount) {
 }
 ```
 
-### ✅ ContextOS Standard (Atomic conditional update in transaction)
+### Best practice: ContextOS Standard (Atomic conditional update in transaction)
 
 ```typescript
 // GOOD: atomic database transaction with invariant check
@@ -1076,10 +1076,10 @@ src/
 
 ## Anti-Patterns
 
-- ❌ Anemic domain model — entities with only getters/setters, all logic in services
-- ❌ Big aggregate — aggregates should be small, focused on invariants
-- ❌ Cross-aggregate transactions — use eventual consistency
-- ❌ DDD everywhere — use DDD only where complexity justifies it
+- [FAIL] Anemic domain model — entities with only getters/setters, all logic in services
+- [FAIL] Big aggregate — aggregates should be small, focused on invariants
+- [FAIL] Cross-aggregate transactions — use eventual consistency
+- [FAIL] DDD everywhere — use DDD only where complexity justifies it
 
 
 ## Code Examples
@@ -1200,7 +1200,7 @@ Activate when creating or optimizing Dockerfiles, docker-compose configurations,
 
 ## Rules & Patterns
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER run containers as `root` in production**: Always create and switch to an unprivileged non-root user (e.g. `USER node` or `USER nonroot`).
 2. **NEVER use the `latest` tag**: Always pin base images to specific immutable version digests or explicit minor tags (e.g. `node:20.12.2-alpine3.19`).
@@ -1252,7 +1252,7 @@ Interacts with `security` (container hardening) and `node` / `nextjs` / `fastapi
 
 ## Example 1: Multi-Stage Build & Layer Caching
 
-### ❌ Anti-pattern (Fat single-stage image running as root)
+### Anti-pattern: Anti-pattern (Fat single-stage image running as root)
 
 ```dockerfile
 # BAD: 1.2GB image, runs as root, breaks caching on every file edit
@@ -1265,7 +1265,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
-### ✅ ContextOS Standard (Slim multi-stage build with non-root user)
+### Best practice: ContextOS Standard (Slim multi-stage build with non-root user)
 
 ```dockerfile
 # GOOD: 95MB image, non-root user, optimized layer caching
@@ -1290,7 +1290,7 @@ CMD ["node", "dist/main.js"]
 
 ## Example 2: Docker Ignore File (`.dockerignore`)
 
-### ✅ ContextOS Standard `.dockerignore`
+### Best practice: ContextOS Standard `.dockerignore`
 
 ```gitignore
 node_modules
@@ -1331,11 +1331,11 @@ coverage
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Systematic 6-phase engineering pipeline (DEFINE → PLAN → BUILD → VERIFY → REVIEW → SHIP) enforcing role declarations, atomic task execution, quality gates, and regression prevention.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate on all project tasks to orchestrate structured development, spec definition, architectural planning, and verification gates.
 
 ## Rules & Patterns
 
@@ -1361,7 +1361,8 @@ Inspired by [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills
 [ROLE: Product Manager]  [ROLE: Architect]  [ROLE: Senior Dev]  [ROLE: QA Lead]  [ROLE: Staff Eng]  [ROLE: Release Eng]
 ```
 
-**IRON RULE**: No phase can be skipped. No code before `/plan` is approved.
+**IRON RULE**: In interactive development, no phase can be skipped and no code is written before `/plan` is approved.
+**Direct Build Exception**: When the prompt/caller explicitly requests a standalone implementation, or declares `[PHASE: Build]`, execute the BUILD phase directly and deliver the complete, self-contained production code without conversational pauses.
 
 ---
 
@@ -1503,7 +1504,7 @@ For complex React components, prioritize testing _user behavior_ over internal s
 - Focus on: "When user clicks X, does Y appear?" not "Does `useState` hold the right value?"
 
 ```tsx
-// ✅ BDD: Test behavior
+// [GOOD] BDD: Test behavior
 test("shows error when email is invalid", async () => {
   render(<LoginForm />)
   await userEvent.type(screen.getByLabelText("Email"), "not-an-email")
@@ -1511,7 +1512,7 @@ test("shows error when email is invalid", async () => {
   expect(screen.getByText(/invalid email/i)).toBeInTheDocument()
 })
 
-// ❌ Brittle: Testing internal implementation
+// [BAD] Brittle: Testing internal implementation
 test("sets error state to true", () => {
   const { result } = renderHook(() => useLoginForm())
   act(() => result.current.setError(true))
@@ -1577,8 +1578,31 @@ Review before merging. Always.
 **UI/Design** (if applicable — activate `impeccable-design` skill checklist)
 
 - [ ] Passes impeccable-design Quick Audit (typography, colors, spacing, animations)
-- [ ] Empty states are designed for all lists/tables
-- [ ] No hardcoded z-indexes
+---
+
+## Command Workflows
+
+| Command | Auto-Role | Purpose & Action |
+|:---|:---|:---|
+| **`/spec`** | `[ROLE: Product Manager]` | Interrogate requirements, define In-Scope/Out-of-Scope, write testable acceptance criteria. |
+| **`/plan`** | `[ROLE: Architect]` | Decompose spec into atomic tasks (< 2 hrs each), define affected files and test requirements. |
+| **`/build`** | `[ROLE: Senior Developer]` | Implement task-by-task using TDD, minimal blast radius, atomic commits. |
+| **`/test`** | `[ROLE: QA Lead]` | Run unit, integration, and UI behavioral tests covering all edge cases. |
+| **`/simplify`** | `[ROLE: Staff Engineer]` | Run the 7-rung ladder to strip over-engineering, dead abstractions, and premature flexibility. |
+| **`/review`** | `[ROLE: Staff Engineer + Senior Designer]` | Execute the 5-axis quality gate (correctness, architecture, security, performance, design). |
+| **`/ship`** | `[ROLE: Release Engineer]` | Final validation: clean CI, zero lint errors, updated docs, and verified rollback plan. |
+
+---
+
+## Phase 5.5: SIMPLIFY — /simplify
+
+### Auto-activates → `[ROLE: Staff Engineer]` (Ponytail Mindset)
+
+Before merging, ruthlessly simplify:
+1. Did we introduce abstractions that are only used once? (Inline them).
+2. Can 3 lines of vanilla JavaScript replace a 50-line custom utility?
+3. Is any configuration or generic handler premature? (YAGNI).
+4. Is the code obvious to a mid-level engineer without reading a documentation manual?
 
 ---
 
@@ -1753,11 +1777,11 @@ async def test_create_user(client: AsyncClient):
 
 ## Anti-Patterns
 
-- ❌ Business logic in route handlers — use services
-- ❌ Raw SQL without ORM — use SQLAlchemy
-- ❌ Sync database calls — use async drivers
-- ❌ Hardcoded settings — use Pydantic BaseSettings
-- ❌ No schema validation — always use Pydantic models
+- [FAIL] Business logic in route handlers — use services
+- [FAIL] Raw SQL without ORM — use SQLAlchemy
+- [FAIL] Sync database calls — use async drivers
+- [FAIL] Hardcoded settings — use Pydantic BaseSettings
+- [FAIL] No schema validation — always use Pydantic models
 
 
 ## Code Examples
@@ -2358,11 +2382,11 @@ When integrating with legacy or external systems, create an adapter that transla
 
 ## Anti-Patterns
 
-- ❌ Distributed monolith — services that can't deploy independently
-- ❌ Shared database — defeats the purpose
-- ❌ Synchronous chains — A calls B calls C calls D
-- ❌ No versioning — breaking API changes
-- ❌ Premature microservices — start with a modular monolith
+- [FAIL] Distributed monolith — services that can't deploy independently
+- [FAIL] Shared database — defeats the purpose
+- [FAIL] Synchronous chains — A calls B calls C calls D
+- [FAIL] No versioning — breaking API changes
+- [FAIL] Premature microservices — start with a modular monolith
 
 
 ## Code Examples
@@ -2494,11 +2518,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
 ## Anti-Patterns
 
-- ❌ Business logic in controllers — use services
-- ❌ Direct database access in controllers — use repositories
-- ❌ Circular dependencies — refactor module structure
-- ❌ God modules — split large modules by domain
-- ❌ Not using DTOs — always validate input
+- [FAIL] Business logic in controllers — use services
+- [FAIL] Direct database access in controllers — use repositories
+- [FAIL] Circular dependencies — refactor module structure
+- [FAIL] God modules — split large modules by domain
+- [FAIL] Not using DTOs — always validate input
 
 
 ## Code Examples
@@ -2519,103 +2543,120 @@ How this skill interacts with other skills.
 
 ### Skill: Next.js
 
-# Next.js
+# Next.js App Router Best Practices
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces high-performance architectural patterns for Next.js App Router based on Vercel Engineering guidelines: React Server Components (RSC), zero-waterfall async pipelines, request deduplication via `React.cache()`, bundle optimization, and secure Server Actions.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever building, refactoring, or reviewing Next.js pages, layouts, Route Handlers (`app/api`), Server Actions, or components in the `app/` directory.
+
+## Negative Constraints (What NOT to Do)
+
+1. **NEVER use barrel imports for UI libraries**: Avoid `import { Button, Dialog } from '@/components'`. Import directly from the exact file (`import { Button } from '@/components/ui/button'`) to prevent bundler tree-shaking failures and trace bloat.
+2. **NEVER trust client-provided data or session state in Server Actions**: Always authenticate session and authorize tenant ownership inside the Server Action handler itself before mutating data.
+3. **NEVER introduce sequential `await` waterfalls for independent data**: Always use `Promise.all()` or parallel streaming `<Suspense>` boundaries.
+4. **NEVER pass large unneeded serialized data from Server to Client Components**: Only pass the specific primitive fields required by the client component (`server-dedup-props`).
+5. **NEVER use `useEffect` for data fetching**: Fetch directly in Server Components or use TanStack Query / SWR for client-side queries.
+6. **NEVER import server-only modules in client components**: Use the `server-only` package in data access layers to catch accidental client imports at build time.
 
 ## Rules & Patterns
-<!-- Source: nextjs.md -->
 
-## Next.js — Best Practices (App Router)
+### 1. Eliminating Async Waterfalls (Critical)
 
-## Routing
+- **Parallel Fetching**: Fetch independent data concurrently at the top of the route or component.
+- **Granular Streaming**: Wrap slow, non-critical subtrees in `<Suspense fallback={<Skeleton />}>` so critical above-the-fold content streams immediately.
+- **Defer Awaits**: Check cheap synchronous conditions before awaiting remote resources.
 
-- Use **App Router** (`app/` directory) — not Pages Router
-- **Layouts** — shared UI in `layout.tsx`, nested layouts for sections
-- **Loading states** — `loading.tsx` for Suspense boundaries
-- **Error handling** — `error.tsx` for error boundaries per route
-- **Not found** — `not-found.tsx` for 404 pages
+### 2. Request Deduplication & Caching (`server-cache-react`)
 
-## Server vs Client Components
-
-- **Default to Server Components** — they're server by default
-- **Use `'use client'`** only when you need: event handlers, useState, useEffect, browser APIs
-- **Push client boundaries down** — keep as much as possible on the server
-- **Don't pass functions** from Server to Client components
-
-## Data Fetching
-
-- **Server Components** — fetch directly, no useEffect
-- **Server Actions** — for mutations (`'use server'`)
-- **Route Handlers** — `app/api/` for REST endpoints
-- **Parallel fetching** — use Promise.all for independent requests
-- **Caching** — leverage Next.js cache, revalidate strategically
+- Use `React.cache()` to deduplicate identical database or service calls across multiple components rendered in the same server request lifecycle.
 
 ```tsx
-// Server Component — direct fetch
-async function UserProfile({ id }: { id: string }) {
-  const user = await getUser(id); // No useEffect needed
-  return <div>{user.name}</div>;
+import { cache } from 'react';
+import { db } from '@/lib/db';
+
+export const getCurrentUser = cache(async (userId: string) => {
+  return await db.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true, role: true, email: true }
+  });
+});
+```
+
+### 3. Secure Server Actions (`server-auth-actions`)
+
+- Treat every Server Action as a public HTTP endpoint. Always validate session, authorization, and input schema with Zod.
+
+```tsx
+'use server';
+
+import { z } from 'zod';
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { revalidatePath } from 'next/cache';
+
+const UpdateProfileSchema = z.object({
+  name: z.string().min(2).max(50),
+});
+
+export async function updateProfile(formData: FormData) {
+  const session = await auth();
+  if (!session?.userId) throw new Error('Unauthorized');
+
+  const result = UpdateProfileSchema.safeParse({ name: formData.get('name') });
+  if (!result.success) return { error: 'Invalid input', issues: result.error.flatten() };
+
+  await db.user.update({
+    where: { id: session.userId },
+    data: { name: result.data.name },
+  });
+
+  revalidatePath('/settings');
+  return { success: true };
 }
 ```
 
-## File Structure
+### 4. Bundle Optimization & Dynamic Imports (`bundle-dynamic-imports`)
 
+- Heavy interactive client components (charts, rich-text editors, video players) must be dynamically loaded with `next/dynamic`.
+
+```tsx
+import dynamic from 'next/dynamic';
+
+const AnalyticsChart = dynamic(
+  () => import('@/components/analytics/chart').then(mod => mod.AnalyticsChart),
+  {
+    loading: () => <div className="h-64 animate-pulse bg-muted rounded-lg" />,
+    ssr: false,
+  }
+);
 ```
-app/
-├── layout.tsx              # Root layout
-├── page.tsx                # Home page
-├── globals.css
-├── (auth)/                 # Route group (no URL impact)
-│   ├── login/page.tsx
-│   └── register/page.tsx
-├── dashboard/
-│   ├── layout.tsx          # Dashboard layout
-│   ├── page.tsx            # Dashboard home
-│   └── settings/page.tsx
-├── api/
-│   └── users/route.ts      # API route
-└── components/             # Shared components
-```
-
-## Performance
-
-- **Image optimization** — always use `next/image`
-- **Font optimization** — use `next/font`
-- **Metadata** — export metadata object from pages
-- **Static generation** — prefer SSG over SSR when possible
-- **Edge runtime** — for latency-sensitive routes
-
-## Anti-Patterns
-
-- ❌ Using `useEffect` for data fetching in Server Components
-- ❌ Making everything a Client Component
-- ❌ Not using `loading.tsx` and `error.tsx`
-- ❌ Importing server-only code in Client Components
-- ❌ Not leveraging caching and revalidation
-
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed code examples and component templates.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] All database queries in RSC layers use `React.cache()` if called across multiple components.
+- [ ] No barrel imports (`from '@/components'`); all imports point to exact component modules.
+- [ ] Server Actions have explicit auth checks and Zod input validation.
+- [ ] Heavy client widgets (charts, editors) use `next/dynamic`.
+- [ ] Images use `next/image` with explicit `sizes` and `priority` on LCP elements.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Using `'use client'` at page level instead of leaf components.
+- Relying on client-side authentication checks for Server Actions without server-side validation.
+- Chaining sequential awaits for independent data models.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `react` and `ui-ux-pro` for component design and state management.
+- Pairs with `security` for session authorization and input sanitization.
 
 ### Skill: Node.js
 
@@ -2629,7 +2670,7 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
 1. **NEVER execute synchronous filesystem/crypto calls in request handlers (`fs.readFileSync`)**: Always use async promises (`fs.promises.*`) to avoid blocking the event loop.
 2. **NEVER leave uncaught promise rejections**: Every async route must use `express-async-errors` or wrap operations in try/catch calling `next(err)`.
@@ -2747,7 +2788,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Graceful Process Shutdown
 
-### ❌ Anti-pattern (Abruptly killing process and dropping in-flight requests)
+### Anti-pattern: Anti-pattern (Abruptly killing process and dropping in-flight requests)
 
 ```javascript
 // BAD: drops active database transactions and in-flight HTTP connections
@@ -2756,7 +2797,7 @@ process.on('SIGTERM', () => {
 });
 ```
 
-### ✅ ContextOS Standard (Graceful connection draining)
+### Best practice: ContextOS Standard (Graceful connection draining)
 
 ```typescript
 // GOOD: drains active requests, closes database connections, and exits safely
@@ -2796,7 +2837,7 @@ export function setupGracefulShutdown(server: http.Server) {
 
 ## Example 2: Stream-based File Processing
 
-### ❌ Anti-pattern (Loading entire 500MB file into buffer)
+### Anti-pattern: Anti-pattern (Loading entire 500MB file into buffer)
 
 ```typescript
 // BAD: easily causes Out Of Memory (OOM) crashes under concurrency
@@ -2806,7 +2847,7 @@ app.get('/download/:file', async (req, res) => {
 });
 ```
 
-### ✅ ContextOS Standard (Piping read stream with pipeline)
+### Best practice: ContextOS Standard (Piping read stream with pipeline)
 
 ```typescript
 // GOOD: constant memory usage (O(1) RAM) regardless of file size
@@ -2825,88 +2866,75 @@ app.get('/download/:file', async (req, res, next) => {
 ```
 ### Skill: Web Performance
 
-# Web Performance
+# Web Performance & Core Web Vitals
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces high-efficiency frontend and full-stack performance standards to achieve exceptional Core Web Vitals: Largest Contentful Paint (LCP < 2.5s), Interaction to Next Paint (INP < 200ms), and Cumulative Layout Shift (CLS < 0.1).
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever analyzing, profiling, writing, or optimizing page loading speeds, network waterfalls, script bundling, animation frame rates, or data caching.
+
+## Negative Constraints (What NOT to Do)
+
+1. **NEVER introduce async waterfalls**: Do not chain sequential `await` calls when requests can be executed concurrently via `Promise.all()`.
+2. **NEVER import large full libraries when only a utility is needed**: Never `import _ from 'lodash'`; use `import debounce from 'lodash/debounce'` or native alternatives.
+3. **NEVER render images or videos without explicit aspect ratios**: Always provide `width` and `height` or `aspect-ratio` to avoid Cumulative Layout Shift (CLS).
+4. **NEVER trigger synchronous layout thrashing**: Do not alternate between reading layout properties (`offsetHeight`, `getBoundingClientRect`) and writing styles in loops.
+5. **NEVER animate non-composited properties**: Animate only GPU-composited CSS properties (`transform`, `opacity`). Never animate `width`, `height`, `top`, `left`, or `margin`.
 
 ## Rules & Patterns
-<!-- Source: performance.md -->
 
-## Web Performance — Best Practices
+### 1. Vercel Optimization Hierarchy by Impact
 
-## Core Web Vitals
+| Priority | Category | Key Optimization Target | Expected Impact |
+|:---|:---|:---|:---|
+| **1. CRITICAL** | **Eliminating Waterfalls** | Parallel data fetching (`Promise.all`), Suspense streaming | **30–60% faster LCP** |
+| **2. CRITICAL** | **Bundle Size Optimization** | Direct submodule imports, `next/dynamic`, deferring 3rd party scripts | **40–70% smaller initial JS** |
+| **3. HIGH** | **Server-Side & RSC Caching** | `React.cache()` request deduplication, edge SSR caching | **Lower TTFB & DB load** |
+| **4. MEDIUM-HIGH** | **Client Query Optimization** | SWR / TanStack Query stale-while-revalidate, deduplication | **Zero redundant network calls** |
+| **5. MEDIUM** | **Render & DOM Optimization** | Virtualization for large lists, state colocation, `:focus-visible` | **Smooth 60 FPS / INP < 100ms** |
 
-| Metric | Target | What it measures |
-| --- | --- | --- |
-| LCP (Largest Contentful Paint) | < 2.5s | Loading performance |
-| INP (Interaction to Next Paint) | < 200ms | Responsiveness |
-| CLS (Cumulative Layout Shift) | < 0.1 | Visual stability |
+### 2. Eliminating Network Waterfalls
 
-## Loading Performance
+```ts
+// [GOOD] Parallel execution
+const [user, notifications] = await Promise.all([
+  fetchUser(),
+  fetchNotifications(),
+]);
+const posts = await fetchPosts(user.id);
+```
 
-- **Code splitting** — split by route, lazy load non-critical components
-- **Tree shaking** — use ES modules, avoid side-effect imports
-- **Image optimization** — WebP/AVIF, responsive srcset, lazy loading
-- **Font loading** — `font-display: swap`, preload critical fonts
-- **Critical CSS** — inline above-the-fold styles
-- **Preconnect** — `<link rel="preconnect">` for third-party origins
+### 3. Layout Shift & Visual Stability (CLS < 0.1)
 
-## Runtime Performance
-
-- **Avoid layout thrashing** — batch DOM reads and writes
-- **Debounce/throttle** — expensive event handlers (scroll, resize, input)
-- **Web Workers** — offload heavy computation
-- **Virtualize long lists** — render only visible items
-- **Avoid synchronous operations** — use async/await, requestIdleCallback
-
-## Bundle Optimization
-
-- **Analyze bundle** — use webpack-bundle-analyzer or similar
-- **Dynamic imports** — `import()` for heavy libraries
-- **Avoid barrel exports** — they prevent tree shaking
-- **Vendor splitting** — separate vendor chunks for caching
-- **Compression** — Brotli > gzip
-
-## Caching Strategy
-
-| Asset | Cache | Strategy |
-| --- | --- | --- |
-| HTML | Short (5min) | Revalidate |
-| JS/CSS (hashed) | Long (1 year) | Immutable |
-| Images | Long (1 year) | Immutable |
-| API responses | Depends | stale-while-revalidate |
-| Fonts | Long (1 year) | Immutable |
-
-## Anti-Patterns
-
-- ❌ Importing entire libraries (`import _ from 'lodash'`)
-- ❌ Unoptimized images (PNG > 500KB)
-- ❌ Blocking scripts in `<head>` without `defer`
-- ❌ Layout shifts from dynamic content (no dimensions on images)
-- ❌ Premature optimization — measure first, optimize second
-
+- **Images & Video**: Always supply `width`, `height`, and `sizes` or CSS `aspect-ratio: 16 / 9`.
+- **Dynamic Content**: Reserve layout space for dynamically loaded widgets with min-height placeholders or skeletons.
+- **Tabular Numbers**: Use `font-feature-settings: "tnum"` / `font-variant-numeric: tabular-nums` for counters, clocks, and tables to prevent number width jitter.
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed performance patterns and benchmark snippets.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] LCP target is < 2.5s with preloaded critical fonts and LCP image `priority`.
+- [ ] No sequential `await` waterfalls in API routes or Server Components.
+- [ ] All animated elements use only `transform` and `opacity`.
+- [ ] `prefers-reduced-motion` media queries are respected.
+- [ ] Large tables / lists (> 100 items) utilize virtualization.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Chaining independent async requests instead of using `Promise.all`.
+- Animating layout-triggering properties (`height`, `width`, `top`) causing jank.
+- Missing image dimensions causing layout shift when images finish loading.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `nextjs` and `react` for App Router caching and component lifecycle tuning.
+- Pairs with `ui-ux-pro` for smooth animations and responsive design tokens.
 
 ### Skill: ponytail-mindset
 
@@ -2916,11 +2944,11 @@ How this skill interacts with other skills.
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Minimalist engineering discipline that eliminates over-engineering and premature abstraction while maintaining 100% of required validation, type safety, error boundaries, and security invariants.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate on all BUILD phases to prevent bloated implementations and enforce concise, focused solutions.
 
 ## Rules & Patterns
 
@@ -2978,7 +3006,7 @@ The ladder applies to features and abstractions. These 4 areas are **non-negotia
 ### 1. Input Validation
 
 ```javascript
-// ✅ Always validate — even if "internal" API
+// [GOOD] Always validate — even if "internal" API
 function createUser(data) {
   if (!data.email || !isValidEmail(data.email)) {
     throw new ValidationError('Invalid email');
@@ -2986,7 +3014,7 @@ function createUser(data) {
   // ...
 }
 
-// ❌ Never skip validation for "speed"
+// [BAD] Never skip validation for "speed"
 function createUser(data) {
   return db.insert('users', data); // NEVER
 }
@@ -2995,7 +3023,7 @@ function createUser(data) {
 ### 2. Error Handling
 
 ```javascript
-// ✅ Always handle errors explicitly
+// [GOOD] Always handle errors explicitly
 async function fetchUser(id) {
   try {
     const user = await db.findById(id);
@@ -3007,7 +3035,7 @@ async function fetchUser(id) {
   }
 }
 
-// ❌ Never silently swallow errors
+// [BAD] Never silently swallow errors
 async function fetchUser(id) {
   try {
     return await db.findById(id);
@@ -3018,7 +3046,7 @@ async function fetchUser(id) {
 ### 3. Security Guards
 
 ```javascript
-// ✅ Always check authorization before data access
+// [GOOD] Always check authorization before data access
 app.get('/users/:id/data', authMiddleware, async (req, res) => {
   if (req.user.id !== req.params.id && !req.user.isAdmin) {
     return res.status(403).json({ error: 'Forbidden' });
@@ -3026,7 +3054,7 @@ app.get('/users/:id/data', authMiddleware, async (req, res) => {
   // ...
 });
 
-// ❌ Never skip auth for "internal" routes
+// [BAD] Never skip auth for "internal" routes
 app.get('/users/:id/data', async (req, res) => {
   // No auth check — NEVER
 });
@@ -3035,7 +3063,7 @@ app.get('/users/:id/data', async (req, res) => {
 ### 4. Data Loss Prevention
 
 ```javascript
-// ✅ Always confirm before destructive operations
+// [GOOD] Always confirm before destructive operations
 async function deleteAccount(userId) {
   const user = await db.findById(userId);
   if (!user) throw new NotFoundError('User not found');
@@ -3053,7 +3081,7 @@ async function deleteAccount(userId) {
 
 ### The Date Picker Problem
 
-❌ **What AI usually does** (over-build):
+[FAIL] **What AI usually does** (over-build):
 
 ```bash
 npm install flatpickr
@@ -3063,7 +3091,7 @@ npm install flatpickr
 ## Total: 135 lines + 1 dependency
 ```
 
-✅ **Ponytail approach** (use rung 4 — native platform):
+[PASS] **Ponytail approach** (use rung 4 — native platform):
 
 ```html
 <!-- ponytail: browser has one -->
@@ -3076,7 +3104,7 @@ Total: 1 line. 0 dependencies.
 
 ### The Utility Function Problem
 
-❌ **Over-build**:
+[FAIL] **Over-build**:
 
 ```javascript
 // Creates entire utilities.js module
@@ -3087,7 +3115,7 @@ export const StringUtils = {
 };
 ```
 
-✅ **Ponytail** (rung 6 — one line, or rung 2 — already installed):
+[PASS] **Ponytail** (rung 6 — one line, or rung 2 — already installed):
 
 ```javascript
 // If lodash is already installed (rung 5):
@@ -3101,7 +3129,7 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 
 ### The API Client Problem
 
-❌ **Over-build**:
+[FAIL] **Over-build**:
 
 ```javascript
 // Creates: ApiClient.js (200 lines of abstraction)
@@ -3109,14 +3137,14 @@ const label = name.charAt(0).toUpperCase() + name.slice(1);
 // Creates: ApiConfig.js (configuration layer)
 ```
 
-✅ **Ponytail** (rung 3 — stdlib for client APIs):
+[PASS] **Ponytail** (rung 3 — stdlib for client APIs):
 
 ```javascript
 // fetch is built-in. Use it directly.
 const user = await fetch(`/api/users/${id}`).then(r => r.json());
 ```
 
-✅ **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
+[PASS] **Ponytail for Next.js App Router** — skip the API route entirely (rung 2 — use what the framework provides):
 
 ```typescript
 // Instead of: /api/users/[id]/route.ts + fetch wrapper
@@ -3186,141 +3214,139 @@ How this skill interacts with other skills.
 
 ### Skill: React
 
-# React
+# React Engineering & Performance Best Practices
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces declarative, component-driven UI architecture with optimal re-render cycles, state colocation, responsive optimistic updates, and robust accessibility standards.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever creating, refactoring, or optimizing React functional components, custom hooks, context providers, or UI interaction states.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
-1. **NEVER use `useEffect` for derived/calculated state**: Calculate values inline during render or use `useMemo` if computationally expensive.
-2. **NEVER use array index as `key` in dynamic/mutable lists**: Always use stable, unique entity IDs (`user.id`, `item.id`).
-3. **NEVER mutate React state directly**: Always return new immutable copies (`[...prev, newItem]` or `{ ...prev, key: value }`).
-4. **NEVER declare components inside other components**: Always declare subcomponents at the top-level module scope to avoid re-mounting on every render.
-5. **NEVER omit cleanup functions in `useEffect` with event listeners or timers**: Always return a cleanup function (`return () => clearTimeout(timer)`).
+1. **NEVER use `useEffect` to synchronize or compute derived state**: Calculate derived state inline during render. Use `useMemo` only for computationally intensive derivations.
+2. **NEVER use array indices as `key` props on dynamic or reorderable lists**: Always use stable, unique entity identifiers (`item.id`).
+3. **NEVER mutate React state directly**: Always return new immutable references (`[...prev, newItem]` or `{ ...prev, key: value }`).
+4. **NEVER declare subcomponents inside the render body of parent components**: Declare components at module scope or in dedicated files to prevent DOM node remounting and lost focus state.
+5. **NEVER create memory leaks in `useEffect`**: Always provide clean-up functions for event listeners, `AbortController`, timers, and websocket subscriptions.
+6. **NEVER lift state higher than necessary**: Colocate state to the nearest common ancestor or leaf component to prevent wasteful re-renders of unrelated subtrees.
 
 ## Rules & Patterns
 
-## Component Architecture
+### 1. State Colocation & Re-render Optimization
 
-- **Prefer function components** with hooks over class components
-- **One component per file** — name file same as component
-- **Composition over inheritance** — use children and render props
-- **Keep components small** — if > 150 lines, split it
-
-## Hooks
-
-- **useState** for local state, **useReducer** for complex state
-- **useEffect** — always specify dependencies, clean up subscriptions
-- **Custom hooks** — extract reusable logic into `use*` functions
-- **useMemo/useCallback** — only when you have measured a performance problem
-
-## State Management
-
-- **Local state first** — don't reach for global state until you need it
-- **Lift state up** — find the closest common ancestor
-- **Context** — for cross-cutting concerns (theme, auth, locale)
-- **External store** (Zustand, Jotai) — for truly global, frequently updated state
-
-## Patterns
-
-### Container/Presenter
+- **State Colocation**: Keep state as close as possible to the components that consume it.
+- **Composition to Prevent Re-renders**: Pass expensive static subtrees as `children` to wrapper components holding state so the children do not re-render when the wrapper updates.
 
 ```tsx
-// Container — handles logic
-function UserListContainer() {
-  const users = useUsers();
-  return <UserList users={users} />;
+export function ExpandableCard({ title, children }: { title: string; children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border p-4">
+      <button 
+        type="button"
+        onClick={() => setIsOpen(v => !v)}
+        className="flex w-full justify-between font-semibold"
+        aria-expanded={isOpen}
+      >
+        <span>{title}</span>
+        <span>{isOpen ? '−' : '+'}</span>
+      </button>
+      {isOpen && <div className="mt-3 pt-3 border-t">{children}</div>}
+    </div>
+  );
 }
+```
 
-// Presenter — handles display
-function UserList({ users }: { users: User[] }) {
-  return <ul>{users.map(u => <UserItem key={u.id} user={u} />)}</ul>;
+### 2. Optimistic UI Updates & Concurrent Actions (`useOptimistic`, `useTransition`)
+
+- Provide instantaneous visual feedback for user actions without waiting for server network roundtrips.
+
+```tsx
+import { useOptimistic, useTransition } from 'react';
+
+export function TodoList({ todos, onAdd }: { todos: Todo[]; onAdd: (text: string) => Promise<void> }) {
+  const [isPending, startTransition] = useTransition();
+  const [optimisticTodos, addOptimisticTodo] = useOptimistic(
+    todos,
+    (state, newText: string) => [...state, { id: 'temp-' + Date.now(), text: newText, isPending: true }]
+  );
+
+  const handleAction = async (formData: FormData) => {
+    const text = formData.get('todo') as string;
+    if (!text?.trim()) return;
+
+    startTransition(async () => {
+      addOptimisticTodo(text);
+      await onAdd(text);
+    });
+  };
+
+  return (
+    <form action={handleAction} className="space-y-4">
+      <input name="todo" placeholder="Add a new task..." className="border p-2 rounded" />
+      <button type="submit" disabled={isPending} className="bg-primary text-white px-4 py-2 rounded">
+        {isPending ? 'Saving...' : 'Add'}
+      </button>
+      <ul className="divide-y">
+        {optimisticTodos.map(todo => (
+          <li key={todo.id} className={todo.isPending ? 'opacity-50 italic' : ''}>
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </form>
+  );
 }
 ```
 
-### Error Boundaries
+### 3. Derived State vs. Effects Anti-Pattern
 
-- Wrap major sections in Error Boundaries
-- Provide meaningful fallback UI
-- Log errors to monitoring service
+```tsx
+// [GOOD] Computed directly during render (or memoized if expensive)
+function SearchResults({ query, items }: { query: string; items: Item[] }) {
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter(i => i.title.toLowerCase().includes(q));
+  }, [query, items]);
 
-### Loading States
-
-- Always handle: `loading`, `error`, `empty`, `data` states
-- Use Suspense where supported
-- Show skeleton screens, not spinners
-
-## Performance
-
-- **React.memo** — only for expensive renders with stable props
-- **Code splitting** — lazy load routes and heavy components
-- **Virtualization** — for lists > 100 items
-- **Image optimization** — use next/image or lazy loading
-- **Avoid** — inline object/array creation in JSX props
-
-## Anti-Patterns (Avoid)
-
-- ❌ Props drilling more than 2 levels — use Context or state management
-- ❌ useEffect for derived state — use useMemo instead
-- ❌ Index as key — use stable unique IDs
-- ❌ Mutating state directly — always create new references
-- ❌ God components — split into smaller, focused components
-- ❌ Business logic in components — extract to hooks or services
-
-## Testing
-
-- **React Testing Library** — test behavior, not implementation
-- Test user interactions, not component internals
-- Mock API calls, not React hooks
-- Use `screen.getByRole` over `getByTestId`
-
-## File Structure
-
+  return <List items={filtered} />;
+}
 ```
-components/
-  Button/
-    Button.tsx
-    Button.test.tsx
-    Button.module.css
-    index.ts
-hooks/
-  useAuth.ts
-  useDebounce.ts
-services/
-  api.ts
-types/
-  user.ts
-```
-
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed code examples and hook implementations.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] Zero `useEffect` hooks used for derived calculations.
+- [ ] Every list mapping has a unique, non-index entity ID key.
+- [ ] Subcomponents declared in parent render functions are extracted to top-level scope.
+- [ ] Effects with event listeners, timers, or abortable requests include clean-up returns.
+- [ ] Reusable components are composed cleanly via `children` or render props.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Setting state inside `useEffect` based on prop changes rather than deriving values inline.
+- Declaring nested components within component bodies.
+- Using index keys causing input focus loss or animations breaking on list mutations.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `typescript` for type safety on props, generics, and ref forwarding.
+- Pairs with `ui-ux-pro` and `web-accessibility` for UI tokens and ARIA standards.
 
 
 # React Examples — Anti-patterns vs ContextOS Standard
 
 ## Example 1: Derived State vs. useEffect
 
-### ❌ Anti-pattern (Redundant state + extra render with useEffect)
+### Anti-pattern: Anti-pattern (Redundant state + extra render with useEffect)
 
 ```tsx
 // BAD: causes an unnecessary extra render cycle and potential state desync
@@ -3336,7 +3362,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 }
 ```
 
-### ✅ ContextOS Standard (Inline derived calculation / useMemo)
+### Best practice: ContextOS Standard (Inline derived calculation / useMemo)
 
 ```tsx
 // GOOD: calculated instantly during render with zero extra render pass
@@ -3354,7 +3380,7 @@ function OrderSummary({ items }: { items: CartItem[] }) {
 
 ## Example 2: Custom Hook Encapsulation
 
-### ❌ Anti-pattern (Scattered listener logic inside component)
+### Anti-pattern: Anti-pattern (Scattered listener logic inside component)
 
 ```tsx
 // BAD: window listener logic cluttering UI component
@@ -3369,7 +3395,7 @@ function NavHeader() {
 }
 ```
 
-### ✅ ContextOS Standard (Reusable Custom Hook)
+### Best practice: ContextOS Standard (Reusable Custom Hook)
 
 ```tsx
 // GOOD: extracted into a reusable, testable custom hook
@@ -3401,13 +3427,13 @@ export function useScrollThreshold(threshold = 50): boolean {
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces zero-trust defense-in-depth, OWASP Top 10 mitigation, cryptographic hardening, and sensitive data leakage protection across all services and routes.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever writing authentication, authorization, session management, database queries, cryptography, external API integration, or user input handling.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
 1. **NEVER use standard string comparison (`===`) for secrets/hashes**: Always use `crypto.timingSafeEqual` to prevent timing attacks.
 2. **NEVER store sensitive JWT access/refresh tokens in `localStorage`**: Store tokens in `httpOnly`, `Secure`, `SameSite=Strict` cookies.
@@ -3544,7 +3570,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Timing-Safe Secret Verification
 
-### ❌ Anti-pattern (Vulnerable to side-channel timing attack)
+### Anti-pattern: Anti-pattern (Vulnerable to side-channel timing attack)
 
 ```typescript
 // BAD: string comparison returns early on the first mismatched byte
@@ -3553,7 +3579,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 }
 ```
 
-### ✅ ContextOS Standard (Constant-time buffer comparison)
+### Best practice: ContextOS Standard (Constant-time buffer comparison)
 
 ```typescript
 // GOOD: crypto.timingSafeEqual executes in constant time
@@ -3575,7 +3601,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 
 ## Example 2: Preventing IDOR (Insecure Direct Object Reference)
 
-### ❌ Anti-pattern (Trusting client ID without ownership check)
+### Anti-pattern: Anti-pattern (Trusting client ID without ownership check)
 
 ```typescript
 // BAD: any authenticated user can delete any other user's document!
@@ -3585,7 +3611,7 @@ app.delete('/api/documents/:id', requireAuth, async (req, res) => {
 });
 ```
 
-### ✅ ContextOS Standard (Multi-tenant scoped authorization check)
+### Best practice: ContextOS Standard (Multi-tenant scoped authorization check)
 
 ```typescript
 // GOOD: document deletion is strictly scoped to authenticated user or org
@@ -3620,12 +3646,12 @@ Activate when managing asynchronous server data fetching/caching, optimistic UI 
 
 ## Rules & Patterns
 
-### 🎯 The Rule of Two States
+### The Rule of Two States
 
 - **SERVER STATE (Async)**: Managed exclusively by TanStack Query (`useQuery`, `useMutation`). Caching, background refetching, pagination, and invalidation.
 - **CLIENT STATE (Sync)**: Managed by Zustand. Modal visibility, active filters, wizard step, theme.
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER store server-fetched data in Zustand or Redux stores**: Store ONLY client-local UI state in Zustand. All API data belongs in TanStack Query.
 2. **NEVER duplicate derived state**: Compute values inline or via `useMemo` from existing state instead of storing redundant state variables.
@@ -3657,7 +3683,7 @@ Interacts with `react`, `nextjs`, and `typescript`.
 
 ## Example 1: Selecting State from Zustand
 
-### ❌ Anti-pattern (Subscribing to full store causes unnecessary renders)
+### Anti-pattern: Anti-pattern (Subscribing to full store causes unnecessary renders)
 
 ```typescript
 // BAD: component re-renders whenever ANY property in the store changes!
@@ -3667,7 +3693,7 @@ function CartBadge() {
 }
 ```
 
-### ✅ ContextOS Standard (Atomic granular selector)
+### Best practice: ContextOS Standard (Atomic granular selector)
 
 ```typescript
 // GOOD: component ONLY re-renders when itemCount changes
@@ -3681,7 +3707,7 @@ function CartBadge() {
 
 ## Example 2: Server State Invalidation
 
-### ❌ Anti-pattern (Manually syncing server data into global state with useEffect)
+### Anti-pattern: Anti-pattern (Manually syncing server data into global state with useEffect)
 
 ```typescript
 // BAD: manual sync, race conditions, stale cache bugs
@@ -3693,7 +3719,7 @@ function UserProfile({ userId }) {
 }
 ```
 
-### ✅ ContextOS Standard (Declarative TanStack Query caching)
+### Best practice: ContextOS Standard (Declarative TanStack Query caching)
 
 ```typescript
 // GOOD: automatic caching, deduplication, background revalidation
@@ -3810,7 +3836,7 @@ Before spinning up a dedicated Redis instance for caching API responses, check i
 - `unstable_cache()` — server-side data caching with TTL
 
 ```typescript
-// ✅ Use Next.js native caching first
+// [GOOD] Use Next.js native caching first
 import { revalidateTag } from 'next/cache'
 
 const getUser = unstable_cache(
@@ -3823,7 +3849,7 @@ const getUser = unstable_cache(
 await db.users.update(id, data)
 revalidateTag('user-profile')
 
-// ❌ Don't add Redis for simple SSR caching when Next.js handles it
+// [BAD] Don't add Redis for simple SSR caching when Next.js handles it
 ```
 
 ### Database Architecture
@@ -3832,10 +3858,10 @@ revalidateTag('user-profile')
 
 | Scenario | Use SQL | Use NoSQL |
 | ---------- | --------- | ----------- |
-| Complex joins, ACID transactions | ✅ | ❌ |
-| Flexible/evolving schema | ❌ | ✅ |
-| Horizontal scaling needed | Careful | ✅ |
-| Simple key-value lookup | Overkill | ✅ |
+| Complex joins, ACID transactions | [PASS] | [FAIL] |
+| Flexible/evolving schema | [FAIL] | [PASS] |
+| Horizontal scaling needed | Careful | [PASS] |
+| Simple key-value lookup | Overkill | [PASS] |
 | Full-text search | Use Elasticsearch | Use Elasticsearch |
 | Time-series data | TimescaleDB | InfluxDB |
 
@@ -3903,10 +3929,10 @@ When deploying to serverless (Vercel Functions, AWS Lambda) or edge (Vercel Edge
 - **Always** initialize lazily inside the handler, or use a connection pooling service
 
 ```typescript
-// ❌ Wrong: Module-level initialization (runs on cold start, hangs the function)
+// [BAD] Wrong: Module-level initialization (runs on cold start, hangs the function)
 const db = new DatabaseClient({ ... })  // top of file
 
-// ✅ Correct: Lazy initialization with caching
+// [GOOD] Correct: Lazy initialization with caching
 let db: DatabaseClient | null = null
 function getDb() {
   if (!db) db = new DatabaseClient({ ... })
@@ -3934,7 +3960,7 @@ When building web apps, prefer typed client-server communication over generic RE
 For mutations that touch the database directly, skip the API route entirely:
 
 ```typescript
-// ✅ Server Action: No API route needed, fully type-safe
+// [GOOD] Server Action: No API route needed, fully type-safe
 "use server"
 export async function updateUser(id: string, data: UpdateUserInput) {
   // Input validation (always!)
@@ -3949,7 +3975,7 @@ export async function updateUser(id: string, data: UpdateUserInput) {
   return db.users.update(id, validated)
 }
 
-// ❌ Over-engineering: Don't create /api/users/[id] + fetch wrapper for simple mutations
+// [BAD] Over-engineering: Don't create /api/users/[id] + fetch wrapper for simple mutations
 ```
 
 **Option 2: tRPC (Full-stack type safety)**  
@@ -3969,10 +3995,10 @@ When building a public API consumed by external clients or mobile apps — use R
 **Rule**: NEVER write business logic inside API route handlers, Server Actions, or controllers. Always extract to dedicated services/use-cases.
 
 ```
-❌ Wrong structure:
+[FAIL] Wrong structure:
 app/api/orders/route.ts  ← contains: validation + auth + business logic + DB query
 
-✅ Correct structure:
+[PASS] Correct structure:
 app/api/orders/route.ts  ← only: parse request, call service, return response
 src/services/order.service.ts  ← all business logic, testable without HTTP context
 src/repositories/order.repo.ts  ← all DB queries
@@ -3981,7 +4007,7 @@ src/repositories/order.repo.ts  ← all DB queries
 Example:
 
 ```typescript
-// ❌ Business logic in route (untestable, bloated)
+// [BAD] Business logic in route (untestable, bloated)
 export async function POST(req: Request) {
   const data = await req.json()
   if (data.quantity <= 0) return new Response("Invalid", { status: 400 })
@@ -3991,7 +4017,7 @@ export async function POST(req: Request) {
   // ... 40 more lines
 }
 
-// ✅ Thin route, fat service
+// [GOOD] Thin route, fat service
 export async function POST(req: Request) {
   const data = await req.json()
   const result = await orderService.createOrder(data)
@@ -4121,7 +4147,7 @@ Activate for any task involving unit tests, integration tests, E2E testing, TDD/
 
 ## Rules & Patterns
 
-### 🏛️ The ContextOS Testing Pyramid
+### ️ The ContextOS Testing Pyramid
 
 ```
       /\
@@ -4133,7 +4159,7 @@ Activate for any task involving unit tests, integration tests, E2E testing, TDD/
 /-------------\
 ```
 
-### 🚫 Negative Constraints (What NOT to Do)
+### Negative Constraints (What NOT to Do)
 
 1. **NEVER mock internal implementation details**: Mock ONLY external I/O boundaries (HTTP network requests via MSW, Database via test containers or in-memory DB).
 2. **NEVER test implementation details**: In React Testing Library, query by user-facing roles (`getByRole`, `getByLabelText`), NEVER by CSS selectors or internal component state.
@@ -4180,7 +4206,7 @@ Interacts directly with `engineering-workflow` (Verify phase), `react`, and `typ
 
 ## Example 1: React Component Testing
 
-### ❌ Anti-pattern (Brittle query & implementation coupling)
+### Anti-pattern: Anti-pattern (Brittle query & implementation coupling)
 
 ```typescript
 // BAD: querying by CSS class or test-id and testing internal state
@@ -4193,7 +4219,7 @@ test('submits form', async () => {
 });
 ```
 
-### ✅ ContextOS Standard (User-centric role queries & userEvent)
+### Best practice: ContextOS Standard (User-centric role queries & userEvent)
 
 ```typescript
 // GOOD: user-facing roles, userEvent, async wait
@@ -4222,7 +4248,7 @@ test('submits form with valid user credentials', async () => {
 
 ## Example 2: API Mocking with MSW (Mock Service Worker)
 
-### ❌ Anti-pattern (Hardcoded global fetch monkey-patching)
+### Anti-pattern: Anti-pattern (Hardcoded global fetch monkey-patching)
 
 ```typescript
 // BAD: globally overwriting fetch breaks other tests and hides actual contract
@@ -4231,7 +4257,7 @@ global.fetch = vi.fn().mockResolvedValue({
 });
 ```
 
-### ✅ ContextOS Standard (Network boundary mocking)
+### Best practice: ContextOS Standard (Network boundary mocking)
 
 ```typescript
 // GOOD: declarative MSW network handler
@@ -4278,7 +4304,7 @@ A brief summary of what the skill does and its core philosophy.
 
 Context for when this skill is applicable.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
 1. **NEVER use `any`**: Use `unknown` with type guards, discriminated unions, or Zod schemas.
 2. **NEVER use type assertions (`as Type` or `as unknown as Type`) to bypass safety**: Fix the underlying type signature or use runtime narrowing (`instanceof`, `typeof`, `in`).
@@ -4352,11 +4378,11 @@ interface Repository<T extends { id: string }> {
 
 ## Anti-Patterns
 
-- ❌ `any` — use `unknown` + type guards
-- ❌ Type assertions (`as`) — prefer type guards
-- ❌ Non-null assertions (`!`) — handle null explicitly
-- ❌ Enums — prefer union types or `as const` objects
-- ❌ Complex generics without JSDoc — document intent
+- [FAIL] `any` — use `unknown` + type guards
+- [FAIL] Type assertions (`as`) — prefer type guards
+- [FAIL] Non-null assertions (`!`) — handle null explicitly
+- [FAIL] Enums — prefer union types or `as const` objects
+- [FAIL] Complex generics without JSDoc — document intent
 
 
 ## Code Examples
@@ -4380,7 +4406,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Type-Safe Parsing with Zod (No `any`)
 
-### ❌ Anti-pattern (Blind type assertion with `as`)
+### Anti-pattern: Anti-pattern (Blind type assertion with `as`)
 
 ```typescript
 // BAD: using 'as User' bypasses runtime validation completely
@@ -4391,7 +4417,7 @@ async function fetchUser(id: string): Promise<User> {
 }
 ```
 
-### ✅ ContextOS Standard (Runtime schema validation with Zod)
+### Best practice: ContextOS Standard (Runtime schema validation with Zod)
 
 ```typescript
 // GOOD: guaranteed runtime and compile-time type safety
@@ -4419,7 +4445,7 @@ export async function fetchUser(id: string): Promise<User> {
 
 ## Example 2: Discriminated Unions for State Handling
 
-### ❌ Anti-pattern (Optional soup with boolean flags)
+### Anti-pattern: Anti-pattern (Optional soup with boolean flags)
 
 ```typescript
 // BAD: impossible states can be represented (e.g. isLoading: true AND error: 'Failed')
@@ -4430,7 +4456,7 @@ interface AsyncState<T> {
 }
 ```
 
-### ✅ ContextOS Standard (Discriminated Union)
+### Best practice: ContextOS Standard (Discriminated Union)
 
 ```typescript
 // GOOD: impossible states are impossible at compile-time
@@ -4528,14 +4554,14 @@ Context for when this skill is applicable.
 
 ## Anti-Patterns (from Impeccable)
 
-- ❌ Gray text on colored backgrounds — destroys readability
-- ❌ Pure black text on white (#000 on #fff) — too harsh, tint the black
-- ❌ Cards nested inside cards — visual noise
-- ❌ Bounce/elastic easing — feels dated
-- ❌ Icon tile above every heading — SaaS template tell
-- ❌ Purple-to-blue gradient on everything — overused
-- ❌ Using Inter for everything — pick a font that matches your brand
-- ❌ Rounded-square icons everywhere — lack of visual variety
+- [FAIL] Gray text on colored backgrounds — destroys readability
+- [FAIL] Pure black text on white (#000 on #fff) — too harsh, tint the black
+- [FAIL] Cards nested inside cards — visual noise
+- [FAIL] Bounce/elastic easing — feels dated
+- [FAIL] Icon tile above every heading — SaaS template tell
+- [FAIL] Purple-to-blue gradient on everything — overused
+- [FAIL] Using Inter for everything — pick a font that matches your brand
+- [FAIL] Rounded-square icons everywhere — lack of visual variety
 
 ## Dark Mode
 
@@ -4585,14 +4611,14 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 
 ---
 
-## ❌ Absolute Prohibitions (Never Do These)
+## [FAIL] Absolute Prohibitions (Never Do These)
 
 ### Typography Anti-Patterns
 
 - **NEVER** use Arial, Helvetica, or system-ui defaults as primary fonts
 - **NEVER** use Inter as the ONLY font — it is the #1 "AI-generated" visual tell when used alone
-  - ✅ **CORRECT**: If using Inter for primary UI text, ALWAYS pair it with a strong monospace font like `JetBrains Mono` for numbers, code blocks, and technical accents to create a premium SaaS aesthetic (see Vercel, Linear)
-  - ❌ **WRONG**: Inter for headings, body, labels, numbers, captions — everything
+  - [PASS] **CORRECT**: If using Inter for primary UI text, ALWAYS pair it with a strong monospace font like `JetBrains Mono` for numbers, code blocks, and technical accents to create a premium SaaS aesthetic (see Vercel, Linear)
+  - [FAIL] **WRONG**: Inter for headings, body, labels, numbers, captions — everything
 - **NEVER** mix more than 2 font families
 - **ALWAYS** import proper fonts from Google Fonts or similar
 
@@ -4619,7 +4645,7 @@ Inspired by [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelb
 
 ---
 
-## ✅ Required Standards
+## [PASS] Required Standards
 
 ### Accessibility Checklist
 
@@ -4790,7 +4816,7 @@ transform: scale(0.97);
 For complex UI like modals, popovers, layout shifts, and multi-element orchestration, prefer Framer Motion over raw CSS keyframes. Keep animations quick and purposeful:
 
 ```tsx
-// ✅ Modal entrance — use highly damped spring for physical feel (like Vercel/Linear)
+// [GOOD] Modal entrance — use highly damped spring for physical feel (like Vercel/Linear)
 <motion.div
   initial={{ opacity: 0, scale: 0.96, y: 8 }}
   animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -4798,14 +4824,14 @@ For complex UI like modals, popovers, layout shifts, and multi-element orchestra
   transition={{ type: "spring", stiffness: 400, damping: 30 }}
 />
 
-// ✅ List item stagger
+// [GOOD] List item stagger
 <motion.li
   initial={{ opacity: 0, x: -8 }}
   animate={{ opacity: 1, x: 0 }}
   transition={{ duration: 0.2, ease: "easeOut" }}
 />
 
-// ❌ Never use low damping (bouncy feel)
+// [BAD] Never use low damping (bouncy feel)
 transition={{ type: "spring", stiffness: 200, damping: 8 }} // WRONG
 ```
 
@@ -4852,7 +4878,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Accessible Icon Button with Visible Focus States
 
-### ❌ Anti-pattern (Missing accessible name and arbitrary color values)
+### Anti-pattern: Anti-pattern (Missing accessible name and arbitrary color values)
 
 ```tsx
 // BAD: inaccessible to screen readers, missing focus ring, arbitrary hex
@@ -4861,7 +4887,7 @@ How this skill interacts with other skills.
 </button>
 ```
 
-### ✅ ContextOS Standard (Semantic token scales & ARIA label)
+### Best practice: ContextOS Standard (Semantic token scales & ARIA label)
 
 ```tsx
 // GOOD: full keyboard accessibility, semantic tokens, focus-visible ring
@@ -4879,7 +4905,7 @@ How this skill interacts with other skills.
 
 ## Example 2: Stat Card Hierarchy
 
-### ❌ Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
+### Anti-pattern: Anti-pattern (Flat low-contrast layout with purple-gradient cliche)
 
 ```tsx
 // BAD: cliche AI gradient, poor typographic hierarchy
@@ -4889,7 +4915,7 @@ How this skill interacts with other skills.
 </div>
 ```
 
-### ✅ ContextOS Standard (Refined editorial typography & subtle depth)
+### Best practice: ContextOS Standard (Refined editorial typography & subtle depth)
 
 ```tsx
 // GOOD: high contrast, monospace numerical accent, subtle border
@@ -5025,96 +5051,167 @@ How this skill interacts with other skills.
 
 ### Skill: Web Accessibility
 
-# Web Accessibility
+# Web Accessibility & Interface Guidelines
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces universal accessibility compliance (WCAG 2.1 AA / AAA), rigorous semantic markup, keyboard navigability with focus traps, screen reader live regions, and Web Interface Guidelines standards.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever building, styling, or reviewing user interfaces, forms, modals, menus, navigation drawers, custom interactive widgets, or media elements.
+
+## Negative Constraints (What NOT to Do)
+
+1. **NEVER use `outline: none` without a custom `:focus-visible` replacement**: Keyboard users must always have a distinct, high-contrast visual focus ring.
+2. **NEVER use non-semantic elements (`<div onClick>`) for interactive triggers**: Always use native `<button>` or `<a href>`.
+3. **NEVER create modals or dialogs without keyboard focus traps**: Focus must remain trapped inside open dialogs during Tab / Shift-Tab navigation and restore to trigger on close.
+4. **NEVER rely exclusively on color to indicate state or errors**: Always pair colors with text labels, icons, or ARIA attributes (`aria-invalid="true"`).
+5. **NEVER trap screen readers with missing form labels or error associations**: Every input must link to `<label htmlFor="id">` and errors via `aria-describedby`.
+6. **NEVER play animations without honoring `prefers-reduced-motion`**: Respect user OS motion reduction preferences.
 
 ## Rules & Patterns
-<!-- Source: accessibility.md -->
 
-## Web Accessibility — WCAG 2.1 Compliance
+### 1. Focus Visible & High-Contrast Focus Rings
 
-## Principles (POUR)
+```css
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
-1. **Perceivable** — content can be perceived by all users
-2. **Operable** — interface can be operated by all users
-3. **Understandable** — content and interface are understandable
-4. **Robust** — content works across assistive technologies
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+```
 
-## Keyboard Navigation
+### 2. Accessible Modal & Focus Trap Contract
 
-- All interactive elements must be reachable with Tab
-- Focus order must be logical (DOM order)
-- Custom widgets need keyboard handlers (Enter, Space, Escape, Arrow keys)
-- Visible focus indicator on all interactive elements (never `outline: none` without replacement)
-- Skip navigation link for repeated content
+```tsx
+import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
-## Semantic HTML
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  titleId: string;
+  children: React.ReactNode;
+}
 
-- Use `<button>` not `<div onClick>` for actions
-- Use `<a href>` for navigation
-- Use heading hierarchy (`<h1>` → `<h2>` → `<h3>`)
-- Use `<nav>`, `<main>`, `<article>`, `<aside>` landmarks
-- Use `<label>` with every form input
+export function AccessibleModal({ isOpen, onClose, titleId, children }: ModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
-## ARIA (when HTML alone isn't enough)
+  useEffect(() => {
+    if (!isOpen) return;
+    triggerRef.current = document.activeElement as HTMLElement;
 
-- `aria-label` — label for screen readers when no visible text
-- `aria-labelledby` — reference to existing visible text
-- `aria-describedby` — additional description
-- `aria-live="polite"` — announce dynamic changes
-- `aria-expanded` — for collapsible sections
-- `aria-hidden="true"` — hide decorative elements
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
 
-**Rule: no ARIA is better than bad ARIA.** Use semantic HTML first.
+      if (e.key === 'Tab') {
+        const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) || [];
+        if (!focusables.length) return;
 
-## Color and Contrast
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
 
-- Text contrast: 4.5:1 minimum (AA), 7:1 (AAA)
-- Large text (18px+ bold, 24px+ regular): 3:1 minimum
-- Never use color alone to convey information
-- Test with grayscale filter
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
 
-## Images
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      triggerRef.current?.focus();
+    };
+  }, [isOpen, onClose]);
 
-- All images need `alt` text
-- Decorative images: `alt=""`
-- Complex images: `aria-describedby` with longer description
-- SVG icons: `role="img"` + `aria-label`
+  if (!isOpen) return null;
 
-## Forms
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div 
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="w-full max-w-lg rounded-xl bg-background p-6 shadow-2xl border"
+      >
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+}
+```
 
-- Every input needs a visible `<label>`
-- Error messages linked with `aria-describedby`
-- Required fields marked with `aria-required="true"`
-- Group related fields with `<fieldset>` + `<legend>`
+### 3. Accessible Forms & Error Association
 
-## Testing
+```tsx
+export function EmailInput({ error, ...props }: { error?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const inputId = 'user-email';
+  const errorId = 'user-email-error';
 
-- Automated: axe-core, Lighthouse accessibility audit
-- Manual: keyboard-only navigation test
-- Screen reader: test with NVDA (Windows), VoiceOver (Mac)
-- Zoom: test at 200% and 400% zoom
-
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={inputId} className="text-sm font-medium">
+        Email Address <span aria-hidden="true" className="text-destructive">*</span>
+      </label>
+      <input
+        id={inputId}
+        type="email"
+        autoComplete="email"
+        required
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className="rounded-md border p-2 text-sm focus-visible:ring-2"
+        {...props}
+      />
+      {error && (
+        <p id={errorId} role="alert" className="text-xs text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+```
 
 ## Code Examples
 
-See `EXAMPLES.md` for detailed code examples.
+See `EXAMPLES.md` for detailed dialog, menu, and form examples.
 
 ## Validation Checklist
 
-What to verify during the review phase before completing the task.
+- [ ] All interactive elements are fully operable via Keyboard (`Tab`, `Enter`, `Space`, `Escape`).
+- [ ] Visual `:focus-visible` styling is distinct and high contrast (≥ 3:1).
+- [ ] Modals use `role="dialog"`, `aria-modal="true"`, focus trap, and restore focus on close.
+- [ ] Text contrast ratios satisfy WCAG AA (≥ 4.5:1 for normal text, ≥ 3:1 for large text).
+- [ ] Forms pair inputs with `<label htmlFor>`, valid `autocomplete` tokens, and `aria-invalid`.
+- [ ] Non-text media contains descriptive `alt` attributes or `aria-hidden="true"` for decorative icons.
 
 ## Common Mistakes
 
-Anti-patterns and things to explicitly avoid. See `TROUBLESHOOTING.md`.
+- Hiding outline focus indicators globally without `:focus-visible` fallback.
+- Forgetting to trap focus in modal dialogs or not returning focus to trigger when modal closes.
+- Missing `aria-expanded` attributes on disclosure buttons and dropdown toggles.
 
 ## Integration Notes
 
-How this skill interacts with other skills.
+- Pairs with `ui-ux-pro` and `impeccable-design` for visual contrast and component standards.
+- Pairs with `react` and `nextjs` for accessible dialogs and focus restoration across route transitions.

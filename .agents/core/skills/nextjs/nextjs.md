@@ -60,8 +60,8 @@ app/
 
 ## Anti-Patterns
 
-- ❌ Using `useEffect` for data fetching in Server Components
-- ❌ Making everything a Client Component
-- ❌ Not using `loading.tsx` and `error.tsx`
-- ❌ Importing server-only code in Client Components
-- ❌ Not leveraging caching and revalidation
+- [FAIL] Using `useEffect` for data fetching in Server Components
+- [FAIL] Making everything a Client Component
+- [FAIL] Not using `loading.tsx` and `error.tsx`
+- [FAIL] Importing server-only code in Client Components
+- [FAIL] Not leveraging caching and revalidation

@@ -2,13 +2,13 @@
 
 ## Overview
 
-A brief summary of what the skill does and its core philosophy.
+Enforces zero-trust defense-in-depth, OWASP Top 10 mitigation, cryptographic hardening, and sensitive data leakage protection across all services and routes.
 
 ## When to Use
 
-Context for when this skill is applicable.
+Activate whenever writing authentication, authorization, session management, database queries, cryptography, external API integration, or user input handling.
 
-## 🚫 Negative Constraints (What NOT to Do)
+## Negative Constraints (What NOT to Do)
 
 1. **NEVER use standard string comparison (`===`) for secrets/hashes**: Always use `crypto.timingSafeEqual` to prevent timing attacks.
 2. **NEVER store sensitive JWT access/refresh tokens in `localStorage`**: Store tokens in `httpOnly`, `Secure`, `SameSite=Strict` cookies.
@@ -145,7 +145,7 @@ How this skill interacts with other skills.
 
 ## Example 1: Timing-Safe Secret Verification
 
-### ❌ Anti-pattern (Vulnerable to side-channel timing attack)
+### Anti-pattern: Anti-pattern (Vulnerable to side-channel timing attack)
 
 ```typescript
 // BAD: string comparison returns early on the first mismatched byte
@@ -154,7 +154,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 }
 ```
 
-### ✅ ContextOS Standard (Constant-time buffer comparison)
+### Best practice: ContextOS Standard (Constant-time buffer comparison)
 
 ```typescript
 // GOOD: crypto.timingSafeEqual executes in constant time
@@ -176,7 +176,7 @@ export function verifyApiKey(providedKey: string, storedKey: string): boolean {
 
 ## Example 2: Preventing IDOR (Insecure Direct Object Reference)
 
-### ❌ Anti-pattern (Trusting client ID without ownership check)
+### Anti-pattern: Anti-pattern (Trusting client ID without ownership check)
 
 ```typescript
 // BAD: any authenticated user can delete any other user's document!
@@ -186,7 +186,7 @@ app.delete('/api/documents/:id', requireAuth, async (req, res) => {
 });
 ```
 
-### ✅ ContextOS Standard (Multi-tenant scoped authorization check)
+### Best practice: ContextOS Standard (Multi-tenant scoped authorization check)
 
 ```typescript
 // GOOD: document deletion is strictly scoped to authenticated user or org

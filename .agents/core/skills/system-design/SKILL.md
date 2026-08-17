@@ -85,7 +85,7 @@ Before spinning up a dedicated Redis instance for caching API responses, check i
 - `unstable_cache()` — server-side data caching with TTL
 
 ```typescript
-// ✅ Use Next.js native caching first
+// [GOOD] Use Next.js native caching first
 import { revalidateTag } from 'next/cache'
 
 const getUser = unstable_cache(
@@ -98,7 +98,7 @@ const getUser = unstable_cache(
 await db.users.update(id, data)
 revalidateTag('user-profile')
 
-// ❌ Don't add Redis for simple SSR caching when Next.js handles it
+// [BAD] Don't add Redis for simple SSR caching when Next.js handles it
 ```
 
 ### Database Architecture
@@ -107,10 +107,10 @@ revalidateTag('user-profile')
 
 | Scenario | Use SQL | Use NoSQL |
 | ---------- | --------- | ----------- |
-| Complex joins, ACID transactions | ✅ | ❌ |
-| Flexible/evolving schema | ❌ | ✅ |
-| Horizontal scaling needed | Careful | ✅ |
-| Simple key-value lookup | Overkill | ✅ |
+| Complex joins, ACID transactions | [PASS] | [FAIL] |
+| Flexible/evolving schema | [FAIL] | [PASS] |
+| Horizontal scaling needed | Careful | [PASS] |
+| Simple key-value lookup | Overkill | [PASS] |
 | Full-text search | Use Elasticsearch | Use Elasticsearch |
 | Time-series data | TimescaleDB | InfluxDB |
 
@@ -178,10 +178,10 @@ When deploying to serverless (Vercel Functions, AWS Lambda) or edge (Vercel Edge
 - **Always** initialize lazily inside the handler, or use a connection pooling service
 
 ```typescript
-// ❌ Wrong: Module-level initialization (runs on cold start, hangs the function)
+// [BAD] Wrong: Module-level initialization (runs on cold start, hangs the function)
 const db = new DatabaseClient({ ... })  // top of file
 
-// ✅ Correct: Lazy initialization with caching
+// [GOOD] Correct: Lazy initialization with caching
 let db: DatabaseClient | null = null
 function getDb() {
   if (!db) db = new DatabaseClient({ ... })
@@ -209,7 +209,7 @@ When building web apps, prefer typed client-server communication over generic RE
 For mutations that touch the database directly, skip the API route entirely:
 
 ```typescript
-// ✅ Server Action: No API route needed, fully type-safe
+// [GOOD] Server Action: No API route needed, fully type-safe
 "use server"
 export async function updateUser(id: string, data: UpdateUserInput) {
   // Input validation (always!)
@@ -224,7 +224,7 @@ export async function updateUser(id: string, data: UpdateUserInput) {
   return db.users.update(id, validated)
 }
 
-// ❌ Over-engineering: Don't create /api/users/[id] + fetch wrapper for simple mutations
+// [BAD] Over-engineering: Don't create /api/users/[id] + fetch wrapper for simple mutations
 ```
 
 **Option 2: tRPC (Full-stack type safety)**  
@@ -244,10 +244,10 @@ When building a public API consumed by external clients or mobile apps — use R
 **Rule**: NEVER write business logic inside API route handlers, Server Actions, or controllers. Always extract to dedicated services/use-cases.
 
 ```
-❌ Wrong structure:
+[FAIL] Wrong structure:
 app/api/orders/route.ts  ← contains: validation + auth + business logic + DB query
 
-✅ Correct structure:
+[PASS] Correct structure:
 app/api/orders/route.ts  ← only: parse request, call service, return response
 src/services/order.service.ts  ← all business logic, testable without HTTP context
 src/repositories/order.repo.ts  ← all DB queries
@@ -256,7 +256,7 @@ src/repositories/order.repo.ts  ← all DB queries
 Example:
 
 ```typescript
-// ❌ Business logic in route (untestable, bloated)
+// [BAD] Business logic in route (untestable, bloated)
 export async function POST(req: Request) {
   const data = await req.json()
   if (data.quantity <= 0) return new Response("Invalid", { status: 400 })
@@ -266,7 +266,7 @@ export async function POST(req: Request) {
   // ... 40 more lines
 }
 
-// ✅ Thin route, fat service
+// [GOOD] Thin route, fat service
 export async function POST(req: Request) {
   const data = await req.json()
   const result = await orderService.createOrder(data)

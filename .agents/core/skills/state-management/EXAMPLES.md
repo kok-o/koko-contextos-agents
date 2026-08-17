@@ -2,7 +2,7 @@
 
 ## Example 1: Selecting State from Zustand
 
-### ❌ Anti-pattern (Subscribing to full store causes unnecessary renders)
+### Anti-pattern: Anti-pattern (Subscribing to full store causes unnecessary renders)
 
 ```typescript
 // BAD: component re-renders whenever ANY property in the store changes!
@@ -12,7 +12,7 @@ function CartBadge() {
 }
 ```
 
-### ✅ ContextOS Standard (Atomic granular selector)
+### Best practice: ContextOS Standard (Atomic granular selector)
 
 ```typescript
 // GOOD: component ONLY re-renders when itemCount changes
@@ -26,7 +26,7 @@ function CartBadge() {
 
 ## Example 2: Server State Invalidation
 
-### ❌ Anti-pattern (Manually syncing server data into global state with useEffect)
+### Anti-pattern: Anti-pattern (Manually syncing server data into global state with useEffect)
 
 ```typescript
 // BAD: manual sync, race conditions, stale cache bugs
@@ -38,7 +38,7 @@ function UserProfile({ userId }) {
 }
 ```
 
-### ✅ ContextOS Standard (Declarative TanStack Query caching)
+### Best practice: ContextOS Standard (Declarative TanStack Query caching)
 
 ```typescript
 // GOOD: automatic caching, deduplication, background revalidation

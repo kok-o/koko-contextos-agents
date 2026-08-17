@@ -90,14 +90,14 @@ Context for when this skill is applicable.
 
 ## Anti-Patterns (from Impeccable)
 
-- ❌ Gray text on colored backgrounds — destroys readability
-- ❌ Pure black text on white (#000 on #fff) — too harsh, tint the black
-- ❌ Cards nested inside cards — visual noise
-- ❌ Bounce/elastic easing — feels dated
-- ❌ Icon tile above every heading — SaaS template tell
-- ❌ Purple-to-blue gradient on everything — overused
-- ❌ Using Inter for everything — pick a font that matches your brand
-- ❌ Rounded-square icons everywhere — lack of visual variety
+- [FAIL] Gray text on colored backgrounds — destroys readability
+- [FAIL] Pure black text on white (#000 on #fff) — too harsh, tint the black
+- [FAIL] Cards nested inside cards — visual noise
+- [FAIL] Bounce/elastic easing — feels dated
+- [FAIL] Icon tile above every heading — SaaS template tell
+- [FAIL] Purple-to-blue gradient on everything — overused
+- [FAIL] Using Inter for everything — pick a font that matches your brand
+- [FAIL] Rounded-square icons everywhere — lack of visual variety
 
 ## Dark Mode
 
